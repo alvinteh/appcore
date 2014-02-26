@@ -1,0 +1,49 @@
+.wf-loading {
+    opacity: 0 !important;
+}
+
+.wf-active, .wf-inactive {
+    @include transition(opacity 1s ease-out);
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    height: 100%;
+    font-family: Helvetica, Arial, sans-serif;
+    background: #777777;
+}
+
+#wrapper {
+    margin: 0 auto;
+    width: 980px;
+    height: auto !important;
+    height: 100%;
+    min-height: 100%;
+    background: #ffffff;
+}
+
+#header {
+    margin: 0 0 20px;
+    padding: 10px;
+    height: 30px;
+    background: #cccccc;
+}
+
+#header-title {
+    margin: 0;
+    height: 30px;
+    font-size: 28px;
+    line-height: 30px;
+}
+
+#footer {
+    padding: 10px;
+    height: 15px;
+    line-height: 15px;
+    background: #333333;
+    color: #ffffff;
+    font-size: 10px;
+}

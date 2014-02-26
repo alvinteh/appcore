@@ -1,0 +1,24 @@
+{
+    "name": "appcore",
+    "version": "0.0.1",
+    "ignore": [
+        "**/.*",
+        "build",
+        "test",
+        "*.md",
+        "Gruntfile.js",
+        "package.json",
+        "bower.json"
+    ],
+    "keywords": [
+        "appcore",
+        "javascript",
+        "mvc"
+    ],
+    "dependencies": {
+        "requirejs": "~2.1.9",
+        "jquery": ">=2.0"
+    },
+    "devDependencies": {
+    }
+}

@@ -1,0 +1,65 @@
+/*
+ * General helper styles
+ */
+ 
+.ir {
+    display: block;
+    border: 0;
+    text-indent: -999em;
+    overflow: hidden;
+    background-color: transparent;
+    background-repeat: no-repeat;
+    text-align: left;
+    direction: ltr;
+    *line-height: 0;
+}
+
+.clearfix:before, .clearfix:after {
+    content: "";
+    display: table;
+}
+
+.clearfix:after {
+    clear: both;
+}
+
+.clearfix {
+    *zoom: 1;
+}
+
+
+/*
+ * General app styles
+ */
+
+body {
+    position: relative;
+}
+
+#wrapper {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    width: 100%
+}
+
+a img {
+    border: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+}
+
+input:focus, textarea:focus, select:focus {
+    outline: 0;
+}
+
+p  {
+    margin: 0 0 10px;
+    text-align: justify;
+}
+
+textarea {
+    resize: none;
+}

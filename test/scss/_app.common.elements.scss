@@ -1,0 +1,114 @@
+fieldset {
+    margin: 0;
+    border: 0;
+    padding: 0;
+}
+
+h2 {
+    margin: 0 0 20px;
+    padding: 0 0 4px;
+    font-size: 20px;
+    line-height: 20px;
+    border-bottom: solid 1px #999999;
+}
+
+.section {
+    padding: 0 10px 50px;
+}
+
+.input-button {
+    box-sizing: border-box;
+    height: 25px;
+    border: solid 1px #999999;
+    padding: 3px 10px;
+    font-size: 12px;
+    line-height: 17px;
+    background: #cccccc;
+    text-align: center;
+}
+
+.input-field {
+    position: relative;
+    margin: 0  0 10px;
+    @include clearfix;
+}
+
+.input-general {
+    display: block;
+    float: left;
+    border-color: #999999;
+    font-size: 12px;
+}
+
+.input-label {
+    display: block;
+    position: relative;
+    float: left;
+    margin: 0 10px 0 0;
+    width: 200px;
+    min-height: 25px;
+    line-height: 25px;
+    text-align: right;
+
+    &:after {
+        content: ":";
+    }
+}
+
+.input-select {
+    display: block;
+    float: left;
+    box-sizing: content-box;
+    width: 142px;
+    height: 17px;
+    border: solid 1px #999999;
+    padding: 3px;
+    font-size: 12px;
+    line-height: 17px;
+}
+
+.input-select-multiple {
+    display: block;
+    float: left;
+    box-sizing: content-box;
+    width: 142px;
+    height: 51px;
+    border: solid 1px #999999;
+    padding: 3px;
+    font-size: 12px;
+    line-height: 17px;
+}
+
+.input-text {
+    display: block;
+    float: left;
+    box-sizing: content-box;
+    width: 142px;
+    height: 17px;
+    border: solid 1px #999999;
+    padding: 3px;
+    font-size: 12px;
+    line-height: 17px;
+}
+
+.input-textarea {
+    display: block;
+    float: left;
+    box-sizing: content-box;
+    width: 272px;
+    height: 127px;
+    border: solid 1px #999999;
+    padding: 3px;
+    font-size: 12px;
+    line-height: 17px;
+}
+
+.input-value {
+    display: block;
+    position: relative;
+    float: left;
+    margin: 0 10px 0 0;
+    width: 250px;
+    min-height: 25px;
+    line-height: 25px;
+}
