@@ -39,6 +39,85 @@ define(function(require) {
         return this;
     };
 
+    //Public instance members
+    /*
+        @function addMethod
+
+        Adds the specified method to the specified model's prototype.
+
+        @param {object} model       The desired model
+        @param {string} name        The desired method name
+        @param {string} method      The desired method
+    */
+    Model.addMethod = function(model, name, method) {
+        model.prototype[name] = method;
+    };
+
+    /*
+        @function removeMethod
+
+        Removes the specified method from the specified model's prototype.
+
+        @param {object} model       The desired model
+        @param {string} name        The desired method name
+    */
+    Model.removeMethod = function(model, name) {
+        delete model.prototype[name];
+    };
+
+    /*
+        @function hasMethod
+
+        Checks if the specified method exists in the specified model's prototype.
+
+        @param {object} model       The desired model
+        @param {string} name        The desired method name
+
+        @return {boolean}
+    */
+    Model.hasMethod = function(model, name) {
+        return typeof model.prototype[name] === "function";
+    };
+
+    /*
+        @function addStaticMethod
+
+        Adds the specified method to the specified model.
+
+        @param {object} model       The desired model
+        @param {string} name        The desired method name
+        @param {string} method      The desired method
+    */
+    Model.addStaticMethod = function(model, name, method) {
+        model[name] = method;
+    };
+
+    /*
+        @function removeStaticMethod
+
+        Removes the specified method from the specified model.
+
+        @param {object} model       The desired model
+        @param {string} name        The desired method name
+    */
+    Model.removeMethod = function(model, name) {
+        delete model[name];
+    };
+
+    /*
+        @function hasStaticMethod
+
+        Checks if the specified method exists in the specified model.
+
+        @param {object} model       The desired model
+        @param {string} name        The desired method name
+
+        @return {boolean}
+    */
+    Model.hasStaticMethod = function(model, name) {
+        return typeof model[name] === "function" && typeof model.prototype[name] !== "function";
+    };
+
     Model.prototype = (function(prototype) {
         //Private static members
         //(None)
@@ -108,42 +187,6 @@ define(function(require) {
         */
         prototype.setId = function(id) {
             this[_getAttributes](_key).id = id;
-        };
-
-        /*
-            @function addMethod
-
-            Adds the specified method to the prototype.
-
-            @param {string} name        The desired method name
-            @param {string} method      The desired method
-        */
-        prototype.addMethod = function(name, method) {
-            this.prototype[name] = method;
-        };
-
-        /*
-            @function removeMethod
-
-            Removes the specified method from the prototype.
-
-            @param {string} name        The desired method name
-        */
-        prototype.removeMethod = function(name) {
-            delete this.prototype[name];
-        };
-
-        /*
-            @function hasMethod
-
-            Checks if the specified method exists.
-
-            @param {string} name        The desired method name
-
-            @return {boolean}
-        */
-        prototype.hasMethod = function(name) {
-            return typeof this.prototype[name] === "function";
         };
 
         /*
