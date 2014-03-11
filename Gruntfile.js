@@ -13,6 +13,9 @@ module.exports = function(grunt) {
             }
         },
         clean: {
+            dev: {
+                src: ["test/dependencies/appcore"]
+            },
             dist: {
                 src: ["dist"]
             },
@@ -65,12 +68,12 @@ module.exports = function(grunt) {
         watch: {
             test: {
                 files: "src/**/*.js",
-                tasks: ["jshint:test", "copy:test"]
+                tasks: ["jshint:test", "clean:dev", "copy:test"]
             }
         }
     });
 
-    require('load-grunt-tasks')(grunt);
+    require("load-grunt-tasks")(grunt);
 
     grunt.registerTask("default", ["clean:test", "bower:test", "copy:test", "clean:dist", "requirejs:distNormal", "requirejs:distMin"]);
     grunt.registerTask("test", ["jshint:test", "clean:test", "bower:test", "copy:test"]);
