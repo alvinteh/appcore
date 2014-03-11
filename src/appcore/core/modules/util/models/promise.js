@@ -21,22 +21,25 @@ define(function(require) {
 
         Constructs a Promise instance.
     */
-    var Promise = Ac.Model.create(["state", "value", "queue"], function(func) {
-        var me = this;
+    var Promise = Ac.Model.create(
+        ["state", "value", "queue"],
+        function(func) {
+            var me = this;
 
-        me.set({
-            "state": STATE.UNFULFILLED,
-            "queue": []
-         });
+            me.set({
+                state: STATE.UNFULFILLED,
+                queue: []
+             });
 
-        if (func) {
-            func(function(value) {
-                me.resolve(value);
-            }, function(error) {
-                me.transition(STATE.REJECTED, error);
-            });
+            if (func) {
+                func(function(value) {
+                    me.resolve(value);
+                }, function(error) {
+                    me.transition(STATE.REJECTED, error);
+                });
+            }
         }
-    });
+    );
 
     /*
         @function run
