@@ -10,8 +10,6 @@ define(function(require) {
         @classdesc Promise class.
     */
 
-    var letter = 64;
-
     var STATE = {
         UNFULFILLED: 0,
         FULFILLED: 1,
@@ -23,11 +21,10 @@ define(function(require) {
 
         Constructs a Promise instance.
     */
-    var Promise = Ac.Model.create(["id", "state", "value", "queue"], function(func) {
+    var Promise = Ac.Model.create(["state", "value", "queue"], function(func) {
         var me = this;
 
         me.set({
-            "id": String.fromCharCode(++letter),
             "state": STATE.UNFULFILLED,
             "queue": []
          });
