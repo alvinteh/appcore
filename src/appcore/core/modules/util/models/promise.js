@@ -139,11 +139,11 @@ define(function(require) {
         }
         else if (x && x instanceof Promise) {
             if (x.get("state") === STATE.UNFULFILLED) {
-                var promise = this;
+                var me = this;
                 x.then(function(value) {
-                    promise.resolve(value);
+                    me.resolve(value);
                 }, function(error) {
-                    promise.transition(STATE.REJECTED, error);
+                    me.transition(STATE.REJECTED, error);
                 });
             }
             else {
@@ -195,6 +195,15 @@ define(function(require) {
         this.transition(STATE.REJECTED, error);
     });
 
+
+    /*
+        @function convert
+
+        Convets the specified function (assuming its signature follows the format func(callback, error, value) to use
+        promises).
+
+        @param {mixed} func     The desired function
+    */
     Promise.addStaticMethod("convert", function(func) {
         return function() {
             var context = this;
@@ -203,19 +212,6 @@ define(function(require) {
             return new Promise(function(fulfillCallback, rejectCallback) {
                 func.apply(context, [fulfillCallback, rejectCallback].concat(args));
             });
-        };
-    });
-
-    Promise.addStaticMethod("getDeferred", function() {
-        var resolve, reject;
-
-        return {
-            promise: new Promise(function(res, rej) {
-                resolve = res;
-                reject = rej;
-            }),
-            resolve: resolve,
-            reject: reject
         };
     });
 
