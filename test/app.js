@@ -6,14 +6,15 @@ require.config({
     }
 });
 
-require(["appcore/appcore"], function(Ac) {
+require(["appcore/appcore", "appcore/core/modules/util/models/promise"], function(Ac, Promise) {
+	/*
     //Define User class
     var User = Ac.Model.create(["name", "age"], function(name) {
         this.set("name", name);
         this.set("age", 10);
     });
 
-    User.prototype.greet = function() {
+    User.addMethod("greet", function() {
         console.log("Hello, I am " + this.getName() + " and I am " + this.getAge() + "!");
     };
 
@@ -28,6 +29,55 @@ require(["appcore/appcore"], function(Ac) {
     view1.addDataBinding(p1, function() { return p1.getName() + "!!!"; }, "value");
     view2.addDataBinding(p1, "name", "innerHTML");
     p1.setName("Bob");
+    */
+
+    var testX = Promise.convert(function(callback, error, value) {
+    	setTimeout(function() {
+    		value = 10;
+    		console.log("Initial value = " + value);
+    		callback(value);
+    	}, 0);
+    });
+
+    function testY1(value) {
+    	return new Promise(function(resolve, reject) {
+    		setTimeout(function() {
+    			value += 1;
+    			alert("value + 1 = " + value);
+    			resolve(value);
+    		}, 25);
+    	});
+    }
+
+    function testY2(value) {
+    	return new Promise(function(resolve, reject) {
+    		setTimeout(function() {
+    			value += 2;
+    			alert("value + 2 = " + value);
+    			resolve(value);
+    		}, 50);
+    	});
+    }
+
+    function testY3(value) {
+    	return new Promise(function(resolve, reject) {
+    		setTimeout(function() {
+    			value += 3;
+    			alert("value + 3 = " + value);
+    			resolve(value);
+    		}, 75);
+    	});
+    }
+
+
+    testX()
+    .then(testY1)
+    .then(testY2)
+    .then(testY3)
+    .then(function(value) {
+    	alert("Final value = " + value);
+    });
+
 });
 
 /*
