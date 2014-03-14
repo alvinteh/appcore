@@ -33,8 +33,6 @@ define(function(require) {
 
                 //Implement method manipulation methods
                 childClass.addStaticMethod = function(name, method) {
-                    console.log("Adding to", childClass);
-                    console.log(method);
                     Helper.addStaticMethod(childClass, name, method);
                 };
 
