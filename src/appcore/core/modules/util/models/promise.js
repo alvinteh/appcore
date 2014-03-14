@@ -122,7 +122,7 @@ define(function(require) {
         });
 
         run(this);
-        
+
         return promise;
     });
 
@@ -208,7 +208,7 @@ define(function(require) {
         return function() {
             var context = this;
             var args = [].slice.call(arguments);
-            
+
             return new Promise(function(fulfillCallback, rejectCallback) {
                 func.apply(context, [fulfillCallback, rejectCallback].concat(args));
             });
