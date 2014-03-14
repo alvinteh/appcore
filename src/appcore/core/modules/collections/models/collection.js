@@ -30,7 +30,7 @@ define(function(require) {
              });
         }
     );
-    
+
     //Private static members
     /*
         @function normalizePredicates
@@ -55,7 +55,7 @@ define(function(require) {
     */
     var normalizePredicates = function(predicates) {
         var ret = predicates;
-        
+
         if (!predicates instanceof Array) {
             ret = [];
 
@@ -513,13 +513,13 @@ define(function(require) {
 
         Removes the specified item from the collection.
 
-        @param {object} item        The desired item
+        @param {object|int} item        The desired item or its identifier
     */
     Collection.addMethod("removeItem", function(item) {
         var items = this.get("items");
 
         for (var i = 0, length = items.length; i < length; i++) {
-            if (items[i] === item) {
+            if (i === item || items[i] === item) {
                 delete items[i];
                 break;
             }
