@@ -1,33 +1,32 @@
 define(function() {
     "use strict";
 
-    return (function() {
-        return {
-            /*
-                @function getGetter
+    var Ac = require("../../../../appcore");
+    var coreModelHelper = require("../../core/helpers/model-helper");
 
-                Gets the name of the getter method of the specified attribute.
+    var ModelHelper = Ac.Helper.create("Model");
 
-                @param {string} attribute       The desired attribute
+    /*
+        @function getGetter
 
-                @return {string}
-            */
-            getGetter: function(attribute) {
-                return "get" + attribute.charAt(0).toUpperCase() + attribute.substring(1);
-            },
+        Gets the name of the getter method of the specified attribute.
 
-            /*
-                @function getSetter
+        @param {string} attribute       The desired attribute
 
-                Gets the name of the setter method of the specified attribute.
+        @return {string}
+    */
+    ModelHelper.addStaticMethod("getGetter", coreModelHelper.getGetter);
 
-                @param {string} attribute       The desired attribute
+    /*
+        @function getSetter
 
-                @return {string}
-            */
-            getSetter: function(attribute) {
-                return "set" + attribute.charAt(0).toUpperCase() + attribute.substring(1);
-            }
-        };
-    })();
+        Gets the name of the setter method of the specified attribute.
+
+        @param {string} attribute       The desired attribute
+
+        @return {string}
+    */
+    ModelHelper.addStaticMethod("getSetter", coreModelHelper.getSetter);
+
+    return ModelHelper;
 });

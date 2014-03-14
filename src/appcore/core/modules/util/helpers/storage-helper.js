@@ -1,43 +1,45 @@
-define(function() {
+define(function(require) {
     "use strict";
 
-    return (function() {
-        return {
-            /*
-                @function set
+    var Ac = require("../../../../appcore");
 
-                Saves the specified key-value pair in the session storage.
+    var StorageHelper = Ac.Helper.create("Storage");
 
-                @param {string} key                 The desired key
-                @param {(string|number)} value      The desired value
-            */
-            set: function(key, value) {
-                sessionStorage.setItem(key, value);
-            },
+    /*
+        @function set
 
-            /*
-                @function get
+        Saves the specified key-value pair in the session storage.
 
-                Retrieves the value of the specified key from the session storage.
+        @param {string} key                 The desired key
+        @param {(string|number)} value      The desired value
+    */
+    StorageHelper.addStaticMethod("set", function(key, value) {
+        sessionStorage.setItem(key, value);
+    });
 
-                @param {string} key     The desired key
+    /*
+        @function get
 
-                @return {mixed}
-            */
-            get: function(key) {
-                return sessionStorage.getItem(key);
-            },
+        Retrieves the value of the specified key from the session storage.
 
-            /*
-                @function reset
+        @param {string} key     The desired key
 
-                Removes the specified key (and corresponding value) from the session storage.
+        @return {mixed}
+    */
+    StorageHelper.addStaticMethod("get", function(key) {
+        return sessionStorage.getItem(key);
+    });
 
-                @param {string} key     The desired key
-            */
-            reset: function(key) {
-                sessionStorage.removeItem(key);
-            }
-        };
-    })();
+    /*
+        @function reset
+
+        Removes the specified key (and corresponding value) from the session storage.
+
+        @param {string} key     The desired key
+    */
+    StorageHelper.addStaticMethod("reset", function(key) {
+        sessionStorage.removeItem(key);
+    });
+
+    return StorageHelper;
 });

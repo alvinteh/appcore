@@ -2,8 +2,8 @@ define(function(require) {
     "use strict";
 
     var Model = require("./models/model");
-    var FunctionHelper = require("../util/helpers/function-helper");
-    var ModelHelper = require("../util/helpers/model-helper");
+    var FunctionHelper = require("./helpers/function-helper");
+    var ModelHelper = require("./helpers/model-helper");
 
     var _singleton = null;
 

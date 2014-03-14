@@ -1,29 +1,21 @@
-define(function() {
+define(function(require) {
     "use strict";
 
-    return (function() {
-        return {
-            /*
-                @function generateUuid()
+    var Ac = require("../../../../appcore");
+    var coreUuidHelper = require("../../core/helpers/uuid-helper");
 
-                Generates a UUID.
+    var UuidHelper = Ac.Helper.create("Uuid");
 
-                @param {boolean = true} stripDashes     Flag indicating whether dashes should be stripped.
+    /*
+        @function generateUuid()
 
-                @return {string}
-            */
-            generateUuid: function(stripDashes) {
-                return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
-                    var r = Math.random() * 16 | 0;
-                    var v = c === "x" ? r : (r & 0x3 | 0x8);
+        Generates a UUID.
 
-                    if (stripDashes) {
-                        v = v.replace("-", "");
-                    }
+        @param {boolean = true} stripDashes     Flag indicating whether dashes should be stripped.
 
-                    return v.toString(16);
-                });
-            }
-        };
-    })();
+        @return {string}
+    */
+    UuidHelper.addStaticMethod("generateUuid", coreUuidHelper.generateUuid);
+
+    return UuidHelper;
 });

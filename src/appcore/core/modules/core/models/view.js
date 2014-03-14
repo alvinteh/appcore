@@ -1,8 +1,8 @@
 define(function(require) {
     "use strict";
 
-    var ModelHelper = require("../../util/helpers/model-helper");
-    var UuidHelper = require("../../util/helpers/uuid-helper");
+    var ModelHelper = require("../helpers/model-helper");
+    var UuidHelper = require("../helpers/uuid-helper");
 
     var _key = {};
     var _getAttributes = UuidHelper.generateUuid();

@@ -1,10 +1,9 @@
 define(function(require) {
     "use strict";
 
+    var CoreHelper = require("./core.helper");
     var CoreModel = require("./core.model");
     var CoreView = require("./core.view");
-
-    var _singleton = null;
 
     /*
         @abstract
@@ -19,18 +18,13 @@ define(function(require) {
             views: []
         };
 
-        Core.Model = new CoreModel(Core, data);
+        Core.Helper = new CoreHelper();
+        Core.Model = new CoreModel(Core);
         Core.View = new CoreView(Core, data);
 
         //Public instance members
         return Core;
     })();
 
-    return (function() {
-        if (_singleton === null || _singleton === undefined) {
-            _singleton = Core;
-        }
-
-        return _singleton;
-    })();
+    return Core;
 });

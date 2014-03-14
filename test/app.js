@@ -6,7 +6,7 @@ require.config({
     }
 });
 
-require(["appcore/appcore", "appcore/core/modules/util/models/promise"], function(Ac, Promise) {
+require(["appcore/appcore", "appcore/core/modules/util/models/promise", "appcore/core/modules/util/helpers/uuid-helper"], function(Ac, Promise) {
 	/*
     //Define User class
     var User = Ac.Model.create(["name", "age"], function(name) {
@@ -16,7 +16,13 @@ require(["appcore/appcore", "appcore/core/modules/util/models/promise"], functio
 
     User.addMethod("greet", function() {
         console.log("Hello, I am " + this.getName() + " and I am " + this.getAge() + "!");
-    };
+    });
+
+    User.addStaticMethod("test", function() {
+        console.log("Testing class");
+    });
+
+    User.test();
 
     //Define view
     var view1 = Ac.View.create("#input-text");
@@ -31,6 +37,7 @@ require(["appcore/appcore", "appcore/core/modules/util/models/promise"], functio
     p1.setName("Bob");
     */
 
+    /*
     var testX = Promise.convert(function(callback, error, value) {
     	setTimeout(function() {
     		value = 10;
@@ -77,6 +84,11 @@ require(["appcore/appcore", "appcore/core/modules/util/models/promise"], functio
     .then(function(value) {
     	alert("Final value = " + value);
     });
+    */
+
+    /*
+    console.log(Ac.Helper.get("Uuid").generateUuid());
+    */
 
 });
 

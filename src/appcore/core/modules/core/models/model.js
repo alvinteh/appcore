@@ -1,7 +1,7 @@
 define(function(require) {
     "use strict";
 
-    var UuidHelper = require("../../util/helpers/uuid-helper");
+    var UuidHelper = require("../helpers/uuid-helper");
 
     var _key = {};
     var _getAttributes = UuidHelper.generateUuid();
