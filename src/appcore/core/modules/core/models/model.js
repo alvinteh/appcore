@@ -100,7 +100,7 @@ define(function(require) {
         @param {object} model       The desired model
         @param {string} name        The desired method name
     */
-    Model.removeMethod = function(model, name) {
+    Model.removeStaticMethod = function(model, name) {
         delete model[name];
     };
 
