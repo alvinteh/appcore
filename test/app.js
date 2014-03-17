@@ -6,8 +6,14 @@ require.config({
     }
 });
 
-require(["appcore/appcore", "appcore/core/modules/util/models/promise", "appcore/core/modules/util/helpers/uuid-helper"], function(Ac, Promise) {
-	/*
+require([
+        "appcore/appcore",
+        "appcore/core/modules/util/models/promise",
+        "appcore/core/modules/events/helpers/event-helper",
+        "appcore/core/modules/util/helpers/uuid-helper"
+    ],
+    function(Ac, Promise, EventHelper) {
+    /*
     //Define User class
     var User = Ac.Model.create(["name", "age"], function(name) {
         this.set("name", name);
@@ -39,41 +45,41 @@ require(["appcore/appcore", "appcore/core/modules/util/models/promise", "appcore
 
     /*
     var testX = Promise.convert(function(callback, error, value) {
-    	setTimeout(function() {
-    		value = 10;
-    		console.log("Initial value = " + value);
-    		callback(value);
-    	}, 0);
+        setTimeout(function() {
+            value = 10;
+            console.log("Initial value = " + value);
+            callback(value);
+        }, 0);
     });
 
     function testY1(value) {
-    	return new Promise(function(resolve, reject) {
-    		setTimeout(function() {
-    			value += 1;
-    			alert("value + 1 = " + value);
-    			resolve(value);
-    		}, 25);
-    	});
+        return new Promise(function(resolve, reject) {
+            setTimeout(function() {
+                value += 1;
+                alert("value + 1 = " + value);
+                resolve(value);
+            }, 25);
+        });
     }
 
     function testY2(value) {
-    	return new Promise(function(resolve, reject) {
-    		setTimeout(function() {
-    			value += 2;
-    			alert("value + 2 = " + value);
-    			resolve(value);
-    		}, 50);
-    	});
+        return new Promise(function(resolve, reject) {
+            setTimeout(function() {
+                value += 2;
+                alert("value + 2 = " + value);
+                resolve(value);
+            }, 50);
+        });
     }
 
     function testY3(value) {
-    	return new Promise(function(resolve, reject) {
-    		setTimeout(function() {
-    			value += 3;
-    			alert("value + 3 = " + value);
-    			resolve(value);
-    		}, 75);
-    	});
+        return new Promise(function(resolve, reject) {
+            setTimeout(function() {
+                value += 3;
+                alert("value + 3 = " + value);
+                resolve(value);
+            }, 75);
+        });
     }
 
 
@@ -82,13 +88,51 @@ require(["appcore/appcore", "appcore/core/modules/util/models/promise", "appcore
     .then(testY2)
     .then(testY3)
     .then(function(value) {
-    	alert("Final value = " + value);
+        alert("Final value = " + value);
     });
     */
 
     /*
     console.log(Ac.Helper.get("Uuid").generateUuid());
     */
+
+    var User = Ac.Model.create(["name", "age"], function(name, age) {
+        this.set({
+            name: name,
+            age: age
+        });
+    });
+
+    User.addMethod("grow", function() {
+        this.set("age", this.get("age") + 1);
+        this.trigger("grow", { age: this.get("age") });
+    });
+
+    User.addMethod("talk", function(message) {
+        this.trigger("talk", { message: message });
+    });
+
+    var userA = new User("Alan", 12);
+    var userB = new User("Bob", 15);
+
+    EventHelper.observe(userA, "grow", function(event) {
+        console.log(event.getTarget().getName() + " has grown to " + event.getTarget().getAge() + " years old.");
+    });
+
+    EventHelper.observe(userA, "talk", function(event) {
+        console.log(event.getTarget().getName() + " has said \"" + event.getData().message + "\".");
+    });
+
+    EventHelper.observe(userB, "grow", function(event) {
+        console.log(event.getTarget().getName() + " has grown to " + event.getTarget().getAge() + " years old.");
+    });
+
+    userA.grow();
+    userA.grow();
+    userA.grow();
+    userB.grow();
+    userB.grow();
+    userA.talk("Sup bro?");
 
 });
 
