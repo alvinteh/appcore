@@ -1,6 +1,8 @@
 define(function(require) {
     "use strict";
 
+    var Event = require("../models/event");
+    var EventHelper = require("../helpers/event-helper");
     var UuidHelper = require("../helpers/uuid-helper");
 
     var _key = {};
@@ -137,7 +139,7 @@ define(function(require) {
         };
 
         /*
-            @function setId
+            @function set
 
             Sets the specified attribute.
 
@@ -217,6 +219,18 @@ define(function(require) {
             }
 
             return returnData;
+        };
+
+        /*
+            @function trigger
+
+            Triggers an event on the item.
+
+            @param {string} event       The desired event name
+            @param [{object}] args      Additional arguments for the event
+        */
+        prototype.trigger = function(event, args) {
+            EventHelper.trigger(new Event(this, event, args));
         };
 
         return prototype;

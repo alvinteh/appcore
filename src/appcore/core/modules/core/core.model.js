@@ -79,16 +79,15 @@ define(function(require) {
                             this.set(attribute, value);
                             App.View.refresh(this);
                         };
-
-
-                        childClass.prototype.setId = FunctionHelper.override(childClass.prototype.setId,
-                            function(originalFunction, context, args) {
-                            originalFunction.apply(context, args);
-                            App.View.refresh(context);
-                        });
                     })(attributes[i]);
                     //jshint +W083
                 }
+
+                childClass.prototype.setId = FunctionHelper.override(childClass.prototype.setId,
+                    function(originalFunction, context, args) {
+                    originalFunction.apply(context, args);
+                    App.View.refresh(context);
+                });
 
                 return childClass;
             }
