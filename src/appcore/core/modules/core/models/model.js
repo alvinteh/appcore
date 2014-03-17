@@ -33,7 +33,7 @@ define(function(require) {
         //Special instance method for private member access
         this[_getAttributes] = function(key) {
             if (key === _key) {
-                return attributes;
+                return attributes.attributes;
             }
         };
 
@@ -280,6 +280,17 @@ define(function(require) {
         */
         prototype.trigger = function(event, args) {
             EventHelper.trigger(new Event(this, event, args));
+        };
+
+        /*
+            @function validate
+
+            Validates the current item.
+
+            @return {boolean}
+        */
+        prototype.validate = function() {
+
         };
 
         return prototype;
