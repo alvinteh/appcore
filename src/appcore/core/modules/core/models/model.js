@@ -147,13 +147,48 @@ define(function(require) {
             @param {mixed} value                    The desired value
         */
         prototype.set = function(attribute, value) {
+            var changes = [];
+            var change, oldValue;
+
             if (value !== undefined) {
+                oldValue = this[_getAttributes](_key)[attribute];
                 this[_getAttributes](_key)[attribute] = value;
+                
+                //Trigger events if necessary
+                if (oldValue !== value) {
+                    changes.push({
+                        attribute: attribute,
+                        oldValue: oldValue,
+                        newValue: value
+                    });
+                }
             }
             else {
                 for (var key in attribute) {
+                    oldValue = this[_getAttributes](_key)[key];
                     this[_getAttributes](_key)[key] = attribute[key];
+
+                    if (oldValue !== attribute[key]) {
+                        changes.push({
+                            attribute: key,
+                            oldValue: oldValue,
+                            newValue: attribute[key]
+                        });
+                    }
                 }
+            }
+
+            if (changes.length > 0) {
+                for (var i = 0, length = changes.length; i < length; i++) {
+                    change = changes[i];
+                    
+                    this.trigger("change:" + change.attribute, {
+                        oldValue: change.oldValue,
+                        newValue: change.newValue
+                    });
+                }
+
+                this.trigger("change", changes);
             }
         };
 
@@ -188,6 +223,20 @@ define(function(require) {
             Sets the instance identifier.
         */
         prototype.setId = function(id) {
+            var oldValue = this[_getAttributes](_key).id;
+            if (oldValue !== id) {
+                this.trigger("change:id", {
+                    oldValue: oldValue,
+                    newValue: id
+                });
+
+                this.trigger("change", [{
+                    attribute: "id",
+                    oldValue: oldValue,
+                    newValue: id
+                }]);
+            }
+
             this[_getAttributes](_key).id = id;
         };
 
