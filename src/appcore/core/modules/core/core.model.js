@@ -42,30 +42,8 @@ define(function(require) {
                 //Implement inheritance
                 childClass.prototype = Object.create(parentClass.prototype);
 
-                //Implement method manipulation methods
-                childClass.addMethod = function(name, method) {
-                    Model.addMethod(childClass, name, method);
-                };
-
-                childClass.removeMethod = function(name) {
-                    Model.removeMethod(childClass, name);
-                };
-
-                childClass.hasMethod = function(name) {
-                    return Model.hasMethod(childClass, name);
-                };
-
-                childClass.addStaticMethod = function(name, method) {
-                    Model.addStaticMethod(childClass, name, method);
-                };
-
-                childClass.removeStaticMethod = function(name) {
-                    Model.removeStaticMethod(childClass, name);
-                };
-
-                childClass.hasStaticMethod = function(name) {
-                    return Model.hasStaticMethod(childClass, name);
-                };
+                //Initialize model methods
+                Model.init(childClass);
 
                 //Generate getter and setter methods
                 for (var i = 0, length = attributes.length; i < length; i++) {

@@ -24,7 +24,8 @@ define(function(require) {
         //Private instance members
         var attributes = {
             id: null,
-            attributes: {}
+            attributes: {},
+            validationRules: {}
         };
 
         //Public instance members
@@ -42,259 +43,283 @@ define(function(require) {
     };
 
     //Public instance members
-    /*
-        @function addMethod
+    Model.init = function(model) {
+        model.prototype = (function(prototype) {
+            //Private static members
+            var staticAttributes = {
+                validationRules: {}
+            };
 
-        Adds the specified method to the specified model's prototype.
+            //Public static members
+            /*
+                @function addMethod
 
-        @param {object} model       The desired model
-        @param {string} name        The desired method name
-        @param {string} method      The desired method
-    */
-    Model.addMethod = function(model, name, method) {
-        model.prototype[name] = method;
-    };
+                Adds the specified method to the model's prototype.
 
-    /*
-        @function removeMethod
+                @param {string} name        The desired method name
+                @param {string} method      The desired method
+            */
+            model.addMethod = function(name, method) {
+                model.prototype[name] = method;
+            };
 
-        Removes the specified method from the specified model's prototype.
+            /*
+                @function removeMethod
 
-        @param {object} model       The desired model
-        @param {string} name        The desired method name
-    */
-    Model.removeMethod = function(model, name) {
-        delete model.prototype[name];
-    };
+                Removes the specified method from the model's prototype.
 
-    /*
-        @function hasMethod
+                @param {string} name        The desired method name
+            */
+            model.removeMethod = function(name) {
+                delete model.prototype[name];
+            };
 
-        Checks if the specified method exists in the specified model's prototype.
+            /*
+                @function hasMethod
 
-        @param {object} model       The desired model
-        @param {string} name        The desired method name
+                Checks if the specified method exists in the model's prototype.
 
-        @return {boolean}
-    */
-    Model.hasMethod = function(model, name) {
-        return typeof model.prototype[name] === "function";
-    };
+                @param {string} name        The desired method name
 
-    /*
-        @function addStaticMethod
+                @return {boolean}
+            */
+            model.hasMethod = function(name) {
+                return typeof model.prototype[name] === "function";
+            };
 
-        Adds the specified method to the specified model.
+            /*
+                @function addStaticMethod
 
-        @param {object} model       The desired model
-        @param {string} name        The desired method name
-        @param {string} method      The desired method
-    */
-    Model.addStaticMethod = function(model, name, method) {
-        model[name] = method;
-    };
+                Adds the specified method to the model.
 
-    /*
-        @function removeStaticMethod
+                @param {string} name        The desired method name
+                @param {string} method      The desired method
+            */
+            model.addStaticMethod = function(name, method) {
+                model[name] = method;
+            };
 
-        Removes the specified method from the specified model.
+            /*
+                @function removeStaticMethod
 
-        @param {object} model       The desired model
-        @param {string} name        The desired method name
-    */
-    Model.removeStaticMethod = function(model, name) {
-        delete model[name];
-    };
+                Removes the specified method from the model.
 
-    /*
-        @function hasStaticMethod
+                @param {object} model       The desired model
+            */
+            Model.removeStaticMethod = function(name) {
+                delete model[name];
+            };
 
-        Checks if the specified method exists in the specified model.
+            /*
+                @function hasStaticMethod
 
-        @param {object} model       The desired model
-        @param {string} name        The desired method name
+                Checks if the specified method exists in the model.
 
-        @return {boolean}
-    */
-    Model.hasStaticMethod = function(model, name) {
-        return typeof model[name] === "function" && typeof model.prototype[name] !== "function";
-    };
+                @param {string} name        The desired method name
 
-    Model.prototype = (function(prototype) {
-        //Private static members
-        //(None)
+                @return {boolean}
+            */
+            Model.hasStaticMethod = function(model, name) {
+                return typeof model[name] === "function" && typeof model.prototype[name] !== "function";
+            };
 
-        //Public prototype members
-        /*
-            @function get
+            /*
+                @function getValidationRules
 
-            Gets the specified attribute.
+                Gets the validation rules for the specified model.
 
-            @param {string} attribute       The desired attribute
+                @param {object} model       The desired model
 
-            @return {mixed}
-        */
-        prototype.get = function(attribute) {
-            return this[_getAttributes](_key)[attribute];
-        };
+                @return {object[]}
+            */
+            model.getValidationRules = function() {
+                return staticAttributes.validationRules;
+            };
 
-        /*
-            @function set
+            /*
+                @function setValidationRules
 
-            Sets the specified attribute.
+                Sets the specified validation rules for the specified model.
 
-            @param {string|object} attribute        The desired attribute OR attribute-value dictionary
-            @param {mixed} value                    The desired value
-        */
-        prototype.set = function(attribute, value) {
-            var changes = [];
-            var change, oldValue;
+                @param {object} model       The desired model
+                @param {string} rules       The desired validation rules
+            */
+            model.setValidationRules = function(rules) {
+                staticAttributes.validationRules = rules;
+            };
 
-            if (value !== undefined) {
-                oldValue = this[_getAttributes](_key)[attribute];
-                this[_getAttributes](_key)[attribute] = value;
-                
-                //Trigger events if necessary
-                if (oldValue !== value) {
-                    changes.push({
-                        attribute: attribute,
-                        oldValue: oldValue,
-                        newValue: value
-                    });
-                }
-            }
-            else {
-                for (var key in attribute) {
-                    oldValue = this[_getAttributes](_key)[key];
-                    this[_getAttributes](_key)[key] = attribute[key];
+            //Public prototype members
+            /*
+                @function get
 
-                    if (oldValue !== attribute[key]) {
+                Gets the specified attribute.
+
+                @param {string} attribute       The desired attribute
+
+                @return {mixed}
+            */
+            prototype.get = function(attribute) {
+                return this[_getAttributes](_key)[attribute];
+            };
+
+            /*
+                @function set
+
+                Sets the specified attribute.
+
+                @param {string|object} attribute        The desired attribute OR attribute-value dictionary
+                @param {mixed} value                    The desired value
+            */
+            prototype.set = function(attribute, value) {
+                var changes = [];
+                var change, oldValue;
+
+                if (value !== undefined) {
+                    oldValue = this[_getAttributes](_key)[attribute];
+                    this[_getAttributes](_key)[attribute] = value;
+
+                    //Trigger events if necessary
+                    if (oldValue !== value) {
                         changes.push({
-                            attribute: key,
+                            attribute: attribute,
                             oldValue: oldValue,
-                            newValue: attribute[key]
+                            newValue: value
                         });
                     }
                 }
-            }
+                else {
+                    for (var key in attribute) {
+                        oldValue = this[_getAttributes](_key)[key];
+                        this[_getAttributes](_key)[key] = attribute[key];
 
-            if (changes.length > 0) {
-                for (var i = 0, length = changes.length; i < length; i++) {
-                    change = changes[i];
-                    
-                    this.trigger("change:" + change.attribute, {
-                        oldValue: change.oldValue,
-                        newValue: change.newValue
-                    });
-                }
-
-                this.trigger("change", changes);
-            }
-        };
-
-        /*
-            @function has
-
-            Checks if the specified attribute is defined and not null.
-
-            @param {string} attribute       The desired attribute
-
-            @return {boolean}
-        */
-        prototype.has = function(attribute) {
-            return this[_getAttributes](_key)[attribute] !== undefined &&
-                this[_getAttributes](_key)[attribute] !== null;
-        };
-
-        /*
-            @function getId
-
-            Returns the instance identifier.
-
-            @return {int}
-        */
-        prototype.getId = function() {
-            return this[_getAttributes](_key).id;
-        };
-
-        /*
-            @function setId
-
-            Sets the instance identifier.
-        */
-        prototype.setId = function(id) {
-            var oldValue = this[_getAttributes](_key).id;
-            if (oldValue !== id) {
-                this.trigger("change:id", {
-                    oldValue: oldValue,
-                    newValue: id
-                });
-
-                this.trigger("change", [{
-                    attribute: "id",
-                    oldValue: oldValue,
-                    newValue: id
-                }]);
-            }
-
-            this[_getAttributes](_key).id = id;
-        };
-
-        /*
-            @function toObject
-
-            Gets an object representation of the item.
-
-            @return {object}
-        */
-        prototype.toObject = function() {
-            var returnData = {};
-
-            for (var property in this) {
-                if (typeof this[property] === "function" && property.indexOf("set") === 0) {
-                    var attribute = property.charAt(3).toLowerCase() + property.substring(4);
-                    var methodName = "get" + property.substring(3);
-
-                    if (typeof this[methodName] === "function" && methodName !== "getDataValue") {
-                        var data = this[methodName]();
-
-                        if (data && typeof data === "object" && typeof data.toObject === "function") {
-                            data = data.toObject();
+                        if (oldValue !== attribute[key]) {
+                            changes.push({
+                                attribute: key,
+                                oldValue: oldValue,
+                                newValue: attribute[key]
+                            });
                         }
-
-                        returnData[attribute] = data;
                     }
                 }
-            }
 
-            return returnData;
-        };
+                if (changes.length > 0) {
+                    for (var i = 0, length = changes.length; i < length; i++) {
+                        change = changes[i];
 
-        /*
-            @function trigger
+                        this.trigger("change:" + change.attribute, {
+                            oldValue: change.oldValue,
+                            newValue: change.newValue
+                        });
+                    }
 
-            Triggers an event on the item.
+                    this.trigger("change", changes);
+                }
+            };
 
-            @param {string} event       The desired event name
-            @param [{object}] args      Additional arguments for the event
-        */
-        prototype.trigger = function(event, args) {
-            EventHelper.trigger(new Event(this, event, args));
-        };
+            /*
+                @function has
 
-        /*
-            @function validate
+                Checks if the specified attribute is defined and not null.
 
-            Validates the current item.
+                @param {string} attribute       The desired attribute
 
-            @return {boolean}
-        */
-        prototype.validate = function() {
+                @return {boolean}
+            */
+            prototype.has = function(attribute) {
+                return this[_getAttributes](_key)[attribute] !== undefined &&
+                    this[_getAttributes](_key)[attribute] !== null;
+            };
 
-        };
+            /*
+                @function getId
 
-        return prototype;
-    })(Model.prototype || {});
+                Returns the instance identifier.
+
+                @return {int}
+            */
+            prototype.getId = function() {
+                return this[_getAttributes](_key).id;
+            };
+
+            /*
+                @function setId
+
+                Sets the instance identifier.
+            */
+            prototype.setId = function(id) {
+                var oldValue = this[_getAttributes](_key).id;
+                if (oldValue !== id) {
+                    this.trigger("change:id", {
+                        oldValue: oldValue,
+                        newValue: id
+                    });
+
+                    this.trigger("change", [{
+                        attribute: "id",
+                        oldValue: oldValue,
+                        newValue: id
+                    }]);
+                }
+
+                this[_getAttributes](_key).id = id;
+            };
+
+            /*
+                @function toObject
+
+                Gets an object representation of the item.
+
+                @return {object}
+            */
+            prototype.toObject = function() {
+                var returnData = {};
+
+                for (var property in this) {
+                    if (typeof this[property] === "function" && property.indexOf("set") === 0) {
+                        var attribute = property.charAt(3).toLowerCase() + property.substring(4);
+                        var methodName = "get" + property.substring(3);
+
+                        if (typeof this[methodName] === "function" && methodName !== "getDataValue") {
+                            var data = this[methodName]();
+
+                            if (data && typeof data === "object" && typeof data.toObject === "function") {
+                                data = data.toObject();
+                            }
+
+                            returnData[attribute] = data;
+                        }
+                    }
+                }
+
+                return returnData;
+            };
+
+            /*
+                @function trigger
+
+                Triggers an event on the item.
+
+                @param {string} event       The desired event name
+                @param [{object}] args      Additional arguments for the event
+            */
+            prototype.trigger = function(event, args) {
+                EventHelper.trigger(new Event(this, event, args));
+            };
+
+            /*
+                @function validate
+
+                Validates the current item.
+
+                @return {boolean}
+            */
+            prototype.validate = function() {
+
+            };
+
+            return prototype;
+        })(model.prototype || {});
+    };
 
     return Model;
 });
