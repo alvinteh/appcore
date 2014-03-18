@@ -88,6 +88,13 @@ require([
         });
     });
 
+    var Pet = Ac.Model.create(["name", "type"], function(name, type) {
+        this.set({
+            name: name,
+            type: type
+        });
+    });
+
     //Model method definition
     User.addMethod("greet", function() {
         console.log("Hello, I am " + this.getName() + " and I am " + this.getAge() + "!");
@@ -98,11 +105,34 @@ require([
         console.log("Testing the User class");
     });
 
+    //Model validation
+    User.setValidationRules({
+        age: [
+            {
+                required: true
+            },
+            {
+                type: "int"
+            },
+            {
+                minValue: 0,
+            },
+            {
+                maxValue: 100,
+                message: "Surely a person can't be that old?"
+            }
+        ],
+        name: [
+            {
+                type: "string"
+            }
+        ]
+    });
+
     //Test usage
     var userA = new User("Alan", 12);
     var userB = new User("Bob", 15);
 
-    /*
     userA.greet();
     userB.greet();
     userA.set("name", "Adrian");
@@ -110,7 +140,15 @@ require([
     userA.greet();
     userB.greet();
     User.test();
-    */
+
+    console.log("User validation rules", User.getValidationRules());
+    console.log("Validating userB #1", userB.validate());
+    userB.setName(0);
+    userB.setAge(111);
+    console.log("Validating userB #2", userB.validate());
+
+    console.log("Pet valiation rules", Pet.getValidationRules());
+
 
     /*
      * EVENTS
