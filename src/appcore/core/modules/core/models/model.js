@@ -417,6 +417,17 @@ define(function(require) {
                 return (modelErrors.length === 0 || modelErrors);
             };
 
+            /*
+                @function isValid
+
+                Validates the current item.
+
+                @return {boolean}
+            */
+            prototype.isValid = function() {
+                return this.validate() === true;
+            };
+
             return prototype;
         })(model.prototype || {});
     };
