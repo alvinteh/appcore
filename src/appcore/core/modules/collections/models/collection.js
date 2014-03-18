@@ -2,6 +2,8 @@ define(function(require) {
     "use strict";
 
     var Ac = require("../../../../appcore");
+    var Event = require("../../events/models/event");
+    var EventHelper = require("../../events/helpers/event-helper");
     var ModelHelper = require("../../util/helpers/model-helper");
 
     /*
@@ -340,10 +342,13 @@ define(function(require) {
     Collection.addMethod("removeItemLike", function(attribute, value) {
         var items = this.get("items");
         var methodName = ModelHelper.getGetter(attribute);
+        var tmpItem;
 
         for (var i = 0, length = items.length; i < length; i++) {
             if (items[i][methodName]() === value) {
+                tmpItem = items[i];
                 delete items[i];
+                EventHelper.trigger(new Event(this, "remove", { item: tmpItem }));
                 break;
             }
         }
@@ -362,10 +367,13 @@ define(function(require) {
     Collection.addMethod("removeItemsLike", function(attribute, value) {
         var items = this.get("items");
         var methodName = ModelHelper.getGetter(attribute);
+        var tmpItem;
 
         for (var i = 0, length = items.length; i < length; i++) {
             if (items[i][methodName]() === value) {
+                tmpItem = items[i];
                 delete items[i];
+                EventHelper.trigger(new Event(this, "remove", { item: tmpItem }));
             }
         }
     });
@@ -380,6 +388,7 @@ define(function(require) {
     */
     Collection.addMethod("removeItemWhere", function(predicates) {
         var items = this.get("items");
+        var tmpItem;
 
         for (var i = 0, iLength = items.length; i < iLength; i++) {
             var item = items[i];
@@ -395,7 +404,9 @@ define(function(require) {
             }
 
             if (itemSatisfactory) {
+                tmpItem = items[i];
                 delete items[i];
+                EventHelper.trigger(new Event(this, "remove", { item: tmpItem }));
                 break;
             }
         }
@@ -411,6 +422,7 @@ define(function(require) {
     */
     Collection.addMethod("removeItemsWhere", function(predicates) {
         var items = this.get("items");
+        var tmpItem;
 
         for (var i = 0, iLength = items.length; i < iLength; i++) {
             var item = items[i];
@@ -426,7 +438,9 @@ define(function(require) {
             }
 
             if (itemSatisfactory) {
+                tmpItem = items[i];
                 delete items[i];
+                EventHelper.trigger(new Event(this, "remove", { item: tmpItem }));
             }
         }
     });
@@ -517,10 +531,13 @@ define(function(require) {
     */
     Collection.addMethod("removeItem", function(item) {
         var items = this.get("items");
+        var tmpItem;
 
         for (var i = 0, length = items.length; i < length; i++) {
             if (i === item || items[i] === item) {
+                tmpItem = items[i];
                 delete items[i];
+                EventHelper.trigger(new Event(this, "remove", { item: tmpItem }));
                 break;
             }
         }
@@ -545,6 +562,7 @@ define(function(require) {
         }
 
         items[id] = item;
+        EventHelper.trigger(new Event(this, "remove", { item: item }));
     });
 
     return Collection;
