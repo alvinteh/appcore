@@ -4,7 +4,6 @@ define(function(require) {
     var Ac = require("../../../../appcore");
 
     /*
-        @abstract
         @class CollectionGroup
 
         @classdesc CollectionGroup class.

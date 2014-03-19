@@ -7,7 +7,6 @@ define(function(require) {
     var ModelHelper = require("../../util/helpers/model-helper");
 
     /*
-        @abstract
         @class Collection
 
         @classdesc Collection class.
