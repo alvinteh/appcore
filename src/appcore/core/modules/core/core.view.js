@@ -27,8 +27,17 @@ define(function(require) {
             for (var i = 0, length = appData.eventListeners.length; i < length; i++) {
                 eventListener = appData.eventListeners[i];
 
-                if (eventListener.element === event.target && eventListener.event === event.type) {
-                    eventListener.listener.apply(undefined, [event]);
+                if (eventListener.element === event.target) {
+                    if (eventListener.event === event.type) {
+                        eventListener.listener.apply(undefined, [event]);
+                    }
+                    
+                }
+                else if (eventListener.event === "mutation" && event instanceof window.MutationRecord) {
+                    if (eventListener.element === event.target ||
+                        (event.type === "characterData" && eventListener.element === event.target.parentElement)) {
+                        eventListener.listener.apply(undefined, [event]);
+                    }
                 }
             }
         };
@@ -39,6 +48,22 @@ define(function(require) {
         for (var i  = 0, iLength = events.length; i < iLength; i++) {
             document.addEventListener(events[i], handleEventListeners);
         }
+
+        //Monitor DOM for changes
+        var mutationObserver = new window[(window.MutationObserver ? "" : "WebKit") + "MutationObserver"](
+            function(mutations) {
+            mutations.forEach(function(mutation) {
+                handleEventListeners(mutation);
+            });
+        });
+
+        mutationObserver.observe(window.document.querySelector("body"), {
+            attributes: true,
+            characterData: true,
+            childList: true,
+            subtree: true
+        });
+
 
         View.prototype.addDataBinding = FunctionHelper.override(View.prototype.addDataBinding,
             function(originalFunction, context, args) {
@@ -56,13 +81,12 @@ define(function(require) {
                     return;
                 }
 
-                if (elementProperties.indexOf("value") !== -1) {
-                    for (var i = 0, length = elements.length; i < length; i++) {
-                        element = elements[i];
+                var events = ["change", "input"];
 
-                        var events = ["change", "input"];
-
-                        //jshint -W083
+                for (var i = 0, length = elements.length; i < length; i++) {
+                    element = elements[i];
+                    //jshint -W083
+                    if (elementProperties.indexOf("value") !== -1) {    
                         for (var j = 0, jLength = events.length; j < jLength; j++) {
                             appData.eventListeners.push({
                                 element: element,
@@ -73,11 +97,29 @@ define(function(require) {
                                 }
                             });
                         }
-                        //jshint +W083
+                        
                     }
-                }
-                else {
-
+                    else {
+                        appData.eventListeners.push({
+                            element: element,
+                            event: "mutation",
+                            listener: function(mutation) {
+                                if (mutation.type === "attributes") {
+                                    if (elementProperties.indexOf(mutation.attributeName) !== -1) {
+                                        instance.set(objectProperty, element[mutation.attributeName], { silent: true });
+                                        ViewModule.refresh(instance);    
+                                    }
+                                }
+                                else if (mutation.type === "characterData") {
+                                    if (elementProperties.indexOf("innerHTML") !== -1) {
+                                        instance.set(objectProperty, element.innerHTML, { silent: true });
+                                        ViewModule.refresh(instance);
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    //jshint +W083
                 }
         });
 
