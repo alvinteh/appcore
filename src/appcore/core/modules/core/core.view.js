@@ -33,7 +33,12 @@ define(function(require) {
             }
         };
 
-        document.addEventListener("change", handleEventListeners);
+        var events = ["blur", "change", "click", "focus", "input", "keypress", "keyup", "mousedown", "mouseup",
+        "mouseenter", "mouseleave", "mouseover", "mouseout", "pause", "play", "ratechange", "seeked", "volumechange"];
+
+        for (var i  = 0, iLength = events.length; i < iLength; i++) {
+            document.addEventListener(events[i], handleEventListeners);
+        }
 
         View.prototype.addDataBinding = FunctionHelper.override(View.prototype.addDataBinding,
             function(originalFunction, context, args) {
@@ -47,21 +52,32 @@ define(function(require) {
                 var elements = context.getElements();
                 var element;
                 
-                if (twoWay && elementProperties.indexOf("value") !== -1) {
+                if (!twoWay) {
+                    return;
+                }
+
+                if (elementProperties.indexOf("value") !== -1) {
                     for (var i = 0, length = elements.length; i < length; i++) {
                         element = elements[i];
 
+                        var events = ["change", "input"];
+
                         //jshint -W083
-                        appData.eventListeners.push({
-                            element: element,
-                            event: "change",
-                            listener: function() {
-                                instance.set(objectProperty, element.value, { silent: true });
-                                ViewModule.refresh(instance);
-                            }
-                        });
+                        for (var j = 0, jLength = events.length; j < jLength; j++) {
+                            appData.eventListeners.push({
+                                element: element,
+                                event: events[j],
+                                listener: function() {
+                                    instance.set(objectProperty, element.value, { silent: true });
+                                    ViewModule.refresh(instance);
+                                }
+                            });
+                        }
                         //jshint +W083
                     }
+                }
+                else {
+
                 }
         });
 
