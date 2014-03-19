@@ -57,6 +57,17 @@ define(function(require) {
 
         //Public prototype members
         /*
+            @function getElements
+
+            Retrieves the View's elements.
+
+            @return {object[]}
+        */
+        prototype.getElements = function() {
+            return this[_getAttributes](_key).elements;
+        };
+
+        /*
             @function isDataBoundTo
 
             Checks if the view is data bound to the specified model instance.
@@ -105,7 +116,7 @@ define(function(require) {
 
             for (var i = 0, iLength = dataBindings.length; i < iLength; i++) {
                 var dataBinding = dataBindings[i];
-
+                
                 if (instance === undefined || dataBinding.object === instance) {
                     var objectProperty = dataBinding.objectProperty;
 
@@ -132,14 +143,17 @@ define(function(require) {
             @param [{object}] instance                      The desired model instance
             @param {string|function} objectProperty         The desired object property
             @param {string|string[]} elementProperties      The desired element properties
+            @param [{boolean = true}] twoWay                Flag indicating whether the binding is two-way
         */
-        prototype.addDataBinding = function(instance, objectProperty, elementProperties) {
-            var dataBindings = this[_getAttributes](_key).dataBindings;
+        prototype.addDataBinding = function(instance, objectProperty, elementProperties, twoWay) {
+            var attributes = this[_getAttributes](_key);
+            var dataBindings = attributes.dataBindings;
 
             dataBindings.push({
                 elementProperties: elementProperties instanceof Array ? elementProperties : [elementProperties],
                 object: instance,
-                objectProperty: objectProperty
+                objectProperty: objectProperty,
+                twoWay: twoWay !== false
             });
 
             this.refresh(instance);

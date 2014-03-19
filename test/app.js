@@ -94,7 +94,7 @@ require([
             type: type
         });
     });
-
+    /*
     //Model method definition
     User.addMethod("greet", function() {
         console.log("Hello, I am " + this.getName() + " and I am " + this.getAge() + "!");
@@ -149,7 +149,6 @@ require([
 
     console.log("Pet valiation rules", Pet.getValidationRules());
 
-
     /*
      * EVENTS
      */
@@ -190,18 +189,18 @@ require([
      * DATA BINDING
      */
 
-    /*
+    var userC = new User("Alan", 12);
+
     //Define view
     var view1 = Ac.View.create("#input-text");
     var view2 = Ac.View.create("#header-title, #footer");
 
     //Data binding creation
-    view1.addDataBinding(userA, function() { return userA.getName() + "!!!"; }, "value");
-    view2.addDataBinding(userA, "name", "innerHTML");
+    view1.addDataBinding(userC, "name", "value");
+    view2.addDataBinding(userC, function() { return userC.getName() + "!"; }, "innerHTML");
 
     //Test usage
-    userA.setName("Aaron");
-    */
+    userC.setName("Aaron");
 });
 
 /*

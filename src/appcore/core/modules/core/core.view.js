@@ -2,10 +2,69 @@ define(function(require) {
     "use strict";
 
     var View = require("./models/view");
+    var FunctionHelper = require("./helpers/function-helper");
 
     var _singleton = null;
 
     var ViewModule = function(App, appData) {
+        //Initialize events
+        /*
+            Array of event listeners. Adheres to the following format:
+
+            [
+                {
+                    element,
+                    event,
+                    listener
+                }
+            ]
+        */
+        appData.eventListeners = [];
+
+        var handleEventListeners = function(event) {
+            var eventListener;
+
+            for (var i = 0, length = appData.eventListeners.length; i < length; i++) {
+                eventListener = appData.eventListeners[i];
+
+                if (eventListener.element === event.target && eventListener.event === event.type) {
+                    eventListener.listener.apply(undefined, [event]);
+                }
+            }
+        };
+
+        document.addEventListener("change", handleEventListeners);
+
+        View.prototype.addDataBinding = FunctionHelper.override(View.prototype.addDataBinding,
+            function(originalFunction, context, args) {
+                originalFunction.apply(context, args);
+
+                var instance = args[0];
+                var objectProperty = args[1];
+                var elementProperties = args[2];
+                var twoWay = args[3] !== false;
+
+                var elements = context.getElements();
+                var element;
+                
+                if (twoWay && elementProperties.indexOf("value") !== -1) {
+                    for (var i = 0, length = elements.length; i < length; i++) {
+                        element = elements[i];
+
+                        //jshint -W083
+                        appData.eventListeners.push({
+                            element: element,
+                            event: "change",
+                            listener: function() {
+                                instance.set(objectProperty, element.value, { silent: true });
+                                ViewModule.refresh(instance);
+                            }
+                        });
+                        //jshint +W083
+                    }
+                }
+        });
+
         //Public instance members
         var ViewModule = {
             /*

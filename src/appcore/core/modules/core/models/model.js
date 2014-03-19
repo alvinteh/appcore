@@ -167,14 +167,19 @@ define(function(require) {
 
                 Sets the specified attribute.
 
-                @param {string|object} attribute        The desired attribute OR attribute-value dictionary
-                @param {mixed} value                    The desired value
+                @param {string|object} attribute                The desired attribute OR attribute-value dictionary
+                @param {mixed} value                            The desired value
+                @param [{object}] options                       Additional options for the method
+                @param [{boolean = false}] options.silent       Flag indicating whether the change event should be
+                                                                triggered
             */
-            prototype.set = function(attribute, value) {
+            prototype.set = function(attribute, value, options) {
+                var silent = options && options.silent === true;
+
                 var changes = [];
                 var change, oldValue;
 
-                if (value !== undefined) {
+                if (typeof value !== "object") {
                     oldValue = this[_getAttributes](_key)[attribute];
                     this[_getAttributes](_key)[attribute] = value;
 
@@ -188,6 +193,8 @@ define(function(require) {
                     }
                 }
                 else {
+                    silent = value && value.silent === true;
+
                     for (var key in attribute) {
                         oldValue = this[_getAttributes](_key)[key];
                         this[_getAttributes](_key)[key] = attribute[key];
@@ -206,13 +213,17 @@ define(function(require) {
                     for (var i = 0, length = changes.length; i < length; i++) {
                         change = changes[i];
 
-                        this.trigger("change:" + change.attribute, {
-                            oldValue: change.oldValue,
-                            newValue: change.newValue
-                        });
+                        if (!silent) {
+                            this.trigger("change:" + change.attribute, {
+                                oldValue: change.oldValue,
+                                newValue: change.newValue
+                            });
+                        }
                     }
 
-                    this.trigger("change", changes);
+                    if (!silent) {
+                        this.trigger("change", changes);
+                    }
                 }
             };
 
