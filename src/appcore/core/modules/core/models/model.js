@@ -414,7 +414,7 @@ define(function(require) {
 
                 }
 
-                return (modelErrors.length === 0 || modelErrors);
+                return (JSON.stringify(modelErrors) === "{}" || modelErrors);
             };
 
             /*
