@@ -81,7 +81,7 @@ require([
      */
 
     //Model definition
-    var User = Ac.Model.create(["name", "age"], function(name, age) {
+    var User = Ac.Model.create(["name", "age", "sex"], function(name, age) {
         this.set({
             name: name,
             age: age
@@ -94,7 +94,7 @@ require([
             type: type
         });
     });
-    /*
+    
     //Model method definition
     User.addMethod("greet", function() {
         console.log("Hello, I am " + this.getName() + " and I am " + this.getAge() + "!");
@@ -104,7 +104,7 @@ require([
     User.addStaticMethod("test", function() {
         console.log("Testing the User class");
     });
-
+    /*
     //Model validation
     User.setValidationRules({
         age: [
@@ -193,12 +193,14 @@ require([
 
     //Define view
     var view1 = Ac.View.create("#input-text");
-    var view2 = Ac.View.create("#header-title, #footer");
+    var view2 = Ac.View.create("#header-title");
+    var view3 = Ac.View.create("#footer");
 
     //Data binding creation
     view1.addDataBinding(userC, "name", "value");
-    view2.addDataBinding(userC, function() { return userC.getName() + "!"; }, "innerHTML");
-
+    view2.addDataBinding(userC, "name", "innerHTML");
+    view3.addDataBinding(userC, function() { return "&copy;2014 " + userC.getName() + ". All rights reserved." }, "innerHTML", false);
+    
     //Test usage
     userC.setName("Aaron");
 });
