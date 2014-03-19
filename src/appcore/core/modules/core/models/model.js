@@ -20,13 +20,17 @@ define(function(require) {
 
         Constructs a Model instance.
     */
-    var Model = function() {
+    var Model = function(modelAttributes) {
         //Private instance members
         var attributes = {
             id: null,
             attributes: {},
             validationRules: {}
         };
+
+        for (var i = 0, length = modelAttributes.length; i < length; i++) {
+            attributes.attributes[modelAttributes[i]] = null;
+        }
 
         //Public instance members
         //(None)
@@ -106,7 +110,7 @@ define(function(require) {
 
                 @param {object} model       The desired model
             */
-            Model.removeStaticMethod = function(name) {
+            model.removeStaticMethod = function(name) {
                 delete model[name];
             };
 
@@ -119,7 +123,7 @@ define(function(require) {
 
                 @return {boolean}
             */
-            Model.hasStaticMethod = function(model, name) {
+            model.hasStaticMethod = function(model, name) {
                 return typeof model[name] === "function" && typeof model.prototype[name] !== "function";
             };
 
@@ -285,20 +289,17 @@ define(function(require) {
             prototype.toObject = function() {
                 var returnData = {};
 
-                for (var property in this) {
-                    if (typeof this[property] === "function" && property.indexOf("set") === 0) {
-                        var attribute = property.charAt(3).toLowerCase() + property.substring(4);
-                        var methodName = "get" + property.substring(3);
+                var attributes = this[_getAttributes](_key);
+                var attributeValue;
 
-                        if (typeof this[methodName] === "function" && methodName !== "getDataValue") {
-                            var data = this[methodName]();
+                for (var attribute in attributes) {
+                    attributeValue = attributes[attribute];
 
-                            if (data && typeof data === "object" && typeof data.toObject === "function") {
-                                data = data.toObject();
-                            }
-
-                            returnData[attribute] = data;
-                        }
+                    if (typeof attributeValue === "function") {
+                        returnData[attribute] = attributeValue.toObject();
+                    }
+                    else {
+                        returnData[attribute] = attributeValue;
                     }
                 }
 

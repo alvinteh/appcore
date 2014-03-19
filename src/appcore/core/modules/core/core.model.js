@@ -26,18 +26,34 @@ define(function(require) {
                 parentClass = parentClass ? parentClass : Model;
 
                 //Create the child class constructor. Use a verbose method for performance optimization.
-                var childClass = constructor ?
-                function() {
-                    parentClass.call(this, arguments);
-                    constructor.apply(this, arguments);
+                var childClass;
 
-                    return this;
-                } :
-                function() {
-                    parentClass.call(this, arguments);
+                if (constructor) {
+                    childClass = parentClass === Model ? function() {
+                        parentClass.apply(this, [attributes]);
+                        constructor.apply(this, arguments);
 
-                    return this;
-                };
+                        return this;
+                    } :
+                    function() {
+                        parentClass.apply(this, arguments);
+                        constructor.apply(this, arguments);
+
+                        return this;
+                    };
+                }
+                else {
+                    childClass = parentClass === Model ? function() {
+                        parentClass.apply(this, [attributes]);
+
+                        return this;
+                    } :
+                    function() {
+                        parentClass.apply(this, arguments);
+
+                        return this;
+                    };
+                }
 
                 //Implement inheritance
                 childClass.prototype = Object.create(parentClass.prototype);
