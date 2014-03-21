@@ -117,6 +117,38 @@ define(function(require) {
         return ret;
     };
 
+    /*
+        @function triggerCollectionChange
+
+        Triggers the change event on the collection
+
+        @param {int} event      The desired event
+
+    */
+    var triggerCollectionChange = function(event) {
+        EventHelper.trigger(new Event(this, "change", {
+            item: event.getTarget(),
+            changes: event.getData()
+        }));
+    };
+
+    /*
+        @function removeItem
+
+        Removes the item with the specified identifier from the specified collection.
+
+        @param {int} id                 The desired item's identifier
+        @param {object[]]} items        The desired collection
+
+    */
+    var removeItem = function(id, items) {
+        var tmpItem = items[id];
+        delete items[id];
+        EventHelper.unobserve(tmpItem, "change", triggerCollectionChange);
+        EventHelper.trigger(new Event(this, "remove", { item: tmpItem }));
+    };
+
+
     //Public prototype members
     /*
         @function hasItemWhere
@@ -341,13 +373,10 @@ define(function(require) {
     Collection.addMethod("removeItemLike", function(attribute, value) {
         var items = this.get("items");
         var methodName = ModelHelper.getGetter(attribute);
-        var tmpItem;
 
         for (var i = 0, length = items.length; i < length; i++) {
             if (items[i][methodName]() === value) {
-                tmpItem = items[i];
-                delete items[i];
-                EventHelper.trigger(new Event(this, "remove", { item: tmpItem }));
+                removeItem(i, items);
                 break;
             }
         }
@@ -366,13 +395,10 @@ define(function(require) {
     Collection.addMethod("removeItemsLike", function(attribute, value) {
         var items = this.get("items");
         var methodName = ModelHelper.getGetter(attribute);
-        var tmpItem;
 
         for (var i = 0, length = items.length; i < length; i++) {
             if (items[i][methodName]() === value) {
-                tmpItem = items[i];
-                delete items[i];
-                EventHelper.trigger(new Event(this, "remove", { item: tmpItem }));
+                removeItem(i, items);
             }
         }
     });
@@ -387,7 +413,6 @@ define(function(require) {
     */
     Collection.addMethod("removeItemWhere", function(predicates) {
         var items = this.get("items");
-        var tmpItem;
 
         for (var i = 0, iLength = items.length; i < iLength; i++) {
             var item = items[i];
@@ -403,9 +428,7 @@ define(function(require) {
             }
 
             if (itemSatisfactory) {
-                tmpItem = items[i];
-                delete items[i];
-                EventHelper.trigger(new Event(this, "remove", { item: tmpItem }));
+                removeItem(i, items);
                 break;
             }
         }
@@ -421,7 +444,6 @@ define(function(require) {
     */
     Collection.addMethod("removeItemsWhere", function(predicates) {
         var items = this.get("items");
-        var tmpItem;
 
         for (var i = 0, iLength = items.length; i < iLength; i++) {
             var item = items[i];
@@ -437,9 +459,7 @@ define(function(require) {
             }
 
             if (itemSatisfactory) {
-                tmpItem = items[i];
-                delete items[i];
-                EventHelper.trigger(new Event(this, "remove", { item: tmpItem }));
+                removeItem(i, items);
             }
         }
     });
@@ -530,13 +550,10 @@ define(function(require) {
     */
     Collection.addMethod("removeItem", function(item) {
         var items = this.get("items");
-        var tmpItem;
 
         for (var i = 0, length = items.length; i < length; i++) {
             if (i === item || items[i] === item) {
-                tmpItem = items[i];
-                delete items[i];
-                EventHelper.trigger(new Event(this, "remove", { item: tmpItem }));
+                removeItem(i, items);
                 break;
             }
         }
@@ -545,7 +562,7 @@ define(function(require) {
     /*
         @function addItem
 
-        Adds the specified item to the collection. Note that the setId() method will be called on the item unless it 
+        Adds the specified item to the collection. Note that the setId() method will be called on the item unless it
         already has one (which is not null/undefined).
 
         @param {object} item    The desired item
@@ -561,7 +578,8 @@ define(function(require) {
         }
 
         items[id] = item;
-        EventHelper.trigger(new Event(this, "remove", { item: item }));
+        EventHelper.trigger(new Event(this, "add", { item: item }));
+        EventHelper.observe(item, "change", triggerCollectionChange);
     });
 
     return Collection;
