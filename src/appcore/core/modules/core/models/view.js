@@ -116,7 +116,7 @@ define(function(require) {
 
             for (var i = 0, iLength = dataBindings.length; i < iLength; i++) {
                 var dataBinding = dataBindings[i];
-                
+
                 if (instance === undefined || dataBinding.object === instance) {
                     var objectProperty = dataBinding.objectProperty;
 

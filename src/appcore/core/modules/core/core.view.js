@@ -31,7 +31,6 @@ define(function(require) {
                     if (eventListener.event === event.type) {
                         eventListener.listener.apply(undefined, [event]);
                     }
-                    
                 }
                 else if (eventListener.event === "mutation" && event instanceof window.MutationRecord) {
                     if (eventListener.element === event.target ||
@@ -76,7 +75,7 @@ define(function(require) {
 
                 var elements = context.getElements();
                 var element;
-                
+
                 if (!twoWay) {
                     return;
                 }
@@ -86,7 +85,7 @@ define(function(require) {
                 for (var i = 0, length = elements.length; i < length; i++) {
                     element = elements[i];
                     //jshint -W083
-                    if (elementProperties.indexOf("value") !== -1) {    
+                    if (elementProperties.indexOf("value") !== -1) {
                         for (var j = 0, jLength = events.length; j < jLength; j++) {
                             appData.eventListeners.push({
                                 element: element,
@@ -97,7 +96,7 @@ define(function(require) {
                                 }
                             });
                         }
-                        
+
                     }
                     else {
                         appData.eventListeners.push({
@@ -107,7 +106,7 @@ define(function(require) {
                                 if (mutation.type === "attributes") {
                                     if (elementProperties.indexOf(mutation.attributeName) !== -1) {
                                         instance.set(objectProperty, element[mutation.attributeName], { silent: true });
-                                        ViewModule.refresh(instance);    
+                                        ViewModule.refresh(instance);
                                     }
                                 }
                                 else if (mutation.type === "characterData") {
