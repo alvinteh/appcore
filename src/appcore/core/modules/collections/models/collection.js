@@ -118,15 +118,15 @@ define(function(require) {
     };
 
     /*
-        @function triggerCollectionChange
+        @function triggerItemChange
 
-        Triggers the change event on the collection
+        Triggers the item_change event on the collection
 
         @param {int} event      The desired event
 
     */
-    var triggerCollectionChange = function(event) {
-        EventHelper.trigger(new Event(this, "change", {
+    var triggerItemChange = function(event) {
+        EventHelper.trigger(new Event(this, "item_change", {
             item: event.getTarget(),
             changes: event.getData()
         }));
@@ -144,8 +144,8 @@ define(function(require) {
     var removeItem = function(id, items) {
         var tmpItem = items[id];
         delete items[id];
-        EventHelper.unobserve(tmpItem, "change", triggerCollectionChange);
-        EventHelper.trigger(new Event(this, "remove", { item: tmpItem }));
+        EventHelper.unobserve(tmpItem, "change", triggerItemChange);
+        EventHelper.trigger(new Event(this, "item_remove", { item: tmpItem }));
     };
 
 
@@ -578,8 +578,8 @@ define(function(require) {
         }
 
         items[id] = item;
-        EventHelper.trigger(new Event(this, "add", { item: item }));
-        EventHelper.observe(item, "change", triggerCollectionChange);
+        EventHelper.trigger(new Event(this, "item_add", { item: item }));
+        EventHelper.observe(item, "change", triggerItemChange);
     });
 
     return Collection;

@@ -2,6 +2,8 @@ define(function(require) {
     "use strict";
 
     var Ac = require("../../../../appcore");
+    var Event = require("../../events/models/event");
+    var EventHelper = require("../../events/helpers/event-helper");
 
     /*
         @class CollectionGroup
@@ -29,7 +31,51 @@ define(function(require) {
     );
 
     //Private static members
-    //(None)
+    /*
+        @function triggerItemAdd
+
+        Triggers the item_add event on the collection group.
+
+        @param {int} event      The desired event
+
+    */
+    var triggerItemAdd = function(event) {
+        EventHelper.trigger(new Event(this, "item_add", {
+            collection: event.getTarget(),
+            item: event.getData().item
+        }));
+    };
+
+    /*
+        @function triggerItemChange
+
+        Triggers the item_change event on the collection group.
+
+        @param {int} event      The desired event
+
+    */
+    var triggerItemChange = function(event) {
+        EventHelper.trigger(new Event(this, "item_change", {
+            collection: event.getTarget(),
+            item: event.getData().item,
+            changes: event.getData().changes
+        }));
+    };
+
+    /*
+        @function triggerItemRemove
+
+        Triggers the item_remove event on the collection group.
+
+        @param {int} event      The desired event
+
+    */
+    var triggerItemRemove = function(event) {
+        EventHelper.trigger(new Event(this, "item_remove", {
+            collection: event.getTarget(),
+            item: event.getData().item
+        }));
+    };
 
     //Public prototype members
     /*
@@ -43,6 +89,11 @@ define(function(require) {
         var collections = this.get("collections");
 
         collections[collection.get("name")] = collection;
+
+        EventHelper.observe(collection, "item_add", triggerItemAdd);
+        EventHelper.observe(collection, "item_change", triggerItemChange);
+        EventHelper.observe(collection, "item_remove", triggerItemRemove);
+        EventHelper.trigger(new Event(this, "collection_add", { collection: collection }));
     });
 
     /*
@@ -65,7 +116,13 @@ define(function(require) {
             }
         }
 
+        var tmpCollection = collections[targetCollectionName];
         delete collections[targetCollectionName];
+
+        EventHelper.unobserve(tmpCollection, "item_add", triggerItemAdd);
+        EventHelper.unobserve(tmpCollection, "item_change", triggerItemChange);
+        EventHelper.unobserve(tmpCollection, "item_remove", triggerItemRemove);
+        EventHelper.trigger(new Event(this, "collection_remove", { collection: tmpCollection }));
     });
 
     /*
