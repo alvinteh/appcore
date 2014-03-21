@@ -6,6 +6,17 @@ define(function() {
             /*
                 @function override
 
+                Creates a blank function.
+
+                @return {function}
+            */
+            noop: function() {
+                return function(){};
+            },
+
+            /*
+                @function override
+
                 Gets an overriden version of the specified function. The overriding function will be passed references
                 to the original function, its scope and arguments so that the latter function can be called by running
                 originalFunction.apply(scope, arguments);
