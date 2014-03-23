@@ -16,13 +16,14 @@ define(function(require) {
                 Creates a Model with the specified attributes, constructor and inheritance. Note that inheritancer and
                 return are handled by AppCore and the provided constructor does not need to include them.
 
+                @param {string} name                The desired model name
                 @param {string[]} attributes        The desired class attributes
-                @param [{function}] constructor       The desired class constructor
+                @param [{function}] constructor     The desired class constructor
                 @param [{object}] parentClass       The desired parent class to inherit from
 
                 @return {object}
             */
-            create: function(attributes, constructor, parentClass) {
+            create: function(name, attributes, constructor, parentClass) {
                 parentClass = parentClass ? parentClass : Model;
 
                 //Create the child class constructor. Use a verbose method for performance optimization.
@@ -30,7 +31,7 @@ define(function(require) {
 
                 if (constructor) {
                     childClass = parentClass === Model ? function() {
-                        parentClass.apply(this, [attributes]);
+                        parentClass.apply(this, [name, attributes]);
                         constructor.apply(this, arguments);
 
                         return this;
@@ -44,7 +45,7 @@ define(function(require) {
                 }
                 else {
                     childClass = parentClass === Model ? function() {
-                        parentClass.apply(this, [attributes]);
+                        parentClass.apply(this, [name, attributes]);
 
                         return this;
                     } :

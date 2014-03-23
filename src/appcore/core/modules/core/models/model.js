@@ -19,11 +19,15 @@ define(function(require) {
         @constructor Model
 
         Constructs a Model instance.
+
+        @param {string} modelName       The desired model name
+        @param {string[]} attributes    The desired model attributes
     */
-    var Model = function(modelAttributes) {
+    var Model = function(modelName, modelAttributes) {
         //Private instance members
         var attributes = {
             id: null,
+            name: modelName,
             attributes: {},
             validationRules: {}
         };
@@ -36,9 +40,14 @@ define(function(require) {
         //(None)
 
         //Special instance method for private member access
-        this[_getAttributes] = function(key) {
+        this[_getAttributes] = function(key, privileged) {
             if (key === _key) {
-                return attributes.attributes;
+                if (privileged === true) {
+                    return attributes;
+                }
+                else {
+                    return attributes.attributes;
+                }
             }
         };
 
@@ -108,7 +117,7 @@ define(function(require) {
 
                 Removes the specified method from the model.
 
-                @param {object} model       The desired model
+                @param {string} name        The desired method name
             */
             model.removeStaticMethod = function(name) {
                 delete model[name];
@@ -123,8 +132,56 @@ define(function(require) {
 
                 @return {boolean}
             */
-            model.hasStaticMethod = function(model, name) {
+            model.hasStaticMethod = function(name) {
                 return typeof model[name] === "function" && typeof model.prototype[name] !== "function";
+            };
+
+            /*
+                @function addStaticAttribute
+
+                Adds the specified attribute to the model.
+
+                @param {string} name        The desired method name
+                @param {string} value       The desired value
+            */
+            model.addStaticAttribute = function(name, value) {
+                model[name] = value;
+            };
+
+            /*
+                @function removeStaticAttribute
+
+                Removes the specified attribute from the model.
+
+                @param {object} name        The desired attribute name
+            */
+            model.removeStaticAttribute = function(name) {
+                delete model[name];
+            };
+
+            /*
+                @function hasStaticMethod
+
+                Checks if the specified method exists in the model.
+
+                @param {string} name        The desired method name
+
+                @return {boolean}
+            */
+            model.hasStaticAttribute = function(name) {
+                var type = typeof model[name];
+                return  type !== "undefined"  && type !== "function" && typeof model.prototype[name] !== type;
+            };
+
+            /*
+                @function getModelName()
+
+                Gets the model's name.
+
+                @return {string}
+            */
+            model.getModelName = function() {
+                model[name] = value;
             };
 
             /*
@@ -137,7 +194,7 @@ define(function(require) {
                 @return {object[]}
             */
             model.getValidationRules = function() {
-                return staticAttributes.validationRules;
+                return this[_getAttributes](_key, true).name;
             };
 
             /*
