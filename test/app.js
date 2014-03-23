@@ -81,20 +81,20 @@ require([
      */
 
     //Model definition
-    var User = Ac.Model.create(["name", "age", "sex"], function(name, age) {
+    var User = Ac.Model.create("User", ["name", "age", "sex"], function(name, age) {
         this.set({
             name: name,
             age: age
         });
     });
 
-    var Pet = Ac.Model.create(["name", "type"], function(name, type) {
+    var Pet = Ac.Model.create("Pet", ["name", "type"], function(name, type) {
         this.set({
             name: name,
             type: type
         });
     });
-    
+
     //Model method definition
     User.addMethod("greet", function() {
         console.log("Hello, I am " + this.getName() + " and I am " + this.getAge() + "!");
@@ -200,7 +200,7 @@ require([
     view1.addDataBinding(userC, "name", "value");
     view2.addDataBinding(userC, "name", "innerHTML");
     view3.addDataBinding(userC, function() { return "&copy;2014 " + userC.getName() + ". All rights reserved." }, "innerHTML", false);
-    
+
     //Test usage
     userC.setName("Aaron");
 });
