@@ -20,7 +20,7 @@ define(function(require) {
         @param {function} collectionGroup     The desired collection group.
     */
     var Syncer = Ac.Model.create(
-        ["collectionGroup", "map", "listeners"],
+        ["collectionGroup", "map", "listeners", "syncData"],
         function(collectionGroup) {
             this.set({
                 collectionGroup: collectionGroup,
@@ -30,7 +30,8 @@ define(function(require) {
                     itemRemove: FunctionHelper.noop(),
                     collectionAdd: FunctionHelper.noop(),
                     collectionRemove: FunctionHelper.noop()
-                }
+                },
+                syncData: []
              });
 
             var listeners = this.get("listeners");
@@ -43,6 +44,17 @@ define(function(require) {
         }
     );
 
+    //Public static members
+    Syncer.addStaticAttribute("ACTION_CREATE", "create");
+    Syncer.addStaticAttribute("ACTION_DELETE", "delete");
+    Syncer.addStaticAttribute("ACTION_READ", "read");
+    Syncer.addStaticAttribute("ACTION_UPDATE", "update");
+
+    Syncer.addStaticAttribute("STATUS_CREATED", "created");
+    Syncer.addStaticAttribute("STATUS_DELETED", "deleted");
+    Syncer.addStaticAttribute("STATUS_UNCHANGED", "unchanged");
+    Syncer.addStaticAttribute("STATUS_UPDATED", "updated");
+
     //Private static members
     //(None)
 
@@ -50,19 +62,60 @@ define(function(require) {
     /*
         @function map
 
-        Maps the specified model (optionally filtered for the specified event) to the specified resource.
+        Maps the specified model and event to the specified endpoint.
 
         @param {function} model         The desired model
-        @param {string} resource        The desired resource
-        @param [{string}] event         The desired event
+        @param {string} action          The desired action
+        @param {string} endpoint        The desired endpoint
     */
-    Syncer.addMethod("map", function(model, resource, event) {
+    Syncer.addMethod("map", function(model, action, endpoint) {
         var map = this.get("map");
 
-        var mapModel = model === "*" ? "all" : model;
-        var mapEvent = typeof event !== "string" || event === "*" ? "all" : event;
+        map[model][action] = endpoint;
+    });
 
-        map[mapModel][mapEvent] = resource;
+    /*
+        @function getSyncStatus
+
+        Gets the synchronization status of the specified item
+
+        @param {object} item       The desired item
+    */
+    Syncer.addMethod("getSyncStatus", function(item) {
+        var syncData = this.get("syncData");
+        var syncDataItem;
+
+        for (var i = 0, length = syncData.length; i < length; i++) {
+            syncDataItem = syncData[i];
+
+            if (syncDataItem.item === item) {
+                return syncDataItem.status;
+            }
+        }
+
+        return null;
+    });
+
+    /*
+        @function getSyncAction
+
+        Gets the action that should be done to synchronie the specified item
+
+        @param {object} item       The desired item
+    */
+    Syncer.addMethod("getSyncAction", function(item) {
+        var syncStatus = this.getSyncStatus(item);
+        
+        switch (syncStatus) {
+            case Syncer.STATUS_CREATED:
+                return Syncer.ACTION_CREATE;
+            case Syncer.STATUS_DELETED:
+                return Syncer.ACTION_DELETE;
+            case Syncer.STATUS_UNCHANGED:
+                return null;
+            case Syncer.STATUS_UPDATED:
+                return Syncer.ACTION_UPDATE;
+        }   
     });
 
     /*
