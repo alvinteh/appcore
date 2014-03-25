@@ -4,7 +4,7 @@ define(function(require) {
     var Ac = require("../../../../appcore");
     var Event = require("../../events/models/event");
     var EventHelper = require("../../events/helpers/event-helper");
-    var ModelHelper = require("../../util/helpers/model-helper");
+    var Predicate = require("../../util/models/predicate");
 
     /*
         @class Collection
@@ -54,68 +54,6 @@ define(function(require) {
 
         @return {object[]}
     */
-    var normalizePredicates = function(predicates) {
-        var ret = predicates;
-
-        if (!predicates instanceof Array) {
-            ret = [];
-
-            for (var attribute in predicates) {
-                ret.push({
-                    attribute: attribute,
-                    value: predicates[attribute],
-                    operation: "==="
-                });
-            }
-        }
-
-        return ret;
-    };
-
-    /*
-        @function satisfiesPredicate
-
-        Checks if the specified item satisfied the specified predicate.
-
-        @return {boolean}
-    */
-    var satisfiesPredicate = function(item, predicate) {
-        var ret = false;
-
-        var operation = predicate.operation ? predicate.operation : "===";
-        var func = predicate.func ? predicate.func : null;
-        var itemValue = item[ModelHelper.getGetter(predicate.attribute)]();
-        var predicateValue = predicate.value;
-
-        if (typeof func === "function") {
-            itemValue = func(itemValue);
-        }
-
-        switch (operation) {
-            case "===":
-                ret = itemValue === predicateValue;
-                break;
-            case "==":
-                //jshint -W116
-                ret = itemValue == predicateValue;
-                //jshint +W116
-                break;
-            case ">=":
-                ret = itemValue >= predicateValue;
-                break;
-            case ">":
-                ret = itemValue > predicateValue;
-                break;
-            case "<=":
-                ret = itemValue <= predicateValue;
-                break;
-            case "<":
-                ret = itemValue < predicateValue;
-                break;
-        }
-
-        return ret;
-    };
 
     /*
         @function triggerItemChange
@@ -166,10 +104,10 @@ define(function(require) {
         for (var i = 0, iLength = items.length; i < iLength; i++) {
             var item = items[i];
             var itemSatisfactory = false;
-            var normalizedPredicates = normalizePredicates(predicates);
+            var normalizedPredicates = Predicate.normalize(predicates);
 
             for (var j = 0, jLength = normalizedPredicates.length; j < jLength; j++) {
-                itemSatisfactory = satisfiesPredicate(item, normalizedPredicates[j]);
+                itemSatisfactory = normalizedPredicates[j].test(item);
 
                 if (!itemSatisfactory) {
                     break;
@@ -200,10 +138,10 @@ define(function(require) {
         for (var i = 0, iLength = items.length; i < iLength; i++) {
             var item = items[i];
             var itemSatisfactory = false;
-            var normalizedPredicates = normalizePredicates(predicates);
+            var normalizedPredicates = Predicate.normalize(predicates);
 
             for (var j = 0, jLength = normalizedPredicates.length; j < jLength; j++) {
-                itemSatisfactory = satisfiesPredicate(item, normalizedPredicates[j]);
+                itemSatisfactory = normalizedPredicates[j].test(item);
 
                 if (!itemSatisfactory) {
                     break;
@@ -236,10 +174,10 @@ define(function(require) {
         for (var i = 0, iLength = items.length; i < iLength; i++) {
             var item = items[i];
             var itemSatisfactory = false;
-            var normalizedPredicates = normalizePredicates(predicates);
+            var normalizedPredicates = Predicate.normalize(predicates);
 
             for (var j = 0, jLength = normalizedPredicates.length; j < jLength; j++) {
-                itemSatisfactory = satisfiesPredicate(item, normalizedPredicates[j]);
+                itemSatisfactory = normalizedPredicates[j].test(item);
 
                 if (!itemSatisfactory) {
                     break;
@@ -267,10 +205,9 @@ define(function(require) {
     */
     Collection.addMethod("hasItemLike", function(attribute, value) {
         var items = this.get("items");
-        var methodName = ModelHelper.getGetter(attribute);
 
         for (var i = 0, length = items.length; i < length; i++) {
-            if (items[i][methodName]() === value) {
+            if (items[i].get(attribute) === value) {
                 return true;
             }
         }
@@ -292,10 +229,9 @@ define(function(require) {
     */
     Collection.addMethod("findItemLike", function(attribute, value) {
         var items = this.get("items");
-        var methodName = ModelHelper.getGetter(attribute);
 
         for (var i = 0, length = items.length; i < length; i++) {
-            if (items[i][methodName]() === value) {
+            if (items[i].get(attribute) === value) {
                 return items[i];
             }
         }
@@ -317,12 +253,11 @@ define(function(require) {
     */
     Collection.addMethod("findItemsLike", function(attribute, value) {
         var items = this.get("items");
-        var methodName = ModelHelper.getGetter(attribute);
 
         var ret = [];
 
         for (var i = 0, length = items.length; i < length; i++) {
-            if (items[i][methodName]() === value) {
+            if (items[i].get(attribute) === value) {
                 ret.push(items[i]);
             }
         }
@@ -345,12 +280,11 @@ define(function(require) {
     */
     Collection.addMethod("findItemsBetween", function(attribute, value1, value2) {
         var items = this.get("items");
-        var methodName = ModelHelper.getGetter(attribute);
 
         var ret = [];
 
         for (var i = 0, length = items.length; i < length; i++) {
-            var value = items[i][methodName]();
+            var value = items[i].get(attribute);
 
             if (value >= value1 && value <= value2) {
                 ret.push(items[i]);
@@ -372,10 +306,9 @@ define(function(require) {
     */
     Collection.addMethod("removeItemLike", function(attribute, value) {
         var items = this.get("items");
-        var methodName = ModelHelper.getGetter(attribute);
 
         for (var i = 0, length = items.length; i < length; i++) {
-            if (items[i][methodName]() === value) {
+            if (items[i].get(attribute) === value) {
                 removeItem(i, items);
                 break;
             }
@@ -394,10 +327,9 @@ define(function(require) {
     */
     Collection.addMethod("removeItemsLike", function(attribute, value) {
         var items = this.get("items");
-        var methodName = ModelHelper.getGetter(attribute);
 
         for (var i = 0, length = items.length; i < length; i++) {
-            if (items[i][methodName]() === value) {
+            if (items[i].get(attribute) === value) {
                 removeItem(i, items);
             }
         }
@@ -417,10 +349,10 @@ define(function(require) {
         for (var i = 0, iLength = items.length; i < iLength; i++) {
             var item = items[i];
             var itemSatisfactory = false;
-            var normalizedPredicates = normalizePredicates(predicates);
+            var normalizedPredicates = Predicate.normalize(predicates);
 
             for (var j = 0, jLength = normalizedPredicates.length; j < jLength; j++) {
-                itemSatisfactory = satisfiesPredicate(item, normalizedPredicates[j]);
+                itemSatisfactory = normalizedPredicates[j].test(item);
 
                 if (!itemSatisfactory) {
                     break;
@@ -448,10 +380,10 @@ define(function(require) {
         for (var i = 0, iLength = items.length; i < iLength; i++) {
             var item = items[i];
             var itemSatisfactory = false;
-            var normalizedPredicates = normalizePredicates(predicates);
+            var normalizedPredicates = Predicate.normalize(predicates);
 
             for (var j = 0, jLength = normalizedPredicates.length; j < jLength; j++) {
-                itemSatisfactory = satisfiesPredicate(item, normalizedPredicates[j]);
+                itemSatisfactory = normalizedPredicates[j].test(item);
 
                 if (!itemSatisfactory) {
                     break;
@@ -530,8 +462,7 @@ define(function(require) {
         var ret = null;
 
         //Attempt to return existing item first
-        var methodName = ModelHelper.getGetter(attribute);
-        ret = this.findItemLike(attribute, item[methodName]());
+        ret = this.findItemLike(attribute, item.get(attribute));
 
         if (!ret) {
             this.addItem(item);
