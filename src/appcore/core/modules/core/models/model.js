@@ -181,7 +181,7 @@ define(function(require) {
                 @return {string}
             */
             model.getModelName = function() {
-                model[name] = value;
+                return this[_getAttributes](_key, true).name;
             };
 
             /*
@@ -194,7 +194,7 @@ define(function(require) {
                 @return {object[]}
             */
             model.getValidationRules = function() {
-                return this[_getAttributes](_key, true).name;
+                return staticAttributes.validationRules;
             };
 
             /*
@@ -334,6 +334,17 @@ define(function(require) {
                 }
 
                 this[_getAttributes](_key).id = id;
+            };
+
+            /*
+                @function getModel()
+
+                Gets the model of the item.
+
+                @return {function}
+            */
+            prototype.getModel = function() {
+                return model;
             };
 
             /*
