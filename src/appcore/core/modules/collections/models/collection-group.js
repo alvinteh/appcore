@@ -79,6 +79,20 @@ define(function(require) {
 
     //Public prototype members
     /*
+        @func getCollection
+
+        Gets the specified Collection.
+
+        @param {string} collection      The name of the desired collection
+
+        @return {Collection}
+
+    */
+    CollectionGroup.addMethod("getCollection", function(collection) {
+        return this.get("collections")[collection];
+    });
+
+    /*
         @func addCollection
 
         Adds the specified Collection to the CollectionGroup.
