@@ -28,6 +28,7 @@ define(function(require) {
             for (var i = 0, length = appData.eventListeners.length; i < length; i++) {
                 eventListener = appData.eventListeners[i];
 
+
                 if (eventListener.element === event.target) {
                     if (eventListener.event === event.type) {
                         eventListener.listener.apply(undefined, [event]);
@@ -64,63 +65,145 @@ define(function(require) {
             subtree: true
         });
 
-
-        View.prototype.addDataBinding = FunctionHelper.override(View.prototype.addDataBinding,
+        Element.prototype.addDataBinding = FunctionHelper.override(Element.prototype.addDataBinding,
             function(originalFunction, context, args) {
-                originalFunction.apply(context, args);
 
-                var instance = args[0];
-                var objectProperty = args[1];
-                var elementProperties = args[2];
-                var twoWay = args[3] !== false;
+            originalFunction.apply(context, args);
 
-                var elements = context.getElements();
-                var element;
-
-                if (!twoWay) {
-                    return;
+            var instance = args[0];
+            var objectProperty = args[1];
+            var elementProperties = (function(elementProperties) {
+                if (elementProperties === undefined) {
+                    return (context.getElements()[0].value === undefined ? ["innerHTML"] : ["value"]);
                 }
+                else {
+                    return elementProperties instanceof Array ? elementProperties : [elementProperties];
+                }
+            })(args[2]);
+            var direction = args[3] ? args[3] : Element.TWO_WAY_BINDING;
 
-                var events = ["change", "input"];
+            if (direction === Element.ONE_WAY_BINDING) {
+                return;
+            }
 
-                for (var i = 0, length = elements.length; i < length; i++) {
-                    element = elements[i];
-                    //jshint -W083
-                    if (elementProperties.indexOf("value") !== -1) {
-                        for (var j = 0, jLength = events.length; j < jLength; j++) {
-                            appData.eventListeners.push({
-                                element: element,
-                                event: events[j],
-                                listener: function() {
-                                    instance.set(objectProperty, element.value, { silent: true });
-                                    ViewModule.refresh(instance);
-                                }
-                            });
-                        }
+            var events = ["change", "input"];
 
-                    }
-                    else {
+            var elements = context.getElements();
+            var element;
+            var backwardTransform = args[5], value;
+
+            for (var i = 0, iLength = elements.length; i < iLength; i++) {
+                element = elements[i];
+
+                //jshint -W083
+                if (elementProperties.indexOf("value") !== -1) {
+                    for (var j = 0, jLength = events.length; j < jLength; j++) {
                         appData.eventListeners.push({
                             element: element,
-                            event: "mutation",
-                            listener: function(mutation) {
-                                if (mutation.type === "attributes") {
-                                    if (elementProperties.indexOf(mutation.attributeName) !== -1) {
-                                        instance.set(objectProperty, element[mutation.attributeName], { silent: true });
-                                        ViewModule.refresh(instance);
-                                    }
+                            event: events[j],
+                            listener: function() {
+                                value = element.value;
+
+                                if (backwardTransform) {
+                                    value = backwardTransform(value);
                                 }
-                                else if (mutation.type === "characterData") {
-                                    if (elementProperties.indexOf("innerHTML") !== -1) {
-                                        instance.set(objectProperty, element.innerHTML, { silent: true });
-                                        ViewModule.refresh(instance);
-                                    }
-                                }
+
+                                instance.set(objectProperty, value);
+                                ViewModule.refresh(instance);
                             }
                         });
                     }
-                    //jshint +W083
                 }
+                else {
+                    appData.eventListeners.push({
+                        element: element,
+                        event: "mutation",
+                        listener: function(mutation) {
+                            if (mutation.type === "attributes") {
+                                if (elementProperties.indexOf(mutation.attributeName) !== -1) {
+                                    value = element[mutation.attributeName];
+
+                                    if (backwardTransform) {
+                                        value = backwardTransform(value);
+                                    }
+
+                                    instance.set(objectProperty, value);
+                                    ViewModule.refresh(instance);
+                                }
+                            }
+                            else if (mutation.type === "characterData") {
+                                if (elementProperties.indexOf("innerHTML") !== -1) {
+                                    value = element.innerHTML;
+
+                                    if (backwardTransform) {
+                                        value = backwardTransform(value);
+                                    }
+
+                                    instance.set(objectProperty, value);
+                                    ViewModule.refresh(instance);
+                                }
+                            }
+                        }
+                    });
+                }
+                //jshint +W083
+            }
+        });
+
+        Element.prototype.removeDataBinding = FunctionHelper.override(Element.prototype.removeDataBinding,
+            function(originalFunction, context, args) {
+
+            originalFunction.apply(context, args);
+
+            var elementProperties = (function(elementProperties) {
+                if (elementProperties === undefined) {
+                    return (context.getElements()[0].value === undefined ? ["innerHTML"] : ["value"]);
+                }
+                else {
+                    return elementProperties instanceof Array ? elementProperties : [elementProperties];
+                }
+            })(args[2]);
+            var direction = args[3] ? args[3] : Element.TWO_WAY_BINDING;
+
+            if (direction === Element.ONE_WAY_BINDING) {
+                return;
+            }
+
+            var events = ["change", "input"];
+
+            var elements = context.getElements();
+            var element, eventListener;
+
+            for (var i = 0, iLength = elements.length; i < iLength; i++) {
+                element = elements[i];
+
+                //jshint -W083
+                if (elementProperties.indexOf("value") !== -1) {
+                    for (var j = 0, jLength = events.length; j < jLength; j++) {
+                        for (var k = 0, kLength = appData.eventListeners.length; k < kLength; k++) {
+                            eventListener = appData.eventListeners[k];
+
+                            if (eventListener.element === element && eventListener.event === event) {
+                                appData.eventListeners.splice(k, 1);
+                                k--;
+                                kLength--;
+                            }
+                        }
+                    }
+                }
+                else {
+                    for (var l = 0, lLength = appData.eventListeners.length; l < lLength; l++) {
+                        eventListener = appData.eventListeners[l];
+
+                        if (eventListener.element === element && eventListener.event === event) {
+                            appData.eventListeners.splice(l, 1);
+                            l--;
+                            lLength--;
+                        }
+                    }
+                }
+                //jshint +W083
+            }
         });
 
         //Public instance members
@@ -188,7 +271,11 @@ define(function(require) {
                         }
 
                         return element;
-                    }
+                    },
+
+                    REVERSE_BINDING: Element.REVERSE_BINDING,
+                    ONE_WAY_BINDING: Element.ONE_WAY_BINDING,
+                    TWO_WAY_BINDING: Element.TWO_WAY_BINDING
                 };
             })()
         };

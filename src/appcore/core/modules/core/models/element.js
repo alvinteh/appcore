@@ -50,6 +50,10 @@ define(function(require) {
         return this;
     };
 
+    Element.REVERSE_BINDING = 0;
+    Element.ONE_WAY_BINDING = 1;
+    Element.TWO_WAY_BINDING = 2;
+
     Element.prototype = (function(prototype) {
         //Private static members
         //(None)
@@ -124,20 +128,26 @@ define(function(require) {
             var dataBindings = attributes.dataBindings;
             var elements = attributes.elements;
 
+            var dataBinding, objectProperty, elementProperty, forwardTransform, value;
+
             for (var i = 0, iLength = dataBindings.length; i < iLength; i++) {
-                var dataBinding = dataBindings[i];
+                dataBinding = dataBindings[i];
 
                 if (instance === undefined || dataBinding.object === instance) {
-                    var objectProperty = dataBinding.objectProperty;
+                    objectProperty = dataBinding.objectProperty;
 
                     for (var j = 0, jLength = dataBinding.elementProperties.length; j < jLength; j++) {
-                        var elementProperty = dataBinding.elementProperties[j];
+                        elementProperty = dataBinding.elementProperties[j];
+                        forwardTransform = dataBinding.forwardTransform;
+
+                        value = dataBinding.object.get(objectProperty);
+
+                        if (forwardTransform) {
+                            value = forwardTransform(value);
+                        }
 
                         for (var k = 0, kLength = elements.length; k < kLength; k++) {
-                            var element = elements[k];
-
-                            element[elementProperty] = typeof objectProperty === "string" ?
-                                dataBinding.object.get(objectProperty) : dataBinding.objectProperty();
+                            elements[k][elementProperty] = value;
                         }
                     }
                 }
@@ -147,22 +157,29 @@ define(function(require) {
         /*
             @function addDataBinding
 
-            Data-binds the Element to the specified Model instance.
+            Data-binds the Element to the specified Model instance. If unspecified, the element properties argument
+            defaults to innerHTML/value for the first element.
 
-            @param {object} instance                                        The desired Model instance
-            @param {string|function} objectProperty                         The desired object property
-            @param [{string = "innerHTML"|string[]}] elementProperties      The desired element properties
-            @param [{boolean = true}] twoWay                                Flag indicating whether the data-binding is
-                                                                            two-way
+            @param {object} instance                                    The desired Model instance
+            @param {string|function} objectProperty                     The desired object property
+            @param [{string = "..."|string[]}] elementProperties        The desired element properties
+            @param [{int = 2}] direction                                The desired binding direction
+            @param [{function}] forwardTransform                        The desired transformation function to be run
+                                                                        when performing property-to-element updates
+            @param [{function}] backwardTransform                       The desired transformation function to be run
+                                                                        when performing element-to-property updates
         */
-        prototype.addDataBinding = function(instance, objectProperty, elementProperties, twoWay) {
+        prototype.addDataBinding = function(instance, objectProperty, elementProperties, direction, forwardTransform,
+            backwardTransform) {
             var attributes = this[_getAttributes](_key);
             var dataBindings = attributes.dataBindings;
+
+            var me = this;
 
             dataBindings.push({
                 elementProperties: (function(elementProperties) {
                     if (elementProperties === undefined) {
-                        return ["innerHTML"];
+                        return (me.getElements()[0].value === undefined ? ["innerHTML"] : ["value"]);
                     }
                     else {
                         return elementProperties instanceof Array ? elementProperties : [elementProperties];
@@ -170,7 +187,9 @@ define(function(require) {
                 })(elementProperties),
                 object: instance,
                 objectProperty: objectProperty,
-                twoWay: twoWay !== false
+                direction: direction ? direction : Element.TWO_WAY_BINDING,
+                forwardTransform: forwardTransform,
+                backwardTransform: backwardTransform
             });
 
             this.refresh(instance);
@@ -184,9 +203,9 @@ define(function(require) {
             @param {object} instance                            The desired Model instance
             @param [{string|function}] objectProperty           The desired object property
             @param [{string|string[]}] elementProperties        The desired element properties
-            @param [{boolean = true}] twoWay                    Flag indicating whether the data-binding is two-way
+            @param [{int = 1}] direction                                The desired binding direction
         */
-        prototype.removeDataBinding = function(instance, objectProperty, elementProperties, twoWay) {
+        prototype.removeDataBinding = function(instance, objectProperty, elementProperties, direction) {
             var attributes = this[_getAttributes](_key);
             var dataBindings = attributes.dataBindings;
             var dataBinding;
@@ -197,7 +216,6 @@ define(function(require) {
             for (var i = 0, length = dataBindings.length; i < length; i++) {
                 dataBinding = dataBindings[i];
 
-
                 if (
                     dataBinding.object === instance &&
                     (objectProperty === undefined || dataBinding.objectProperty === objectProperty) &&
@@ -205,16 +223,10 @@ define(function(require) {
                         elementProperties === undefined ||
                         JSON.stringify(dataBinding.elementProperties) === JSON.stringify(normalizedElementProperties)
                     ) &&
-                    (twoWay === undefined || dataBinding.twoWay === twoWay)
+                    (direction === undefined || dataBinding.direction === direction)
                 ) {
                     delete dataBindings[i];
                 }
-                dataBindings.push({
-                    elementProperties: elementProperties instanceof Array ? elementProperties : [elementProperties],
-                    object: instance,
-                    objectProperty: objectProperty,
-                    twoWay: twoWay !== false
-                });
             }
         };
 
