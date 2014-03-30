@@ -16,8 +16,8 @@ Dependencies
 To-do
 -------
 
-* RequireJS 2.1+
 * Fix issues with persistence module
+* Implement module format
 * Implement controllers
 * Implement routes
 
