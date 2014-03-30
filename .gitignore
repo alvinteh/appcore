@@ -10,3 +10,4 @@ bower_components
 node_modules
 .sass-cache
 /test/dependencies
+/test/css/app.min.css
