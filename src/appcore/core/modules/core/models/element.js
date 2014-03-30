@@ -17,7 +17,7 @@ define(function(require) {
 
         Constructs an Element instance.
 
-        @param [HTMLElement[]|HTMLElement|string] elements      The desired HTML element(s)
+        @param [{HTMLElement[]|HTMLElement|string}] elements        The desired HTML element(s)
     */
     var Element = function(elements) {
         //Private instance members
@@ -149,17 +149,25 @@ define(function(require) {
 
             Data-binds the Element to the specified Model instance.
 
-            @param {object} instance                        The desired Model instance
-            @param {string|function} objectProperty         The desired object property
-            @param {string|string[]} elementProperties      The desired element properties
-            @param [{boolean = true}] twoWay                Flag indicating whether the data-binding is two-way
+            @param {object} instance                                        The desired Model instance
+            @param {string|function} objectProperty                         The desired object property
+            @param [{string = "innerHTML"|string[]}] elementProperties      The desired element properties
+            @param [{boolean = true}] twoWay                                Flag indicating whether the data-binding is
+                                                                            two-way
         */
         prototype.addDataBinding = function(instance, objectProperty, elementProperties, twoWay) {
             var attributes = this[_getAttributes](_key);
             var dataBindings = attributes.dataBindings;
 
             dataBindings.push({
-                elementProperties: elementProperties instanceof Array ? elementProperties : [elementProperties],
+                elementProperties: (function(elementProperties) {
+                    if (elementProperties === undefined) {
+                        return ["innerHTML"];
+                    }
+                    else {
+                        return elementProperties instanceof Array ? elementProperties : [elementProperties];
+                    }
+                })(elementProperties),
                 object: instance,
                 objectProperty: objectProperty,
                 twoWay: twoWay !== false
