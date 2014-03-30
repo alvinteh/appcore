@@ -131,7 +131,6 @@ require([
         );
 
         EventHelper.observe(guestA, "change", function() {
-            console.log("HERE");
             var validationInfo = guestA.validate();
 
             var existingErrors = document.querySelectorAll(".input-error");
