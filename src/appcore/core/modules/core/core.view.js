@@ -166,11 +166,7 @@ define(function(require) {
             */
             refresh: function(instance) {
                 for (var i = 0, length = appData.views.length; i < length; i++) {
-                    var view = appData.views[i];
-
-                    if ((instance === undefined && view.hasDataBindings()) || view.isDataBoundTo(instance)) {
-                        view.refresh(instance);
-                    }
+                    appData.views[i].refresh(instance);
                 }
             },
 
