@@ -44,13 +44,25 @@ define(function(require) {
                     };
                 }
                 else {
+                    var defaultConstructor = function() {
+                        var values = {};
+
+                        for (var i = 0, length = arguments.length; i < length; i++) {
+                            values[attributes[i]] = arguments[i];
+                        }
+
+                        this.set(values);
+                    };
+
                     childClass = parentClass === Model ? function() {
                         parentClass.apply(this, [name, attributes]);
+                        defaultConstructor.apply(this, arguments);
 
                         return this;
                     } :
                     function() {
                         parentClass.apply(this, arguments);
+                        defaultConstructor.apply(this, arguments);
 
                         return this;
                     };
@@ -63,7 +75,11 @@ define(function(require) {
                 Model.init(childClass);
 
                 //Generate getter and setter methods
+                var attribute;
+
                 for (var i = 0, length = attributes.length; i < length; i++) {
+                    attribute = attributes[i];
+
                     //jshint -W083
                     (function(attribute) {
                         childClass.prototype[ModelHelper.getGetter(attribute)] = function() {
@@ -77,6 +93,12 @@ define(function(require) {
                     })(attributes[i]);
                     //jshint +W083
                 }
+
+                childClass.prototype.set = FunctionHelper.override(childClass.prototype.set,
+                    function(originalFunction, context, args) {
+                    originalFunction.apply(context, args);
+                    App.View.refresh(context);
+                });
 
                 childClass.prototype.setId = FunctionHelper.override(childClass.prototype.setId,
                     function(originalFunction, context, args) {
