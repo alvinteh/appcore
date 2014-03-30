@@ -468,9 +468,9 @@ define(function(require) {
                             if (
                                 //jshint -W101
                                 (rule.format === "email" && !/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(attributeValue)) ||
-                                (rule.format === "alpha" && !/^[a-z]$/i.test(attributeValue)) ||
+                                (rule.format === "alpha" && !/^[a-z]*$/i.test(attributeValue)) ||
                                 (rule.format === "flag" && attributeValue !== 0 && attributeValue !== 1) ||
-                                (rule.format === "alphanumeric" && !/^[a-z0-9]$/i.test(attributeValue)) ||
+                                (rule.format === "alphanumeric" && !/^[a-z0-9]*$/i.test(attributeValue)) ||
                                 (rule.format === "creditcard" && !/^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|6(?:011|5[0-9][0-9])[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|(?:2131|1800|35\d{3})\d{11})$/.test(attributeValue))
                                 //jshint +W101
                                 ) {
