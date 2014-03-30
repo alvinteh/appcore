@@ -9,200 +9,204 @@ require.config({
 require([
         "appcore/appcore",
         "appcore/core/modules/util/models/promise",
-        "appcore/core/modules/events/helpers/event-helper",
+        "appcore/core/modules/core/helpers/event-helper",
         "appcore/core/modules/util/helpers/uuid-helper"
     ],
     function(Ac, Promise, EventHelper) {
 
+    var testFlags = {
+        models: {
+            base: true
+        },
+        general: {
+            dataBinding: true,
+            events: false,
+            helpers: false,
+            promises: false
+        }
+    };
+
+    var test = function(module, func) {
+        var flags = module.split(".");
+
+        if (testFlags[flags[0]][flags[1]]) {
+            func();
+        }
+    };
+
     /*
-     *  PROMISES
+     * COMMON TEST VARIABLES
+     */
+    var Guest;
+
+    /*
+     *  MODELS - BASE
+     */
+     test("models.base", function() {
+        //Model definition
+        Guest = Ac.Model.create("Guest", ["name", "category", "confirmed"]);
+
+        //Model method definition
+        Guest.addMethod("confirm", function() {
+            this.set("confirmed", 1);
+        });
+
+        //Model static attribute definition
+        Guest.addStaticAttribute("CATEGORY_NORMAL", 0);
+        Guest.addStaticAttribute("CATEGORY_VIP", 1);
+
+        //Model static method definition
+        Guest.addStaticMethod("test", function() {
+            console.log("Testing the Guest model.");
+        });
+
+        //Model validation
+        Guest.setValidationRules({
+            name: [
+                {
+                    required: true
+                },
+                {
+                    type: "string"
+                },
+                {
+                    minLength: 2,
+                    message: "The guest's name should be at least 2 characters long."
+                }
+            ],
+            category: [
+                {
+                    type: "int"
+                }
+            ],
+            confirmed: [
+                {
+                    type: "int"
+                },
+                {
+                    format: "flag"
+                }
+            ]
+        });
+
+        Guest.test();
+    });
+
+    /*
+     *  GENERAL - HELPERS
      */
 
-    /*
-    //Promise creation (method #1)
-    var testX = Promise.convert(function(callback, error, value) {
-        setTimeout(function() {
-            value = 10;
-            console.log("Initial value = " + value);
-            callback(value);
-        }, 0);
-    });
-
-    //Promise creation (method #2)
-    function testY1(value) {
-        return new Promise(function(resolve, reject) {
-            setTimeout(function() {
-                value += 1;
-                alert("value + 1 = " + value);
-                resolve(value);
-            }, 25);
-        });
-    }
-
-    function testY2(value) {
-        return new Promise(function(resolve, reject) {
-            setTimeout(function() {
-                value += 2;
-                alert("value + 2 = " + value);
-                resolve(value);
-            }, 50);
-        });
-    }
-
-    function testY3(value) {
-        return new Promise(function(resolve, reject) {
-            setTimeout(function() {
-                value += 3;
-                alert("value + 3 = " + value);
-                resolve(value);
-            }, 75);
-        });
-    }
-
-    //Test usage
-    testX()
-    .then(testY1)
-    .then(testY2)
-    .then(testY3)
-    .then(function(value) {
-        alert("Final value = " + value);
+    test("general.helpers", function() {
+        console.log(Ac.Helper.get("Uuid").generateUuid());
     });
 
     /*
-     *  HELPERS
+     * GENERAL - DATA BINDING
      */
+    test("general.dataBinding", function() {
+        var guestA = new Guest("Alan", 1, 0);
 
-    /*
-    //Test usage
-    console.log(Ac.Helper.get("Uuid").generateUuid());
+        //Define view
+        var view1 = Ac.View.create("#sample");
+        var nameElement = Ac.View.Element.create("#sample-name", view1);
+        var categoryElement = Ac.View.Element.create("#sample-category", view1);
+        var confirmedElement = Ac.View.Element.create("#sample-status", view1);
 
-    /*
-     *  MODELS
-     */
-
-    //Model definition
-    var User = Ac.Model.create("User", ["name", "age", "sex"], function(name, age) {
-        this.set({
-            name: name,
-            age: age
-        });
-    });
-
-    var Pet = Ac.Model.create("Pet", ["name", "type"], function(name, type) {
-        this.set({
-            name: name,
-            type: type
-        });
-    });
-
-    //Model method definition
-    User.addMethod("greet", function() {
-        console.log("Hello, I am " + this.getName() + " and I am " + this.getAge() + "!");
-    });
-
-    //Model static method definition
-    User.addStaticMethod("test", function() {
-        console.log("Testing the User class");
-    });
-    /*
-    //Model validation
-    User.setValidationRules({
-        age: [
-            {
-                required: true
-            },
-            {
-                type: "int"
-            },
-            {
-                minValue: 0,
-            },
-            {
-                maxValue: 100,
-                message: "Surely a person can't be that old?"
+        //Data binding creation
+        nameElement.addDataBinding(guestA, "name");
+        categoryElement.addDataBinding(guestA, function() {
+            switch (guestA.getCategory()) {
+                case Guest.CATEGORY_NORMAL:
+                    return "Normal";
+                case Guest.CATEGORY_VIP:
+                    return "VIP";
             }
-        ],
-        name: [
-            {
-                type: "string"
-            }
-        ]
+        });
+        confirmedElement.addDataBinding(guestA, function() {
+            return (guestA.getConfirmed() ? "checked" : "");
+        }, "checked");
     });
 
-    //Test usage
-    var userA = new User("Alan", 12);
-    var userB = new User("Bob", 15);
-
-    userA.greet();
-    userB.greet();
-    userA.set("name", "Adrian");
-    userB.set({ name: "Bill" });
-    userA.greet();
-    userB.greet();
-    User.test();
-
-    console.log("User validation rules", User.getValidationRules());
-    console.log("Validating userB #1", userB.validate());
-    userB.setName(0);
-    userB.setAge(111);
-    console.log("Validating userB #2", userB.validate());
-
-    console.log("Pet valiation rules", Pet.getValidationRules());
-
     /*
-     * EVENTS
+     * GENERAL - EVENTS
      */
+     test("general.events", function() {
+        var guestA = new Guest("Alan", 1, 0);
+        var guestB = new Guest("Bob", 1, 0);
+
+        //Event triggers
+        Guest.addMethod("talk", function(message) {
+            this.trigger("talk", { message: message });
+        });
+
+        //Event observers
+        EventHelper.observe(guestA, "talk", function(event) {
+            console.log(event.getTarget().getName() + " has said \"" + event.getData().message + "\".");
+        });
+
+        EventHelper.observe(guestB, "talk", function(event) {
+            console.log(event.getTarget().getName() + " has said \"" + event.getData().message + "\".");
+        });
+
+        //Test usage
+        guestA.talk("Hello!");
+        guestB.talk("Hi!");
+        guestA.talk("How are you?");
+    });
 
     /*
-    //Event triggers
-    User.addMethod("grow", function() {
-        this.set("age", this.get("age") + 1);
-        this.trigger("grow", { age: this.get("age") });
-    });
-
-    User.addMethod("talk", function(message) {
-        this.trigger("talk", { message: message });
-    });
-
-    //Event observers
-    EventHelper.observe(userA, "grow", function(event) {
-        console.log(event.getTarget().getName() + " has grown to " + event.getTarget().getAge() + " years old.");
-    });
-
-    EventHelper.observe(userA, "talk", function(event) {
-        console.log(event.getTarget().getName() + " has said \"" + event.getData().message + "\".");
-    });
-
-    EventHelper.observe(userB, "grow", function(event) {
-        console.log(event.getTarget().getName() + " has grown to " + event.getTarget().getAge() + " years old.");
-    });
-
-    //Test usage
-    userA.grow();
-    userA.grow();
-    userA.grow();
-    userB.grow();
-    userB.grow();
-    userA.talk("Sup bro?");
-
-    /*
-     * DATA BINDING
+     *  GENERAL - PROMISES
      */
+    test("general.promises", function() {
+        //Promise creation (method #1)
+        var testX = Promise.convert(function(callback, error, value) {
+            setTimeout(function() {
+                value = 10;
+                console.log("Initial value = " + value);
+                callback(value);
+            }, 0);
+        });
 
-    var userC = new User("Alan", 12);
+        //Promise creation (method #2)
+        function testY1(value) {
+            return new Promise(function(resolve, reject) {
+                setTimeout(function() {
+                    value += 1;
+                    console.log("value + 1 = " + value);
+                    resolve(value);
+                }, 25);
+            });
+        }
 
-    //Define view
-    var view1 = Ac.View.create("#input-text");
-    var view2 = Ac.View.create("#header-title");
-    var view3 = Ac.View.create("#footer");
+        function testY2(value) {
+            return new Promise(function(resolve, reject) {
+                setTimeout(function() {
+                    value += 2;
+                    console.log("value + 2 = " + value);
+                    resolve(value);
+                }, 50);
+            });
+        }
 
-    //Data binding creation
-    view1.addDataBinding(userC, "name", "value");
-    view2.addDataBinding(userC, "name", "innerHTML");
-    view3.addDataBinding(userC, function() { return "&copy;2014 " + userC.getName() + ". All rights reserved." }, "innerHTML", false);
+        function testY3(value) {
+            return new Promise(function(resolve, reject) {
+                setTimeout(function() {
+                    value += 3;
+                    console.log("value + 3 = " + value);
+                    resolve(value);
+                }, 75);
+            });
+        }
 
-    //Test usage
-    userC.setName("Aaron");
+        //Test usage
+        testX()
+        .then(testY1)
+        .then(testY2)
+        .then(testY3)
+        .then(function(value) {
+            console.log("Final value = " + value);
+        });
+    });
 });
 
 /*

@@ -1,30 +1,9 @@
-#home-ajax-suggestions {
-    position: absolute;
-    top: 25px;
-    left: 210px;
-    margin: 0;
-    padding: 0;
-    border-left: solid 1px #999999;
-    border-right: solid 1px #999999;
-    width: 148px;
-    @include clearfix;
-}
+#home {
+    #datatable-header-label-category, #datatable-header-label-status {
+        width: 100px;
+    }
 
-.home-ajax-suggestion {
-    display: block;
-    float: left;
-    margin: 0;
-    border-bottom: solid 1px #999999;
-    padding: 3px;
-    width: 142px;
-    height: 19px;
-    cursor: pointer;
-    font-size: 12px;
-    line-height: 19px;
-    list-style: none;
-
-    &:hover {
-        background: #333399;
-        color: #ffffff;
+    #datatable-header-label-actions {
+        width: 150px;
     }
 }

@@ -12,6 +12,10 @@ h2 {
     border-bottom: solid 1px #999999;
 }
 
+.hidden {
+    display: none;
+}
+
 .section {
     padding: 0 10px 50px;
 }
@@ -25,6 +29,18 @@ h2 {
     line-height: 17px;
     background: #cccccc;
     text-align: center;
+}
+
+.input-button-submit {
+    margin-left: 180px;
+}
+
+.input-button-action {
+    margin-right: 5px;
+
+    &:last-child {
+        margin-right: 0;
+    }
 }
 
 .input-field {
@@ -45,7 +61,7 @@ h2 {
     position: relative;
     float: left;
     margin: 0 10px 0 0;
-    width: 200px;
+    width: 170px;
     min-height: 25px;
     line-height: 25px;
     text-align: right;
@@ -103,6 +119,21 @@ h2 {
     line-height: 17px;
 }
 
+.input-checkbox, .input-radio {
+    display: block;
+    float: left;
+    margin: 6px 5px 0 0;
+    line-height: 25px;
+}
+
+.input-checkbox-label, .input-radio-label {
+    display: inline-block;
+    float: left;
+    margin: 0 10px 0 0;
+    min-height: 25px;
+    line-height: 25px;
+}
+
 .input-value {
     display: block;
     position: relative;
@@ -111,4 +142,45 @@ h2 {
     width: 250px;
     min-height: 25px;
     line-height: 25px;
+}
+
+.datatable {
+    width: 100%;
+}
+
+.datatable-header {
+    padding: 3px 0;
+    height: 24px;
+    background: #999999;
+    line-height: 24px;
+    text-align: left;
+}
+
+.datatable-header-label, .datatable-footer-summary {
+    padding: 0 5px;
+}
+
+.datatable-row {
+    &:nth-child(2n) {
+        background: #dddddd;
+    }
+
+    &:nth-child(2n + 1) {
+        background: #eeeeee;
+    }
+
+    td {
+        padding: 3px 5px;
+        height: 24px;
+        line-height: 24px;
+    }
+}
+
+.datatable-footer {
+    padding: 3px 0;
+    height: 24px;
+    background: #999999;
+    font-size: 10px;
+    line-height: 24px;
+    text-align: left;
 }
