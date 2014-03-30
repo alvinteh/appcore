@@ -1,6 +1,7 @@
 define(function(require) {
     "use strict";
 
+    var Element = require("./models/element");
     var View = require("./models/view");
     var FunctionHelper = require("./helpers/function-helper");
 
@@ -171,7 +172,29 @@ define(function(require) {
                         view.refresh(instance);
                     }
                 }
-            }
+            },
+
+            Element: (function() {
+                return {
+                    /*
+                        @function create
+
+                        Creates an Element instance and optionally adds it to the specified View.
+
+                        @param [{HTMLElement[]|HTMLElement|string}] elements        The desired HTML element(s)
+                        @param [View] view                                          The desired View
+                    */
+                    create: function(elements, view) {
+                        var element = new Element(elements);
+
+                        if (view instanceof View) {
+                            view.addElement(element);
+                        }
+
+                        return element;
+                    }
+                };
+            })()
         };
 
         return ViewModule;
