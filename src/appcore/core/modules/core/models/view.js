@@ -1,7 +1,6 @@
 define(function(require) {
     "use strict";
 
-    var ModelHelper = require("../helpers/model-helper");
     var UuidHelper = require("../helpers/uuid-helper");
 
     var _key = {};
@@ -18,23 +17,21 @@ define(function(require) {
 
         Constructs a View instance. Note that this does not add the View to AppCore's internal records.
 
-        @param [htmlElement[]|htmlElement|string] elements      The desired HTML element(s)
+        @param [htmlElement|string] containerElement        The desired container HTML element or selector.
     */
-    var View = function(elements) {
+    var View = function(containerElement) {
         //Private instance members
         var attributes = {
             dataBindings: [],
-            elements: (function (elements) {
-                if (elements instanceof Array) {
-                    return elements;
-                }
-                else if (elements instanceof HTMLElement) {
-                    return [elements];
+            containerElement: (function (containerElement) {
+                if (containerElement instanceof HTMLElement) {
+                    return containerElement;
                 }
                 else {
-                    return document.querySelectorAll(elements);
+                    return document.querySelector(containerElement);
                 }
-            })(elements)
+            })(containerElement),
+            elements: []
         };
 
         //Public instance members
@@ -57,106 +54,69 @@ define(function(require) {
 
         //Public prototype members
         /*
+            @function getContainerElement
+
+            Retrieves the View's container element.
+
+            @return {HTMLElement}
+        */
+        prototype.getContainerElement = function() {
+            return this[_getAttributes](_key).containerElement;
+        };
+
+        /*
             @function getElements
 
-            Retrieves the View's elements.
+            Retrieves the View's Elements.
 
-            @return {object[]}
+            @return {Element[]}
         */
         prototype.getElements = function() {
             return this[_getAttributes](_key).elements;
         };
 
         /*
-            @function isDataBoundTo
+            @function addElement
 
-            Checks if the view is data bound to the specified model instance.
-
-            @param {object} instance        The desired model instance
-
-            @return {boolean}
+            Adds the specified Element to the View.
         */
-        prototype.isDataBoundTo = function(instance) {
-            var dataBindings = this[_getAttributes](_key).dataBindings;
+        prototype.addElement = function(element) {
+            var elements = this[_getAttributes](_key).elements;
 
-            for (var i = 0, length = dataBindings.length; i < length; i++) {
-                var dataBinding = dataBindings[i];
-
-                if (dataBinding.object === instance) {
-                    return true;
-                }
+            if (elements.indexOf(element) === -1) {
+                elements.push(element);
             }
-
-            return false;
         };
 
         /*
-            @function hasDataBindings
+            @function removeElement
 
-            Checks if the view has any data bindings.
-
-            @return {boolean}
+            Removes the specified Element from the View.
         */
-        prototype.hasDataBindings = function() {
-            return this[_getAttributes](_key).dataBindings.length > 0;
-        };
+        prototype.removeElement = function(element) {
+            var elements = this[_getAttributes](_key).elements;
 
+            var index = elements.indexOf(element);
+
+            if (index !== -1) {
+                elements.splice(index, 1);
+            }
+        };
 
         /*
             @function refresh
 
-            Refreshes the view with the specified model instance.
+            Refreshes the View (and its Elements) with the specified Model instance.
 
             @param [{object}] instance      The desired model instance.
         */
         prototype.refresh = function(instance) {
             var attributes = this[_getAttributes](_key);
-            var dataBindings = attributes.dataBindings;
             var elements = attributes.elements;
 
-            for (var i = 0, iLength = dataBindings.length; i < iLength; i++) {
-                var dataBinding = dataBindings[i];
-
-                if (instance === undefined || dataBinding.object === instance) {
-                    var objectProperty = dataBinding.objectProperty;
-
-                    for (var j = 0, jLength = dataBinding.elementProperties.length; j < jLength; j++) {
-                        var elementProperty = dataBinding.elementProperties[j];
-
-                        for (var k = 0, kLength = elements.length; k < kLength; k++) {
-                            var element = elements[k];
-
-                            element[elementProperty] = typeof objectProperty === "string" ?
-                                dataBinding.object[ModelHelper.getGetter(objectProperty)]() :
-                                dataBinding.objectProperty();
-                        }
-                    }
-                }
+            for (var i = 0, length = elements.length; i < length; i++) {
+                elements[i].refresh(instance);
             }
-        };
-
-        /*
-            @function addDataBinding
-
-            Data-binds the view with the specified model instance.
-
-            @param [{object}] instance                      The desired model instance
-            @param {string|function} objectProperty         The desired object property
-            @param {string|string[]} elementProperties      The desired element properties
-            @param [{boolean = true}] twoWay                Flag indicating whether the binding is two-way
-        */
-        prototype.addDataBinding = function(instance, objectProperty, elementProperties, twoWay) {
-            var attributes = this[_getAttributes](_key);
-            var dataBindings = attributes.dataBindings;
-
-            dataBindings.push({
-                elementProperties: elementProperties instanceof Array ? elementProperties : [elementProperties],
-                object: instance,
-                objectProperty: objectProperty,
-                twoWay: twoWay !== false
-            });
-
-            this.refresh(instance);
         };
 
         return prototype;
