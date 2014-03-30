@@ -18,7 +18,7 @@ define(function(require) {
         @param {mixed} value            The desired value
         @param {string} operationg      The desired operation (===/==/</<=/>/>=/user-defined function)
     */
-    var Predicate = Ac.Model.create(
+    var Predicate = Ac.Model.create("Predicate",
         ["attribute", "value", "operation"],
         function(attribute, value, operation) {
             this.set({

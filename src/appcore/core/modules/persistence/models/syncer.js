@@ -19,7 +19,7 @@ define(function(require) {
 
         @param {function} collectionGroup     The desired collection group.
     */
-    var Syncer = Ac.Model.create(
+    var Syncer = Ac.Model.create("Syncer",
         ["collectionGroup", "map", "listeners", "syncData"],
         function(collectionGroup) {
             this.set({

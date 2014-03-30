@@ -20,7 +20,7 @@ define(function(require) {
 
         Constructs a Promise instance.
     */
-    var Promise = Ac.Model.create(
+    var Promise = Ac.Model.create("Promise",
         ["state", "value", "queue"],
         function(func) {
             var me = this;

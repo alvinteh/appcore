@@ -21,7 +21,7 @@ define(function(require) {
 
         @param {function} collectionGroup     The desired collection group.
     */
-    var RestSyncer = Ac.Model.create(
+    var RestSyncer = Ac.Model.create("RestSyncer",
         ["server"],
         function(collectionGroup, server) {
             this.set("server", server);

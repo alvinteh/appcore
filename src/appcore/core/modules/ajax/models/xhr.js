@@ -19,7 +19,7 @@ define(function(require) {
 
         @param {function} collectionGroup     The desired collection group.
     */
-    var Xhr = Ac.Model.create(
+    var Xhr = Ac.Model.create("Xhr",
         ["url", "method", "status", "response"],
         function(url, method) {
             this.set({

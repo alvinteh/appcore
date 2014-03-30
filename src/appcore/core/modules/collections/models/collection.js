@@ -20,7 +20,7 @@ define(function(require) {
         @param {string} name        The desired name
         @param {function} model     The desired model the collection will contain items of
     */
-    var Collection = Ac.Model.create(
+    var Collection = Ac.Model.create("Collection",
         ["name", "model", "currentAutoIncrementNo", "items"],
         function(name, model) {
             this.set({

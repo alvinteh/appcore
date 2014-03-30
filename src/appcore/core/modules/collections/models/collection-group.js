@@ -19,7 +19,7 @@ define(function(require) {
         @param {string} name        The desired name
         @param [object}] syncer     The desired Syncer
     */
-    var CollectionGroup = Ac.Model.create(
+    var CollectionGroup = Ac.Model.create("CollectionGroup",
         ["name", "syncer"],
         function(name, syncer) {
             this.set({
