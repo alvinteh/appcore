@@ -16,7 +16,8 @@ require([
 
     var testFlags = {
         models: {
-            base: true
+            base: true,
+            validation: true
         },
         general: {
             dataBinding: true,
@@ -60,18 +61,25 @@ require([
             console.log("Testing the Guest model.");
         });
 
-        //Model validation
+        Guest.test();
+    });
+
+    /*
+     * MODELS - VALIDATION
+     */
+    test("models.validation", function() {
+        //Model validation rules
         Guest.setValidationRules({
             name: [
                 {
                     required: true
                 },
                 {
-                    type: "string"
+                    format: "alpha",
+                    message: "The guest's name should only contain alphabets."
                 },
                 {
                     minLength: 2,
-                    message: "The guest's name should be at least 2 characters long."
                 }
             ],
             category: [
@@ -89,7 +97,60 @@ require([
             ]
         });
 
-        Guest.test();
+        var guestA = new Guest("", Guest.CATEGORY_VIP, 1);
+
+        var view1 = Ac.View.create("#form");
+        Ac.View.Element.create("#form-name", view1).addDataBinding(guestA, "name");
+        var options = document.querySelector("#form-category").options;
+        Ac.View.Element.create("#form-category", view1).addDataBinding(guestA, "category", null,
+            Ac.View.Element.TWO_WAY,
+            function(value) {
+                var option;
+
+                for (var i = 0, length = options.length; i < length; i++) {
+                    option = options[i];
+
+                    if (option.value.toString() === value.toString()) {
+                        options[i].selected = true;
+                        return;
+                    }
+                }
+            },
+            function(value) {
+                return options[document.querySelector("#form-category").selectedIndex].value;
+            }
+        );
+        Ac.View.Element.create("#form-confirmed", view1).addDataBinding(guestA, "confirmed", "checked",
+            Ac.View.Element.TWO_WAY,
+            function(value) {
+                return (value === 1 ? "checked" : "");
+            },
+            function(value) {
+                return (this.checked ? 1 : 0);
+            }
+        );
+
+        EventHelper.observe(guestA, "change", function() {
+            console.log("HERE");
+            var validationInfo = guestA.validate();
+
+            var existingErrors = document.querySelectorAll(".input-error");
+
+            for (var i = 0, length = existingErrors.length; i < length; i++) {
+                existingErrors[i].remove();
+            }
+
+            if (validationInfo !== true) {
+                for (var property in validationInfo) {
+                    var inputElement = document.querySelector("#form-" + property);
+                    var errorElement = document.createElement("span");
+                    errorElement.className = "input-error";
+                    errorElement.innerHTML = validationInfo[property].join("<br />");
+
+                    inputElement.parentNode.appendChild(errorElement);
+                }
+            }
+        });
     });
 
     /*
@@ -104,27 +165,32 @@ require([
      * GENERAL - DATA BINDING
      */
     test("general.dataBinding", function() {
-        var guestA = new Guest("Alan", 1, 0);
+        var guestA = new Guest("Alan", 1, 1);
 
         //Define view
         var view1 = Ac.View.create("#sample");
-        var nameElement = Ac.View.Element.create("#sample-name", view1);
-        var categoryElement = Ac.View.Element.create("#sample-category", view1);
-        var confirmedElement = Ac.View.Element.create("#sample-status", view1);
 
         //Data binding creation
-        nameElement.addDataBinding(guestA, "name");
-        categoryElement.addDataBinding(guestA, function() {
-            switch (guestA.getCategory()) {
+        Ac.View.Element.create("#sample-name", view1).addDataBinding(guestA, "name");
+        Ac.View.Element.create("#sample-category", view1).addDataBinding(guestA, "category", "innerHTML",
+            Ac.View.Element.ONE_WAY, function(value) {
+            switch (value) {
                 case Guest.CATEGORY_NORMAL:
                     return "Normal";
                 case Guest.CATEGORY_VIP:
                     return "VIP";
             }
         });
-        confirmedElement.addDataBinding(guestA, function() {
-            return (guestA.getConfirmed() ? "checked" : "");
-        }, "checked");
+        Ac.View.Element.create("#sample-confirmed", view1).addDataBinding(guestA, "confirmed", "checked",
+            Ac.View.Element.ONE_WAY,
+            function(value) {
+                return (value === 1 ? "checked" : "");
+            }
+        );
+
+        EventHelper.observe(guestA, "change", function(event) {
+            console.log(guestA.toObject());
+        });
     });
 
     /*

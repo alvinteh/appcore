@@ -20,6 +20,15 @@ h2 {
     padding: 0 10px 50px;
 }
 
+.input-error {
+    display: inline-block;
+    float: left;
+    margin: 0 0 0 5px;
+    min-height: 25px;
+    color: #ff0000;
+    line-height: 25px;
+}
+
 .input-button {
     box-sizing: border-box;
     height: 25px;
