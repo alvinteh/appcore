@@ -8,4 +8,5 @@
 .sizecache.json
 bower_components
 node_modules
+.sass-cache
 /test/dependencies
