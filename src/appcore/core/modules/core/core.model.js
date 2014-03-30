@@ -47,8 +47,10 @@ define(function(require) {
                     var defaultConstructor = function() {
                         var values = {};
 
-                        for (var i = 0, length = arguments.length; i < length; i++) {
-                            values[attributes[i]] = arguments[i];
+                        if (arguments) {
+                            for (var i = 0, length = attributes.length; i < length; i++) {
+                                values[attributes[i]] = arguments[i] !== undefined ? arguments[i] : null;
+                            }
                         }
 
                         this.set(values);
