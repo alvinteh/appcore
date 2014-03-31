@@ -25,7 +25,7 @@ define(function(require) {
             this.set({
                 collectionGroup: collectionGroup,
                 listeners: {
-                    itemAdd: function() {},
+                    itemAdd: FunctionHelper.noop(),
                     itemChange: FunctionHelper.noop(),
                     itemRemove: FunctionHelper.noop(),
                     collectionAdd: FunctionHelper.noop(),
@@ -105,7 +105,7 @@ define(function(require) {
     */
     Syncer.addMethod("getSyncAction", function(item) {
         var syncStatus = this.getSyncStatus(item);
-        
+
         switch (syncStatus) {
             case Syncer.STATUS_CREATED:
                 return Syncer.ACTION_CREATE;
@@ -115,7 +115,7 @@ define(function(require) {
                 return null;
             case Syncer.STATUS_UPDATED:
                 return Syncer.ACTION_UPDATE;
-        }   
+        }
     });
 
     /*
