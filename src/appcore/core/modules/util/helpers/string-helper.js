@@ -4,7 +4,7 @@ define(function(require) {
     var Ac = require("../../../../appcore");
     var coreStringHelper = require("../../core/helpers/string-helper");
 
-    var StringHelper = Ac.Helper.create("String");
+    var StringHelper = Ac.Helper.create();
 
     /*
         @function convertToSnakeCase

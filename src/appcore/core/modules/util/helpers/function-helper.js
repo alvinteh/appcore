@@ -4,7 +4,7 @@ define(function(require) {
     var Ac = require("../../../../appcore");
     var coreFunctionHelper = require("../../core/helpers/function-helper");
 
-    var FunctionHelper = Ac.Helper.create("Function");
+    var FunctionHelper = Ac.Helper.create();
 
     /*
         @function override

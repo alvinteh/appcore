@@ -3,7 +3,7 @@ define(function(require) {
 
     var Ac = require("../../../../appcore");
 
-    var StorageHelper = Ac.Helper.create("Storage");
+    var StorageHelper = Ac.Helper.create();
 
     /*
         @function set

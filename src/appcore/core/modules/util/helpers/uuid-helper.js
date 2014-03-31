@@ -4,7 +4,7 @@ define(function(require) {
     var Ac = require("../../../../appcore");
     var coreUuidHelper = require("../../core/helpers/uuid-helper");
 
-    var UuidHelper = Ac.Helper.create("Uuid");
+    var UuidHelper = Ac.Helper.create();
 
     /*
         @function generateUuid()

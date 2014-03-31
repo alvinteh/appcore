@@ -7,7 +7,7 @@ define(function(require) {
 
     var HelperModule = function() {
         //Private instance members
-        var helpers = {};
+        //(None)
 
         //Public instance members
         var HelperModule = {
@@ -16,11 +16,9 @@ define(function(require) {
 
                 Creates a Helper.
 
-                @param {string} name        The desired Helper name.
-
-                @return {object}
+                @return {Helper}
             */
-            create: function(name) {
+            create: function() {
                 //Create the child class constructor. Use a verbose method for performance optimization.
                 var childClass = function() {
                     Helper.call(this, arguments);
@@ -44,22 +42,7 @@ define(function(require) {
                     return Helper.hasStaticMethod(childClass, name);
                 };
 
-                helpers[name] = childClass;
-
-                return helpers[name];
-            },
-
-            /*
-                @function get
-
-                Gets a Helper.
-
-                @param {string} name        The desired Helper name.
-
-                @return {object}
-            */
-            get: function(name) {
-                return helpers[name];
+                return childClass;
             }
         };
 

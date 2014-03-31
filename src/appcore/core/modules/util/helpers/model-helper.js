@@ -1,10 +1,10 @@
-define(function() {
+define(function(require) {
     "use strict";
 
     var Ac = require("../../../../appcore");
     var coreModelHelper = require("../../core/helpers/model-helper");
 
-    var ModelHelper = Ac.Helper.create("Model");
+    var ModelHelper = Ac.Helper.create();
 
     /*
         @function getGetter
