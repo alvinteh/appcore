@@ -3,6 +3,7 @@ define(function(require) {
 
     var Event = require("../models/event");
     var EventHelper = require("../helpers/event-helper");
+    var StringHelper = require("../helpers/string-helper");
     var UuidHelper = require("../helpers/uuid-helper");
 
     var _key = {};
@@ -396,7 +397,8 @@ define(function(require) {
             prototype.validate = function() {
                 var modelRules = staticAttributes.validationRules;
                 var modelErrors = {};
-                var attributeRules, attributeRequired, attributeErrors, attributeOverride, attributeValue, rule;
+                var attributeRules, attributeRequired, attributeErrors, attributeOverride, attributeValue,
+                attributeName, rule;
 
                 function addError(message) {
                     attributeErrors.push(rule.message || message);
@@ -408,6 +410,7 @@ define(function(require) {
                     attributeErrors = [];
                     attributeOverride = false;
                     attributeRequired = false;
+                    attributeName = StringHelper.uppercaseFirst(StringHelper.humanize(attribute));
 
                     //Set override flag to allow nulls/etc. for non-required attributes with type checks
                     for (var i = 0, length = attributeRules.length; i < length; i++) {
@@ -424,44 +427,44 @@ define(function(require) {
 
                         if (rule.required) {
                             if (attributeValue === null || attributeValue === undefined || attributeValue === "") {
-                                addError(attribute + " is required.");
+                                addError(attributeName + " is required.");
                             }
                         }
                         else if (rule.type) {
                             if (!attributeOverride) {
                                 if (rule.type === "string" && typeof attributeValue !== "string") {
-                                    addError(attribute + " should be a string.");
+                                    addError(attributeName + " should be a string.");
                                 }
                                 else if (rule.type === "int" && (typeof attributeValue !== "number" ||
                                     attributeValue % 1 !== 0)) {
-                                    addError(attribute + " should be an integer.");
+                                    addError(attributeName + " should be an integer.");
                                 }
                                 else if (rule.type === "number" && typeof attributeValue !== "number") {
-                                    addError(attribute + " should be a number.");
+                                    addError(attributeName + " should be a number.");
                                 }
                                 else if (rule.type === "boolean" && typeof attributeValue !== "boolean") {
-                                    addError(attribute + " should be a boolean.");
+                                    addError(attributeName + " should be a boolean.");
                                 }
                             }
                         }
                         else if (rule.minLength) {
                             if (attributeValue.length < rule.minLength) {
-                                addError(attribute + " should be at least " + rule.minLength + " characters long.");
+                                addError(attributeName + " should be at least " + rule.minLength + " characters long.");
                             }
                         }
                         else if (rule.maxLength) {
                             if (attributeValue.length > rule.maxLength) {
-                                addError(attribute + " should be at most " + rule.maxLength + " characters long.");
+                                addError(attributeName + " should be at most " + rule.maxLength + " characters long.");
                             }
                         }
                         else if (rule.minValue) {
                             if (attributeValue < rule.minValue) {
-                                addError(attribute + " should be at least " + rule.minValue + ".");
+                                addError(attributeName + " should be at least " + rule.minValue + ".");
                             }
                         }
                         else if (rule.maxValue) {
                             if (attributeValue > rule.maxValue) {
-                                addError(attribute + " should be at most " + rule.maxValue + ".");
+                                addError(attributeName + " should be at most " + rule.maxValue + ".");
                             }
                         }
                         else if (rule.format) {
@@ -474,17 +477,17 @@ define(function(require) {
                                 (rule.format === "creditcard" && !/^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|6(?:011|5[0-9][0-9])[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|(?:2131|1800|35\d{3})\d{11})$/.test(attributeValue))
                                 //jshint +W101
                                 ) {
-                                addError(attribute + " should be a valid " + rule.format);
+                                addError(attributeName + " should be a valid " + rule.format);
                             }
                         }
                         else if (rule.regex) {
                             if (!rule.regex.test(attributeValue)) {
-                                addError(attribute + " should match " + rule.regex + ".");
+                                addError(attributeName + " should match " + rule.regex + ".");
                             }
                         }
                         else if (rule.func) {
                             if (!rule.func(attributeValue, this)) {
-                                addError(attribute + " should pass " + rule.func + ".");
+                                addError(attributeName + " should pass " + rule.func + ".");
                             }
                         }
                     }
