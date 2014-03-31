@@ -9,8 +9,7 @@ require.config({
 require([
         "appcore/appcore",
         "appcore/core/modules/core/models/promise",
-        "appcore/core/modules/core/helpers/event-helper",
-        "appcore/core/modules/util/helpers/uuid-helper"
+        "appcore/core/modules/core/helpers/event-helper"
     ],
     function(Ac, Promise, EventHelper) {
 
@@ -22,8 +21,8 @@ require([
         general: {
             dataBinding: true,
             events: false,
-            helpers: false,
-            promises: true
+            modules: true,
+            promises: false
         }
     };
 
@@ -157,8 +156,10 @@ require([
      *  GENERAL - HELPERS
      */
 
-    test("general.helpers", function() {
-        console.log(Ac.Helper.get("Uuid").generateUuid());
+    test("general.modules", function() {
+        Ac.Module.load("Util").then(function() {
+            console.log(Ac.Module.get("Util").UuidHelper.generateUuid());
+        });
     });
 
     /*
@@ -187,10 +188,6 @@ require([
             forwardTransform: function(value) {
                 return (value === 1 ? "checked" : "");
             }
-        });
-
-        EventHelper.observe(guestA, "change", function(event) {
-            console.log(guestA.toObject());
         });
     });
 
