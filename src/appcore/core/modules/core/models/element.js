@@ -146,8 +146,10 @@ define(function(require) {
                             value = forwardTransform(value);
                         }
 
-                        for (var k = 0, kLength = elements.length; k < kLength; k++) {
-                            elements[k][elementProperty] = value;
+                        if (elementProperty !== null) {
+                            for (var k = 0, kLength = elements.length; k < kLength; k++) {
+                                elements[k][elementProperty] = value;
+                            }
                         }
                     }
                 }
@@ -162,15 +164,20 @@ define(function(require) {
 
             @param {object} instance                                    The desired Model instance
             @param {string|function} objectProperty                     The desired object property
-            @param [{string = "..."|string[]}] elementProperties        The desired element properties
-            @param [{int = 2}] direction                                The desired binding direction
-            @param [{function}] forwardTransform                        The desired transformation function to be run
+            @param [{string|string[]}] options.elementProperties        The desired element properties
+            @param [{int = 2}] options.direction                        The desired binding direction
+            @param [{function}] options.forwardTransform                The desired transformation function to be run
                                                                         when performing property-to-element updates
-            @param [{function}] backwardTransform                       The desired transformation function to be run
+            @param [{function}] options.backwardTransform               The desired transformation function to be run
                                                                         when performing element-to-property updates
         */
-        prototype.addDataBinding = function(instance, objectProperty, elementProperties, direction, forwardTransform,
-            backwardTransform) {
+        prototype.addDataBinding = function(instance, objectProperty, options) {
+            var elementProperties = options && options.elementProperties !== undefined ? options.elementProperties :
+                undefined;
+            var direction = options && options.direction !== undefined ? options.direction : Element.TWO_WAY_BINDING;
+            var forwardTransform = options && options.forwardTransform ? options.forwardTransform : undefined;
+            var backwardTransform = options && options.backwardTransform ? options.backwardTransform : undefined;
+
             var attributes = this[_getAttributes](_key);
             var dataBindings = attributes.dataBindings;
 
@@ -187,7 +194,7 @@ define(function(require) {
                 })(elementProperties),
                 object: instance,
                 objectProperty: objectProperty,
-                direction: direction ? direction : Element.TWO_WAY_BINDING,
+                direction: direction,
                 forwardTransform: forwardTransform,
                 backwardTransform: backwardTransform
             });

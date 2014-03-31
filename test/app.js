@@ -97,14 +97,14 @@ require([
             ]
         });
 
-        var guestA = new Guest("", Guest.CATEGORY_VIP, 1);
+        var guestA = new Guest("", Guest.CATEGORY_NORMAL, 1);
 
         var view1 = Ac.View.create("#form");
         Ac.View.Element.create("#form-name", view1).addDataBinding(guestA, "name");
         var options = document.querySelector("#form-category").options;
-        Ac.View.Element.create("#form-category", view1).addDataBinding(guestA, "category", null,
-            Ac.View.Element.TWO_WAY,
-            function(value) {
+        Ac.View.Element.create("#form-category", view1).addDataBinding(guestA, "category", {
+            elementProperties: null,
+            forwardTransform: function(value) {
                 var option;
 
                 for (var i = 0, length = options.length; i < length; i++) {
@@ -112,23 +112,24 @@ require([
 
                     if (option.value.toString() === value.toString()) {
                         options[i].selected = true;
-                        return;
+                        break;
                     }
                 }
             },
-            function(value) {
+            backwardTransform: function(value) {
+                console.log("Not here");
                 return options[document.querySelector("#form-category").selectedIndex].value;
             }
-        );
-        Ac.View.Element.create("#form-confirmed", view1).addDataBinding(guestA, "confirmed", "checked",
-            Ac.View.Element.TWO_WAY,
-            function(value) {
+        });
+        Ac.View.Element.create("#form-confirmed", view1).addDataBinding(guestA, "confirmed", {
+            elementProperties: "checked",
+            forwardTransform: function(value) {
                 return (value === 1 ? "checked" : "");
             },
-            function(value) {
+            backwardTransform: function(value) {
                 return (this.checked ? 1 : 0);
             }
-        );
+        });
 
         EventHelper.observe(guestA, "change", function() {
             var validationInfo = guestA.validate();
@@ -171,21 +172,22 @@ require([
 
         //Data binding creation
         Ac.View.Element.create("#sample-name", view1).addDataBinding(guestA, "name");
-        Ac.View.Element.create("#sample-category", view1).addDataBinding(guestA, "category", "innerHTML",
-            Ac.View.Element.ONE_WAY, function(value) {
-            switch (value) {
-                case Guest.CATEGORY_NORMAL:
-                    return "Normal";
-                case Guest.CATEGORY_VIP:
-                    return "VIP";
+        Ac.View.Element.create("#sample-category", view1).addDataBinding(guestA, "category", {
+            forwardTransform: function(value) {
+                switch (value) {
+                    case Guest.CATEGORY_NORMAL:
+                        return "Normal";
+                    case Guest.CATEGORY_VIP:
+                        return "VIP";
+                }
             }
         });
-        Ac.View.Element.create("#sample-confirmed", view1).addDataBinding(guestA, "confirmed", "checked",
-            Ac.View.Element.ONE_WAY,
-            function(value) {
+        Ac.View.Element.create("#sample-confirmed", view1).addDataBinding(guestA, "confirmed", {
+            elementProperties: "checked",
+            forwardTransform: function(value) {
                 return (value === 1 ? "checked" : "");
             }
-        );
+        });
 
         EventHelper.observe(guestA, "change", function(event) {
             console.log(guestA.toObject());
