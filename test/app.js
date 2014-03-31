@@ -8,7 +8,7 @@ require.config({
 
 require([
         "appcore/appcore",
-        "appcore/core/modules/util/models/promise",
+        "appcore/core/modules/core/models/promise",
         "appcore/core/modules/core/helpers/event-helper",
         "appcore/core/modules/util/helpers/uuid-helper"
     ],
@@ -23,7 +23,7 @@ require([
             dataBinding: true,
             events: false,
             helpers: false,
-            promises: false
+            promises: true
         }
     };
 
