@@ -37,7 +37,6 @@ define(function() {
                 @param {object} prototype       The desired prototype
                 @param [{string}] attributes    The desired attributes
             */
-
             generateGettersSetters: function(prototype, attributes) {
                 for (var i = 0, length = attributes.length; i < length; i++) {
                     //jshint -W083
