@@ -3,6 +3,7 @@ define(function(require) {
 
     var CoreHelper = require("./core.helper");
     var CoreModel = require("./core.model");
+    var CoreModule = require("./core.module");
     var CoreView = require("./core.view");
 
     /*
@@ -20,6 +21,7 @@ define(function(require) {
 
         Core.Helper = new CoreHelper();
         Core.Model = new CoreModel(Core);
+        Core.Module = new CoreModule();
         Core.View = new CoreView(Core, data);
 
         //Public instance members
