@@ -6,7 +6,6 @@ define(function(require) {
     var Promise = require("../../util/models/promise");
 
     /*
-        @abstract
         @class Xhr
 
         @classdesc Xhr class.
