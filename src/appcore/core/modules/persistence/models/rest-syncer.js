@@ -5,7 +5,7 @@ define(function(require) {
     var StringHelper = require("../../util/helpers/string-helper");
     var Syncer = require("./syncer");
     var Predicate = require("../../util/models/predicate");
-    var Promise = require("../../util/models/promise");
+    var Promise = require("../../core/models/promise");
     var Xhr = require("../../ajax/models/xhr");
 
     /*
