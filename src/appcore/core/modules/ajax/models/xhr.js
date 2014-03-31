@@ -20,7 +20,7 @@ define(function(require) {
         @param {function} collectionGroup     The desired collection group.
     */
     var Xhr = Ac.Model.create("Xhr",
-        ["url", "method", "status", "response"],
+        ["url", "method", "data", "status", "response"],
         function(url, method) {
             this.set({
                 url: url,
@@ -86,8 +86,42 @@ define(function(require) {
                 
             };
 
-            xhr.open(this.get("method"), this.get("url"));
-            xhr.send();
+            var serialize = function(object) {
+                var pairs = [];
+
+                for (var property in object) {
+                    if (!object.hasOwnProperty(property)) {
+                        continue;
+                    }
+                    if (Object.prototype.toString.call(object[property]) === "[object Object]") {
+                        pairs.push(serialize(object[property]));
+                        continue;
+                    }
+
+                    pairs.push(property + "=" + object[property]);
+                }
+                return pairs.join("&");
+            };
+
+            var data = this.get("data");
+            var method = this.get("method");
+            var url = this.get("url");
+
+            if (data) {
+                if (method === Xhr.METHOD_GET) {
+                    url += "?" + serialize(data);
+                }
+                else {
+                    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                    data = serialize(data);
+                }
+            }
+            else {
+                data = undefined;
+            }
+
+            xhr.open(method, url);
+            xhr.send(data);
       });
     });
 
