@@ -8,53 +8,51 @@ module.exports = function(grunt) {
                 options: {
                     cleanup: true,
                     layout: "byComponent",
+                    production: false,
                     targetDir: "test/dependencies"
                 }
             }
         },
         clean: {
-            devCss: {
-                src: ["test/css"]
-            },
-            devJs: {
+            dev: {
                 src: ["test/dependencies/appcore"]
             },
             dist: {
                 src: ["dist"]
             },
             test: {
-                src: ["test/dependencies", "test/css"]
-            }
-        },
-        compass: {
-            common: {
-                options: {
-                    cssDir: "test/css",
-                    outputStyle: "compressed",
-                    raw:
-                        "on_stylesheet_saved do |filename|\n" +
-                            "if File.exists? (filename)\n" +
-                                "FileUtils.cp(filename, filename.gsub(\".css\", \".min.css\"))\n" +
-                                "FileUtils.rm(filename);\n" +
-                            "end\n" +
-                        "end\n",
-                    sassDir: "test/scss"
-                }
+                src: ["test/dependencies"]
             }
         },
         copy: {
-            test: {
+            common: {
                 expand: true,
                 cwd: "src/",
                 src: "**",
                 dest: "test/dependencies/"
+            },
+            commonGruntBlanketMocha: {
+                expand: true,
+                cwd: "node_modules/grunt-blanket-mocha",
+                src: "**",
+                dest: "test/dependencies/grunt-blanket-mocha"
+            }
+        },
+        blanket_mocha: {
+            common: {
+                options: {
+                    log : true,
+                    logErrors: true,
+                    threshold: 0
+                },
+                src: "test/index.html"
             }
         },
         jshint: {
             options: {
                 jshintrc: ".jshintrc"
             },
-            test: {
+            common: {
                 src: "src/**/*.js",
             }
         },
@@ -85,19 +83,32 @@ module.exports = function(grunt) {
             }
         },
         watch: {
-            devCss: {
-                files: "test/scss/*.scss",
-                tasks: ["clean:devCss", "compass:common"]
-            },
-            devJs: {
+            dev: {
                 files: "src/**/*.js",
-                tasks: ["jshint:test", "clean:devJs", "copy:test"]
+                tasks: [
+                    "jshint:common",
+                    "clean:dev",
+                    "copy:common",
+                    "blanket_mocha:common"
+                ]
             }
         }
     });
 
     require("load-grunt-tasks")(grunt);
 
-    grunt.registerTask("default", ["clean:test", "bower:test", "copy:test", "clean:dist", "requirejs:distNormal", "requirejs:distMin"]);
-    grunt.registerTask("test", ["jshint:test", "clean:test", "bower:test", "compass:common", "copy:test"]);
+    grunt.registerTask("default", [
+        "clean:dist",
+        "requirejs:distNormal",
+        "requirejs:distMin"
+    ]);
+
+    grunt.registerTask("test", [
+        "jshint:common",
+        "clean:test",
+        "bower:test",
+        "copy:commonGruntBlanketMocha",
+        "copy:common",
+        "blanket_mocha:common"
+    ]);
 };

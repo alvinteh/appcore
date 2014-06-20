@@ -1,0 +1,3 @@
+define([
+    "specs/framework.js"
+]);
