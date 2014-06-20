@@ -34,11 +34,11 @@ define(function() {
                         Am.Module.load("Util").then(function() {
                             var UuidHelper = Am.Module.get("Util").UuidHelper;
 
-                            var uuid1 = UuidHelper.generateUuid().indexOf("-") === -1;
-                            var uuid2 = UuidHelper.generateUuid(true).indexOf("-") === -1;
-                            var uuid3 = UuidHelper.generateUuid(false).indexOf("-") !== -1;
+                            var test1 = UuidHelper.generateUuid().indexOf("-") === -1;
+                            var test2 = UuidHelper.generateUuid(true).indexOf("-") === -1;
+                            var test3 = UuidHelper.generateUuid(false).indexOf("-") !== -1;
 
-                            expect(uuid1 && uuid2 && uuid3).to.be.true;
+                            expect(test1 && test2 && test3).to.be.true;
 
                             done();
                         });

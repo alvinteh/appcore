@@ -44,12 +44,12 @@ define(function() {
                         Am.Module.load("Util").then(function() {
                             var StringHelper = Am.Module.get("Util").StringHelper;
 
-                            var value1 = StringHelper.lowercaseFirst("TestStringHere") === "testStringHere";
-                            var value2 = StringHelper.lowercaseFirst("testStringHere") === "testStringHere";
-                            var value3 = StringHelper.lowercaseFirst("TEstStringHere") === "tEstStringHere";
-                            var value4 = StringHelper.lowercaseFirst("tEstStringHere") === "tEstStringHere";
+                            var test1 = StringHelper.lowercaseFirst("TestStringHere") === "testStringHere";
+                            var test2 = StringHelper.lowercaseFirst("testStringHere") === "testStringHere";
+                            var test3 = StringHelper.lowercaseFirst("TEstStringHere") === "tEstStringHere";
+                            var test4 = StringHelper.lowercaseFirst("tEstStringHere") === "tEstStringHere";
 
-                            expect(value1 && value2 && value3 && value4).to.be.true;
+                            expect(test1 && test2 && test3 && test4).to.be.true;
 
                             done();
                         });
@@ -61,12 +61,12 @@ define(function() {
                         Am.Module.load("Util").then(function() {
                             var StringHelper = Am.Module.get("Util").StringHelper;
 
-                            var value1 = StringHelper.uppercaseFirst("TestStringHere") === "TestStringHere";
-                            var value2 = StringHelper.uppercaseFirst("testStringHere") === "TestStringHere";
-                            var value3 = StringHelper.uppercaseFirst("TEstStringHere") === "TEstStringHere";
-                            var value4 = StringHelper.uppercaseFirst("tEstStringHere") === "TEstStringHere";
+                            var test1 = StringHelper.uppercaseFirst("TestStringHere") === "TestStringHere";
+                            var test2 = StringHelper.uppercaseFirst("testStringHere") === "TestStringHere";
+                            var test3 = StringHelper.uppercaseFirst("TEstStringHere") === "TEstStringHere";
+                            var test4 = StringHelper.uppercaseFirst("tEstStringHere") === "TEstStringHere";
 
-                            expect(value1 && value2 && value3 && value4).to.be.true;
+                            expect(test1 && test2 && test3 && test4).to.be.true;
 
                             done();
                         });
