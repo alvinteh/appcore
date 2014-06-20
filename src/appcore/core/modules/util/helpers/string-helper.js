@@ -7,6 +7,17 @@ define(function(require) {
     var StringHelper = Ac.Helper.create();
 
     /*
+        @function convertToCamelCase
+
+        Converts the specified snake-cased string to camel case.
+
+        @param {string} string      The desired string
+
+        @return {string}
+    */
+    StringHelper.addStaticMethod("convertToCamelCase", coreStringHelper.convertToCamelCase);
+
+    /*
         @function convertToSnakeCase
 
         Converts the specified camel-cased string to snake case.

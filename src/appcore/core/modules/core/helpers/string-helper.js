@@ -4,6 +4,19 @@ define(function() {
     var StringHelper = (function() {
         return {
             /*
+                @function convertToCamelCase
+
+                Converts the specified snake-cased string to camel case.
+
+                @param {string} string      The desired string
+
+                @return {string}
+            */
+            convertToCamelCase: function(string) {
+                return string.replace(/(\_\w)/g, function($1) { return $1[1].toUpperCase(); });
+            },
+
+            /*
                 @function convertToSnakeCase
 
                 Converts the specified camel-cased string to snake case.
@@ -53,7 +66,7 @@ define(function() {
             */
             humanize: function(string) {
                 return string.replace(/([A-Z])/g, function($1) { return " " + $1.toLowerCase(); })
-                    .replace("_", "");
+                    .replace(/_/g, " ");
             }
         };
     })();
