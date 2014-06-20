@@ -43,7 +43,7 @@ module.exports = function(grunt) {
                 options: {
                     log : true,
                     logErrors: true,
-                    threshold: 0
+                    threshold: 100,
                 },
                 src: "test/index.html"
             }
