@@ -1,3 +1,5 @@
 define([
-    "specs/framework.js"
+    "specs/framework.js",
+    "specs/util/function_helper.js",
+    "specs/util/uuid_helper.js"
 ]);
