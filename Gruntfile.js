@@ -36,6 +36,12 @@ module.exports = function(grunt) {
                 cwd: "node_modules/grunt-blanket-mocha",
                 src: "**",
                 dest: "test/dependencies/grunt-blanket-mocha"
+            },
+            commonSinon: {
+                expand: true,
+                cwd: "node_modules/sinon",
+                src: "**",
+                dest: "test/dependencies/sinon"
             }
         },
         blanket_mocha: {
@@ -108,6 +114,7 @@ module.exports = function(grunt) {
         "clean:test",
         "bower:test",
         "copy:commonGruntBlanketMocha",
+        "copy:commonSinon",
         "copy:common",
         "blanket_mocha:common"
     ]);
