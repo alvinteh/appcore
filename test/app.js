@@ -3,7 +3,7 @@ require.config({
     baseUrl: "dependencies",
     urlArgs: (new Date()).getTime().toString().substring(8),
     paths: {
-        chai: "chai/chai",
+        chai: "chai/chai"
     },
     use: {
         mocha: {
@@ -13,7 +13,24 @@ require.config({
 });
 
 //Setup JavaScript dependencies
-require(["../../src/appcore/appcore", "chai"], function(Am, chai) {
+require([
+        "../../src/appcore/appcore",
+        "chai",
+        "sinon/lib/sinon",
+        "sinon/lib/sinon/spy",
+        "sinon/lib/sinon/call",
+        "sinon/lib/sinon/behavior",
+        "sinon/lib/sinon/stub",
+        "sinon/lib/sinon/mock",
+        "sinon/lib/sinon/collection",
+        "sinon/lib/sinon/assert",
+        "sinon/lib/sinon/sandbox",
+        "sinon/lib/sinon/test",
+        "sinon/lib/sinon/test_case",
+        "sinon/lib/sinon/assert",
+        "sinon/lib/sinon/match",
+    ], function(Am, chai) {
+
     window.Am = Am;
 
     //Setup Mocha
