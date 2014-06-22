@@ -67,7 +67,7 @@ define(function() {
 
                             person.grow = FunctionHelper.override(person.grow,
                                 function(originalFunction, context, arguments) {
-                                
+
                                 context.age = 50;
                                 originalFunction.apply(context, arguments);
                             });
