@@ -58,7 +58,7 @@ define(function(require) {
         var ret = [];
         var predicate;
 
-        if (!predicates instanceof Array) {
+        if (!Array.isArray(predicates)) {
             for (var attribute in predicates) {
                 ret.push(new Predicate(attribute, predicates[attribute]));
             }
