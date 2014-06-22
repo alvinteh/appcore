@@ -52,6 +52,9 @@ define(function(require) {
             }
         ]
 
+        Accepted operation values are ==, ===, <, <=, >, >= and function references. If function references are being
+        used, the referenced function should have the signature func(itemValue, predicateValue) and return a boolean.
+
         @return {Predicate[]}
     */
     Predicate.addStaticMethod("normalize", function(predicates) {
@@ -91,7 +94,7 @@ define(function(require) {
         var predicateValue = this.get("value");
 
         if (typeof operation === "function") {
-            itemValue = operation(itemValue);
+            ret = operation(itemValue, predicateValue);
         }
         else {
             switch (operation) {
