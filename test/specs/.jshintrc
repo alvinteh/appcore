@@ -19,6 +19,7 @@
 
         "describe",
         "expect",
-        "it"
+        "it",
+        "sinon"
     ]
 }
