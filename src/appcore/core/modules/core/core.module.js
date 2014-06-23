@@ -59,7 +59,7 @@ define(function(require) {
                     var moduleParts = module.split(".");
                     var moduleType = moduleParts.length === 1 ? "core" : moduleParts[1];
                     var moduleName = moduleParts[moduleParts.length === 1 ? 0 : 1].toLowerCase();
-                    
+
                     var moduleUrl = "../../../" + moduleType + "/modules/" + moduleName + "/" + moduleName;
 
                     normalizedModules.push(moduleUrl);
@@ -72,12 +72,23 @@ define(function(require) {
                     for (var i = 0, length = name.length; i < length; i++) {
                         processModule(name[i]);
                     }
-                }                
+                }
 
                 return new Promise(function(resolve, reject) {
                     require(normalizedModules,
                         function() {
-                            resolve(null);
+                            var modules = {};
+
+                            if (typeof name === "string") {
+                                modules = ModuleModule.get(name);
+                            }
+                            else {
+                                for (var i = 0, length = name.length; i < length; i++) {
+                                    modules[name[i]] = ModuleModule.get(name[i]);
+                                }
+                            }
+
+                            resolve(modules);
                         },
                         function(error) {
                             reject(error);
