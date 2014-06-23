@@ -23,10 +23,12 @@ define(function(require) {
     */
     var RestSyncer = Ac.Model.create("RestSyncer",
         ["server"],
-        function(collectionGroup, server) {
-            this.set("server", server);
-        },
-        Syncer
+        {
+            constructor: function(collectionGroup, server) {
+                this.set("server", server);
+            },
+            parent: Syncer
+        }
     );
 
     //Private static members

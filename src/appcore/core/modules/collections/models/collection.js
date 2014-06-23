@@ -22,13 +22,15 @@ define(function(require) {
     */
     var Collection = Ac.Model.create("Collection",
         ["name", "model", "currentAutoIncrementNo", "items"],
-        function(name, model) {
-            this.set({
-                name: name,
-                model: model,
-                currentAutoIncrementNo: 1,
-                items: []
-             });
+        {
+            constructor: function(name, model) {
+                this.set({
+                    name: name,
+                    model: model,
+                    currentAutoIncrementNo: 1,
+                    items: []
+                 });
+            }
         }
     );
 

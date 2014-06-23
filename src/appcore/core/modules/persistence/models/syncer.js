@@ -21,26 +21,28 @@ define(function(require) {
     */
     var Syncer = Ac.Model.create("Syncer",
         ["collectionGroup", "map", "listeners", "syncData"],
-        function(collectionGroup) {
-            this.set({
-                collectionGroup: collectionGroup,
-                listeners: {
-                    itemAdd: FunctionHelper.noop(),
-                    itemChange: FunctionHelper.noop(),
-                    itemRemove: FunctionHelper.noop(),
-                    collectionAdd: FunctionHelper.noop(),
-                    collectionRemove: FunctionHelper.noop()
-                },
-                syncData: []
-             });
+        {
+            constructor: function(collectionGroup) {
+                this.set({
+                    collectionGroup: collectionGroup,
+                    listeners: {
+                        itemAdd: FunctionHelper.noop(),
+                        itemChange: FunctionHelper.noop(),
+                        itemRemove: FunctionHelper.noop(),
+                        collectionAdd: FunctionHelper.noop(),
+                        collectionRemove: FunctionHelper.noop()
+                    },
+                    syncData: []
+                 });
 
-            var listeners = this.get("listeners");
+                var listeners = this.get("listeners");
 
-            EventHelper.observe(collectionGroup, "item_add", listeners.itemAdd);
-            EventHelper.observe(collectionGroup, "item_change", listeners.itemChange);
-            EventHelper.observe(collectionGroup, "item_remove", listeners.itemRemove);
-            EventHelper.observe(collectionGroup, "collection_add", listeners.collectionAdd);
-            EventHelper.observe(collectionGroup, "collection_remove", listeners.collectionRemove);
+                EventHelper.observe(collectionGroup, "item_add", listeners.itemAdd);
+                EventHelper.observe(collectionGroup, "item_change", listeners.itemChange);
+                EventHelper.observe(collectionGroup, "item_remove", listeners.itemRemove);
+                EventHelper.observe(collectionGroup, "collection_add", listeners.collectionAdd);
+                EventHelper.observe(collectionGroup, "collection_remove", listeners.collectionRemove);
+            }
         }
     );
 

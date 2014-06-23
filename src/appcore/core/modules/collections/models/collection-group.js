@@ -21,12 +21,14 @@ define(function(require) {
     */
     var CollectionGroup = Ac.Model.create("CollectionGroup",
         ["name", "syncer"],
-        function(name, syncer) {
-            this.set({
-                name: name,
-                syncer: syncer ? syncer : null,
-                collections: {}
-             });
+        {
+            constructor: function(name, syncer) {
+                this.set({
+                    name: name,
+                    syncer: syncer ? syncer : null,
+                    collections: {}
+                 });
+            }
         }
     );
 

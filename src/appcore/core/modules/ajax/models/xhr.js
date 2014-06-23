@@ -20,11 +20,13 @@ define(function(require) {
     */
     var Xhr = Ac.Model.create("Xhr",
         ["url", "method", "data", "status", "response"],
-        function(url, method) {
-            this.set({
-                url: url,
-                method: method ? method : Xhr.METHOD_GET
-            });
+        {
+            constructor: function(url, method) {
+                this.set({
+                    url: url,
+                    method: method ? method : Xhr.METHOD_GET
+                });
+            }
         }
     );
 

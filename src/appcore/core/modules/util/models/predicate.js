@@ -20,12 +20,14 @@ define(function(require) {
     */
     var Predicate = Ac.Model.create("Predicate",
         ["attribute", "value", "operation"],
-        function(attribute, value, operation) {
-            this.set({
-                attribute: attribute,
-                value: value,
-                operation: operation ? operation : "==="
-             });
+        {
+            constructor: function(attribute, value, operation) {
+                this.set({
+                    attribute: attribute,
+                    value: value,
+                    operation: operation ? operation : "==="
+                 });
+            }
         }
     );
 
