@@ -1,7 +1,8 @@
 define(function(require) {
     "use strict";
 
-    var Ac = require("../../appcore");
+    var Ac = require("../../../appcore");
+
     var Collection = require("./models/collection");
     var CollectionGroup = require("./models/collection-group");
 

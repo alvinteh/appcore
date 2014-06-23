@@ -2,8 +2,8 @@ define(function(require) {
     "use strict";
 
     var Ac = require("../../../../appcore");
-    var Event = require("../../events/models/event");
-    var EventHelper = require("../../events/helpers/event-helper");
+    var Event = require("../../core/models/event");
+    var EventHelper = require("../../core/helpers/event-helper");
 
     /*
         @class CollectionGroup
