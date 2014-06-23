@@ -20,6 +20,8 @@
         "describe",
         "expect",
         "it",
-        "sinon"
+        "sinon",
+
+        "getUrlParam"
     ]
 }
