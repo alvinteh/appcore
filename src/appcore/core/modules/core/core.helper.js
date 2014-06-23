@@ -20,11 +20,7 @@ define(function(require) {
             */
             create: function() {
                 //Create the child class constructor. Use a verbose method for performance optimization.
-                var childClass = function() {
-                    Helper.call(this, arguments);
-
-                    return this;
-                };
+                var childClass = {};
 
                 //Implement inheritance
                 childClass.prototype = Object.create(Helper.prototype);
