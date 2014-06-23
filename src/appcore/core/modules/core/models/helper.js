@@ -13,16 +13,7 @@ define(function() {
 
         Constructs a Helper instance.
     */
-    var Helper = function() {
-        //Private instance members
-        //(None)
-
-        //Public instance members
-        //(None)
-
-        //Return instance
-        return this;
-    };
+    var Helper = function() {};
 
     //Public instance members
     /*
