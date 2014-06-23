@@ -1,7 +1,8 @@
 define(function(require) {
     "use strict";
 
-    var Ac = require("../../appcore");
+    var Ac = require("../../../appcore");
+
     var Xhr = require("./models/xhr");
 
     /*

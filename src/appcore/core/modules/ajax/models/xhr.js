@@ -2,8 +2,8 @@ define(function(require) {
     "use strict";
 
     var Ac = require("../../../../appcore");
-    var EventHelper = require("../../events/helpers/event-helper");
-    var Promise = require("../../util/models/promise");
+    var EventHelper = require("../../core/helpers/event-helper");
+    var Promise = require("../../core/models/promise");
 
     /*
         @class Xhr
@@ -82,7 +82,7 @@ define(function(require) {
 
                     reject(new Error("Unable to process XMLHttpRequest."));
                 }
-                
+
             };
 
             var serialize = function(object) {
