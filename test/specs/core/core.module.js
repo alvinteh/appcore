@@ -42,7 +42,6 @@ define(function() {
                  */
 
                 if (window.getUrlParam("ignore-timeout").toString() !== "1") {
-                    console.log("Set timeout");
                     this.timeout(10000);
                 }
 
