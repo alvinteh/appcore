@@ -1,5 +1,6 @@
 define([
     "specs/framework.js",
+    "specs/core/core.helper.js",
     "specs/core/core.module.js",
     "specs/util/helpers/function-helper.js",
     "specs/util/helpers/model-helper.js",
