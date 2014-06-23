@@ -1,7 +1,8 @@
 define(function(require) {
     "use strict";
 
-    var Ac = require("../../appcore");
+    var Ac = require("../../../appcore");
+
     var Syncer = require("./models/syncer");
     var RestSyncer = require("./models/rest-syncer");
 

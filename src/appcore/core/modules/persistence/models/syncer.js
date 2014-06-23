@@ -2,7 +2,7 @@ define(function(require) {
     "use strict";
 
     var Ac = require("../../../../appcore");
-    var EventHelper = require("../../events/helpers/event-helper");
+    var EventHelper = require("../../core/helpers/event-helper");
     var FunctionHelper = require("../../util/helpers/function-helper");
 
     /*
