@@ -33,6 +33,14 @@ require([
 
     window.Am = Am;
 
+    //Setup utility get URL parameter function
+    window.getUrlParam = function(name) {
+        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(location.search);
+        return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    };
+
     //Setup Mocha
     chai.should();
     window.expect = chai.expect;
