@@ -77,7 +77,7 @@ define(function(require) {
                 childClass.prototype = Object.create(parentClass.prototype);
 
                 //Initialize model methods
-                Model.init(childClass);
+                Model.init(name, childClass);
 
                 //Generate getter and setter methods
                 var attribute;

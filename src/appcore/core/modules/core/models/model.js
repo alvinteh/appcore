@@ -28,7 +28,6 @@ define(function(require) {
         //Private instance members
         var attributes = {
             id: null,
-            name: modelName,
             attributes: {},
             validationRules: {}
         };
@@ -41,14 +40,9 @@ define(function(require) {
         //(None)
 
         //Special instance method for private member access
-        this[_getAttributes] = function(key, privileged) {
+        this[_getAttributes] = function(key) {
             if (key === _key) {
-                if (privileged === true) {
-                    return attributes;
-                }
-                else {
-                    return attributes.attributes;
-                }
+                return attributes.attributes;
             }
         };
 
@@ -57,10 +51,11 @@ define(function(require) {
     };
 
     //Public instance members
-    Model.init = function(model) {
+    Model.init = function(name, model) {
         model.prototype = (function(prototype) {
             //Private static members
             var staticAttributes = {
+                modelName: name,
                 validationRules: {}
             };
 
@@ -182,7 +177,7 @@ define(function(require) {
                 @return {string}
             */
             model.getModelName = function() {
-                return this[_getAttributes](_key, true).name;
+                return staticAttributes.modelName;
             };
 
             /*
@@ -359,17 +354,9 @@ define(function(require) {
                 var returnData = {};
 
                 var attributes = this[_getAttributes](_key);
-                var attributeValue;
 
                 for (var attribute in attributes) {
-                    attributeValue = attributes[attribute];
-
-                    if (typeof attributeValue === "function") {
-                        returnData[attribute] = attributeValue.toObject();
-                    }
-                    else {
-                        returnData[attribute] = attributeValue;
-                    }
+                    returnData[attribute] = attributes[attribute];
                 }
 
                 return returnData;
