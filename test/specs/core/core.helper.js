@@ -41,7 +41,6 @@ define(function() {
                     });
 
                     expect(TestHelper.test()).to.be.true;
-                    expect(TestHelper.prototype.test).to.not.exist;
 
                     done();
                 });
