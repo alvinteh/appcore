@@ -26,7 +26,8 @@ define(function(require) {
             */
             create: function(name, attributes, options) {
                 var parentClass = options && options.parent ? options.parent : Model;
-                var constructor = options && typeof options.constructor === "function" ? options.constructor : null;
+                var constructor = options && options.hasOwnProperty("constructor") && typeof options.constructor ===
+                    "function" ? options.constructor : null;
 
                 //Create the child class constructor. Use a verbose method for performance optimization.
                 var childClass;
