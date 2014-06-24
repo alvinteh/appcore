@@ -391,6 +391,10 @@ define(function(require) {
                     attributeErrors.push(rule.message || message);
                 }
 
+                function isEmpty(value) {
+                    return typeof value === "undefined" || value === null || value === "";
+                }
+
                 for (var attribute in modelRules) {
                     attributeRules = modelRules[attribute];
                     attributeValue = this[_getAttributes](_key)[attribute];
@@ -413,7 +417,7 @@ define(function(require) {
                         rule = attributeRules[i];
 
                         if (rule.required) {
-                            if (attributeValue === null || attributeValue === undefined || attributeValue === "") {
+                            if (isEmpty(attributeValue)) {
                                 addError(attributeName + " is required.");
                             }
                         }
@@ -435,22 +439,26 @@ define(function(require) {
                             }
                         }
                         else if (rule.minLength) {
-                            if (attributeValue.length < rule.minLength) {
+                            if (isEmpty(attributeValue) || typeof attributeValue !== "string" ||
+                                attributeValue.length < rule.minLength) {
                                 addError(attributeName + " should be at least " + rule.minLength + " characters long.");
                             }
                         }
                         else if (rule.maxLength) {
-                            if (attributeValue.length > rule.maxLength) {
+                            if (isEmpty(attributeValue) || typeof attributeValue !== "string" ||
+                                attributeValue.length > rule.maxLength) {
                                 addError(attributeName + " should be at most " + rule.maxLength + " characters long.");
                             }
                         }
                         else if (rule.minValue) {
-                            if (attributeValue < rule.minValue) {
+                            if (isEmpty(attributeValue) ||  typeof attributeValue !== "number" ||
+                                attributeValue < rule.minValue) {
                                 addError(attributeName + " should be at least " + rule.minValue + ".");
                             }
                         }
                         else if (rule.maxValue) {
-                            if (attributeValue > rule.maxValue) {
+                            if (isEmpty(attributeValue) || typeof attributeValue !== "number" ||
+                                attributeValue > rule.maxValue) {
                                 addError(attributeName + " should be at most " + rule.maxValue + ".");
                             }
                         }
@@ -468,13 +476,14 @@ define(function(require) {
                             }
                         }
                         else if (rule.regex) {
-                            if (!rule.regex.test(attributeValue)) {
+                            if (isEmpty(attributeValue) || !rule.regex.test(attributeValue)) {
                                 addError(attributeName + " should match " + rule.regex + ".");
                             }
                         }
-                        else if (rule.func) {
-                            if (!rule.func(attributeValue, this)) {
-                                addError(attributeName + " should pass " + rule.func + ".");
+                        else if (rule.function) {
+                            var result = rule.function(attributeValue, this);
+                            if (result !== true) {
+                                addError(result);
                             }
                         }
                     }
