@@ -236,7 +236,7 @@ define(function(require) {
                 var changes = [];
                 var change, oldValue;
 
-                if (typeof value !== "object" && value !== undefined) {
+                if (typeof attribute !== "object" && value !== undefined) {
                     oldValue = this[_getAttributes](_key)[attribute];
                     this[_getAttributes](_key)[attribute] = value;
 
