@@ -16,6 +16,7 @@ require.config({
 require([
         "../../src/appcore/appcore",
         "chai",
+        "chai-as-promised/lib/chai-as-promised",
         "sinon/lib/sinon",
         "sinon/lib/sinon/spy",
         "sinon/lib/sinon/call",
@@ -29,7 +30,9 @@ require([
         "sinon/lib/sinon/test_case",
         "sinon/lib/sinon/assert",
         "sinon/lib/sinon/match",
-    ], function(Am, chai) {
+    ], function(Am, chai, chaiAsPromised) {
+
+    chai.use(chaiAsPromised);
 
     window.Am = Am;
 
