@@ -93,7 +93,7 @@ define(function(require) {
             }, 0);
         };
 
-        
+
         /*
             @function get
 
@@ -106,7 +106,7 @@ define(function(require) {
         prototype.get = function(attribute) {
             return this[_getAttributes](_key)[attribute];
         };
-        
+
         /*
             @function transition
 
@@ -119,7 +119,8 @@ define(function(require) {
             var currentState = this.get("state");
 
             if (currentState === state || currentState !== STATE.UNFULFILLED || value === undefined ||
-                (state !== STATE.FULFILLED && state !== STATE.REJECTED)) {
+                (state !== STATE.FULFILLED && state !== STATE.REJECTED) ||
+                arguments.length < 2) {
                 return false;
             }
 
@@ -176,36 +177,31 @@ define(function(require) {
                     });
                 }
                 else {
+                    console.log("Line 181 called");
                     this.transition(x.get("state"), x.get("value"));
                 }
             }
             else if ((typeof x === "object" || typeof x === "function") && x !== null) {
                 var called = false;
 
-                try {
-                    var then = x.then;
+                var then = x.then;
 
-                    if (typeof then === "function") {
-                        then.call(x, function(y) {
-                            if (!called) {
-                                this.resolve(y);
-                            }
-                            called = true;
-                        }, function(r) {
-                            if (!called) {
-                                this.transition(STATE.REJECTED, r);
-                            }
-                            called = true;
-                        });
-                    }
-                    else {
-                        this.transition(STATE.FULFILLED, x);
-                    }
+                if (typeof then === "function") {
+                    var promise = this;
+                    then.call(x, function(y) {
+                        if (!called) {
+                            promise.resolve(y);
+                        }
+                        called = true;
+                    }, function(r) {
+                        if (!called) {
+                            promise.transition(STATE.REJECTED, r);
+                        }
+                        called = true;
+                    });
                 }
-                catch (e) {
-                    if (!called) {
-                        this.transition(STATE.REJECTED, e);
-                    }
+                else {
+                    this.transition(STATE.FULFILLED, x);
                 }
             }
             else {
@@ -231,8 +227,8 @@ define(function(require) {
     /*
         @function convert
 
-        Convets the specified function (assuming its signature follows the format func(callback, error, value) to use
-        promises).
+        Converts the specified function (assuming its signature follows the format func(errorCallback, successCallback,
+        value) to use promises).
 
         @param {mixed} func     The desired function
     */
@@ -242,7 +238,7 @@ define(function(require) {
             var args = [].slice.call(arguments);
 
             return new Promise(function(fulfillCallback, rejectCallback) {
-                func.apply(context, [fulfillCallback, rejectCallback].concat(args));
+                func.apply(context, [rejectCallback, fulfillCallback].concat(args));
             });
         };
     };
