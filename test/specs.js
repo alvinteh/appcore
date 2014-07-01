@@ -1,4 +1,5 @@
 define([
+    "specs/util/models/promise.js",
     "specs/framework.js",
     "specs/core/core.helper.js",
     "specs/core/core.model.js",
