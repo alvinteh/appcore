@@ -14,7 +14,7 @@ define(function() {
                         done();
                     });
 
-                    describe("::normalize()", function() {
+                    describe("normalize()", function() {
                         it("should normalize predicates following the { attr1: val1[,...] } format", function(done) {
                             var predicates = Predicate.normalize({
                                 attribute1: true,
@@ -76,7 +76,7 @@ define(function() {
                         });
                     });
 
-                    describe("test()", function() {
+                    describe("instance.test()", function() {
                         it("should return whether it is satisfied by the tested value", function(done) {
                             var testOperation = function(itemValue, predicateValue) {
                                 return itemValue.toLowerCase() === predicateValue.toLowerCase();

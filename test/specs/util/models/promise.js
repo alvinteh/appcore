@@ -38,7 +38,7 @@ define(function() {
                         });
                     });
 
-                    describe("::convert()", function() {
+                    describe("convert()", function() {
                         it("should convert the specified function to use promises", function(done) {
                             var convertedFunction = Promise.convert(function(errorCallback, fulfillCallback, value) {
                                 setTimeout(function() {

@@ -133,7 +133,7 @@ define(function() {
                 });
             });
 
-            describe("model.getModelName()", function() {
+            describe("instance.getModelName()", function() {
                 it("should return the model name", function(done) {
                     var Person = Am.Model.create("Person", []);
 
@@ -143,7 +143,7 @@ define(function() {
                 });
             });
 
-            describe("model.addMethod()", function() {
+            describe("instance.addMethod()", function() {
                 it("should create a public method", function(done) {
                     var Person = Am.Model.create("Person", []);
                     Person.addMethod("test", function() {
@@ -170,7 +170,7 @@ define(function() {
 
             });
 
-            describe("model.hasMethod()", function() {
+            describe("instance.hasMethod()", function() {
                 it("should detect whether the specified non-static method exists", function(done) {
                     var Person = Am.Model.create("Person", []);
                     Person.addMethod("test", function() {
@@ -184,7 +184,7 @@ define(function() {
                 });
             });
 
-            describe("model.removeMethod()", function() {
+            describe("instance.removeMethod()", function() {
                 it("should remove the specified non-static method from itself", function(done) {
                     var Person = Am.Model.create("Person", []);
                     Person.addMethod("test", function() {
@@ -204,7 +204,7 @@ define(function() {
                 });
             });
 
-            describe("model.addStaticMethod()", function() {
+            describe("instance.addStaticMethod()", function() {
                 it("should create a public method", function(done) {
                     var Person = Am.Model.create("Person", []);
                     Person.addStaticMethod("test", function() {
@@ -230,7 +230,7 @@ define(function() {
 
             });
 
-            describe("model.hasStaticMethod()", function() {
+            describe("instance.hasStaticMethod()", function() {
                 it("should detect whether the specified static method exists", function(done) {
                     var Person = Am.Model.create("Person", []);
                     Person.addStaticMethod("test", function() {
@@ -253,7 +253,7 @@ define(function() {
                 });
             });
 
-            describe("model.removeStaticMethod()", function() {
+            describe("instance.removeStaticMethod()", function() {
                 it("should remove the specified static method from itself", function(done) {
                     var Person = Am.Model.create("Person", []);
                     Person.addStaticMethod("test", function() {
@@ -268,7 +268,7 @@ define(function() {
                 });
             });
 
-            describe("model.addStaticAttribute()", function() {
+            describe("instance.addStaticAttribute()", function() {
                 it("should create a public attribute", function(done) {
                     var Person = Am.Model.create("Person", []);
                     Person.addStaticAttribute("test", 5);
@@ -296,7 +296,7 @@ define(function() {
 
             });
 
-            describe("model.hasStaticAttribute()", function() {
+            describe("instance.hasStaticAttribute()", function() {
                 it("should detect whether the specified static attribute exists", function(done) {
                     var Person = Am.Model.create("Person", ["firstName"]);
                     Person.addStaticAttribute("test", 5);
@@ -320,7 +320,7 @@ define(function() {
                 });
             });
 
-            describe("model.removeStaticMethod()", function() {
+            describe("instance.removeStaticMethod()", function() {
                 it("should remove the specified static attribute from itself", function(done) {
                     var Person = Am.Model.create("Person", []);
                     Person.addStaticAttribute("test", 5);
@@ -333,7 +333,7 @@ define(function() {
                 });
             });
 
-            describe("model.getValidationRules()", function() {
+            describe("instance.getValidationRules()", function() {
                 it("should return the model's validation rules", function(done) {
                     var Person = Am.Model.create("Person", ["firstName"]);
 
@@ -346,7 +346,7 @@ define(function() {
                 });
             });
 
-            describe("model.setValidationRules()", function() {
+            describe("instance.setValidationRules()", function() {
                 it("should set the model's validation rules", function(done) {
                     var Person = Am.Model.create("Person", ["firstName"]);
 
@@ -359,7 +359,7 @@ define(function() {
                 });
             });
 
-            describe("instance.getModel()", function() {
+            describe("modelInstance.getModel()", function() {
                 it("should return the caller's model", function(done) {
                     var Person = Am.Model.create("Person", []);
 
@@ -371,7 +371,7 @@ define(function() {
                 });
             });
 
-            describe("instance.get()", function() {
+            describe("modelInstance.get()", function() {
                 it("should return the value of specified attribute", function(done) {
                     var Person = Am.Model.create("Person", ["firstName", "lastName"]);
 
@@ -384,7 +384,7 @@ define(function() {
                 });
             });
 
-            describe("instance.set()", function() {
+            describe("modelInstance.set()", function() {
                 it("should set the value of specified attribute", function(done) {
                     var Person = Am.Model.create("Person", ["firstName", "lastName"]);
 
@@ -400,7 +400,7 @@ define(function() {
                 });
             });
 
-            describe("instance.has()", function() {
+            describe("modelInstance.has()", function() {
                 it("should check whether the specified attribute exists", function(done) {
                     var Person = Am.Model.create("Person", ["firstName", "lastName"]);
 
@@ -413,7 +413,7 @@ define(function() {
                 });
             });
 
-            describe("instance.getId()", function() {
+            describe("modelInstance.getId()", function() {
                 it("should return the caller's Id", function(done) {
                     var Person = Am.Model.create("Person", [], {
                         constructor: function(id) {
@@ -429,7 +429,7 @@ define(function() {
                 });
             });
 
-            describe("instance.setId()", function() {
+            describe("modelInstance.setId()", function() {
                 it("should set the caller's Id", function(done) {
                     var Person = Am.Model.create("Person", [], {
                         constructor: function(id) {
@@ -446,7 +446,7 @@ define(function() {
                 });
             });
 
-            describe("instance.toObject()", function() {
+            describe("modelInstance.toObject()", function() {
                 it("should return an object representation of the caller", function(done) {
                     var Person = Am.Model.create("Person", ["firstName", "lastName"]);
 
@@ -509,7 +509,7 @@ define(function() {
                });
             });
 
-            describe("instance.validate()", function() {
+            describe("modelInstance.validate()", function() {
                 it("should process required rules", function(done) {
                     var Person = Am.Model.create("Person", ["firstName"]);
 
@@ -899,7 +899,7 @@ define(function() {
                 });
             });
 
-            describe("instance.isValid()", function() {
+            describe("modelInstance.isValid()", function() {
                 it("should return whether the caller passes the model's validation rules", function(done) {
                     var Person = Am.Model.create("Person", ["firstName"]);
 
