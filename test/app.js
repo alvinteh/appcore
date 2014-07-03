@@ -3,7 +3,8 @@ require.config({
     baseUrl: "dependencies",
     urlArgs: (new Date()).getTime().toString().substring(8),
     paths: {
-        chai: "chai/chai"
+        chai: "chai/chai",
+        jquery: "//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min"
     },
     use: {
         mocha: {
@@ -30,7 +31,7 @@ require([
         "sinon/lib/sinon/test_case",
         "sinon/lib/sinon/assert",
         "sinon/lib/sinon/match",
-    ], function(Am, chai, chaiAsPromised) {
+    ], function(Am, $, chai, chaiAsPromised) {
 
     chai.use(chaiAsPromised);
 
@@ -50,7 +51,9 @@ require([
     window.mocha.setup("bdd");
 
     //Run tests
-    require(["specs.js"], function() {
-        window.mocha.run();
+    require(["jquery", "specs.js"], function($) {
+        $(function() {
+            window.mocha.run();
+        });
     });
 });
