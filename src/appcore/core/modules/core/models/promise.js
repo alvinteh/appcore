@@ -177,7 +177,6 @@ define(function(require) {
                     });
                 }
                 else {
-                    console.log("Line 181 called");
                     this.transition(x.get("state"), x.get("value"));
                 }
             }
