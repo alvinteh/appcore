@@ -31,7 +31,7 @@ require([
         "sinon/lib/sinon/test_case",
         "sinon/lib/sinon/assert",
         "sinon/lib/sinon/match",
-    ], function(Am, $, chai, chaiAsPromised) {
+    ], function(Am, chai, chaiAsPromised) {
 
     chai.use(chaiAsPromised);
 
