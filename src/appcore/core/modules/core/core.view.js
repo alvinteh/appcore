@@ -73,8 +73,8 @@ define(function(require) {
             var instance = args[0];
             var objectProperty = args[1];
             var elementProperties = (function(elementProperties) {
-                if (elementProperties === undefined) {
-                    return (context.getElements()[0].value === undefined ? ["innerHTML"] : ["value"]);
+                if (typeof elementProperties === "undefined") {
+                    return (typeof context.getElements()[0].value === "undefined" ? ["innerHTML"] : ["value"]);
                 }
                 else {
                     return elementProperties instanceof Array ? elementProperties : [elementProperties];
@@ -155,15 +155,9 @@ define(function(require) {
 
             originalFunction.apply(context, args);
 
-            var elementProperties = (function(elementProperties) {
-                if (elementProperties === undefined) {
-                    return (context.getElements()[0].value === undefined ? ["innerHTML"] : ["value"]);
-                }
-                else {
-                    return elementProperties instanceof Array ? elementProperties : [elementProperties];
-                }
-            })(args[2]);
-            var direction = args[3] ? args[3] : Element.TWO_WAY_BINDING;
+            var options = args[2];
+            var elementProperties = options ? options.elementProperties : undefined;
+            var direction = options ? options.direction : undefined;
 
             if (direction === Element.ONE_WAY_BINDING) {
                 return;
@@ -178,7 +172,9 @@ define(function(require) {
                 element = elements[i];
 
                 //jshint -W083
-                if (elementProperties.indexOf("value") !== -1) {
+                if ((typeof elementProperties === "undefined" && typeof context.getElements()[0].value !==
+                    "undefined") || (typeof elementProperties !== "undefined" && elementProperties.indexOf("value") !==
+                    -1)) {
                     for (var j = 0, jLength = events.length; j < jLength; j++) {
                         for (var k = 0, kLength = appData.eventListeners.length; k < kLength; k++) {
                             eventListener = appData.eventListeners[k];
@@ -284,7 +280,7 @@ define(function(require) {
     };
 
     return (function() {
-        if (_singleton === null || _singleton === undefined) {
+        if (_singleton === null || typeof _singleton === "undefined") {
             _singleton = ViewModule;
         }
 
