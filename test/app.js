@@ -2,6 +2,13 @@
 require.config({
     baseUrl: "dependencies",
     urlArgs: (new Date()).getTime().toString().substring(8),
+    packages: [
+        {
+            name: "appcore",
+            location: "../../src/appcore",
+            main: "appcore"
+        }
+    ],
     paths: {
         chai: "chai/chai",
         jquery: "//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min"
@@ -15,7 +22,7 @@ require.config({
 
 //Setup JavaScript dependencies
 require([
-        "../../src/appcore/appcore",
+        "appcore/appcore",
         "chai",
         "chai-as-promised/lib/chai-as-promised",
         "sinon/lib/sinon",
