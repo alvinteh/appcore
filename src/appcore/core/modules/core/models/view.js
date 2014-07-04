@@ -84,7 +84,22 @@ define(function(require) {
             var elements = this[_getAttributes](_key).elements;
 
             if (elements.indexOf(element) === -1) {
-                elements.push(element);
+                var isChild = (function(parent, child) {
+                    var node = child.parentNode;
+
+                    while (node !== null) {
+                        if (node === parent) {
+                            return true;
+                        }
+
+                        node = node.parentNode;
+                    }
+                    return false;
+                })(this[_getAttributes](_key).containerElement, element.getElement());
+
+                if (isChild) {
+                    elements.push(element);
+                }
             }
         };
 
@@ -101,6 +116,17 @@ define(function(require) {
             if (index !== -1) {
                 elements.splice(index, 1);
             }
+        };
+
+        /*
+            @function hasElement
+
+            Checks whether the specified Element exists in the View.
+        */
+        prototype.hasElement = function(element) {
+            var elements = this[_getAttributes](_key).elements;
+
+            return elements.indexOf(element) !== -1;
         };
 
         /*
