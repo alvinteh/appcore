@@ -236,7 +236,7 @@ define(function(require) {
                 var changes = [];
                 var change, oldValue;
 
-                if (typeof attribute !== "object" && value !== undefined) {
+                if (typeof attribute !== "object" && typeof value !== "undefined") {
                     oldValue = this[_getAttributes](_key)[attribute];
                     this[_getAttributes](_key)[attribute] = value;
 
@@ -294,7 +294,7 @@ define(function(require) {
                 @return {boolean}
             */
             prototype.has = function(attribute) {
-                return this[_getAttributes](_key)[attribute] !== undefined &&
+                return typeof this[_getAttributes](_key)[attribute] !== "undefined" &&
                     this[_getAttributes](_key)[attribute] !== null;
             };
 
@@ -411,7 +411,7 @@ define(function(require) {
                         }
                     }
                     attributeOverride = (!attributeRequired && (attributeValue === null ||
-                        attributeValue === undefined || attributeValue === ""));
+                        typeof attributeValue === "undefined" || attributeValue === ""));
 
                     for (i = 0, length = attributeRules.length; i < length; i++) {
                         rule = attributeRules[i];
