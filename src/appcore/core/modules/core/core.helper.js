@@ -46,7 +46,7 @@ define(function(require) {
     };
 
     return (function() {
-        if (_singleton === null || _singleton === undefined) {
+        if (_singleton === null || typeof _singleton === "undefined") {
             _singleton = HelperModule;
         }
 
