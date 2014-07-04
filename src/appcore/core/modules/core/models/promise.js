@@ -118,7 +118,7 @@ define(function(require) {
         prototype.transition = function(state, value) {
             var currentState = this.get("state");
 
-            if (currentState === state || currentState !== STATE.UNFULFILLED || value === undefined ||
+            if (currentState === state || currentState !== STATE.UNFULFILLED || typeof value === "undefined" ||
                 (state !== STATE.FULFILLED && state !== STATE.REJECTED) ||
                 arguments.length < 2) {
                 return false;
