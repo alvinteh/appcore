@@ -80,7 +80,8 @@ define(function(require) {
                     return elementProperties instanceof Array ? elementProperties : [elementProperties];
                 }
             })(args[2]);
-            var direction = args[3] ? args[3] : Element.TWO_WAY_BINDING;
+            var direction = args[2] && typeof args[2].direction !== "undefined" ?
+                args[2].direction : Element.TWO_WAY_BINDING;
 
             if (direction === Element.ONE_WAY_BINDING) {
                 return;
@@ -218,6 +219,32 @@ define(function(require) {
                 }
 
                 appData.views.push(view);
+            },
+
+            /*
+                @function remove
+
+                Removes the specified view to the internal records.
+
+                @param {object} view        The desired view
+            */
+            remove: function(view) {
+                var index = appData.views.indexOf(view);
+
+                if (index !== -1) {
+                    appData.views.splice(index, 1);
+                }
+            },
+
+            /*
+                @function has
+
+                Checks whether the specified view exists in the internal records.
+
+                @param {object} view        The desired view
+            */
+            has: function(view) {
+                return appData.views.indexOf(view) !== -1;
             },
 
             /*
