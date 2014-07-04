@@ -20,6 +20,10 @@
         "describe",
         "expect",
         "it",
+        "after",
+        "afterEach",
+        "before",
+        "beforeEach",
         "sinon",
 
         "getUrlParam",
