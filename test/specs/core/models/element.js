@@ -56,9 +56,20 @@ define(function() {
 
                         done();
                     });
+
+                    it("should add the created Element to the specified View if applicable", function(done) {
+                        $("#test").append("<div id=\"test1\">");
+                        $("#test1").append("<div id=\"test2\">");
+                        var view = Am.View.create("#test1");
+                        var element = Am.View.Element.create("#test2", view);
+
+                        expect(view.hasElement(element)).to.be.true;
+
+                        done();
+                    });
                 });
 
-                describe("getElement()", function() {
+                describe("instance.getElement()", function() {
                     it("should return the appropriate HTMLElement", function(done) {
                         $("#test").append("<div id=\"test1\">");
                         var element = Am.View.Element.create("#test1");
@@ -79,7 +90,7 @@ define(function() {
                     });
                 });
 
-                describe("getElements()", function() {
+                describe("instance.getElements()", function() {
                     it("should return an array of all the HTMLElements", function(done) {
                         $("#test").append("<div id=\"test1\">");
                         $("#test").append("<div id=\"test2\">");
@@ -103,7 +114,7 @@ define(function() {
                     });
                 });
 
-                describe("addDataBinding()/refresh()", function() {
+                describe("addDataBinding()", function() {
                     it("should automatically call refresh() for non-reverse bindings", function(done) {
                         $("#test").append("<input id=\"test1\" type=\"text\">");
                         $("#test").append("<input id=\"test2\" type=\"text\">");
@@ -203,7 +214,7 @@ define(function() {
                     });
                 });
 
-                describe("refresh()", function() {
+                describe("instance.refresh()", function() {
                     it("should refresh the Element's HTMLElement(s)'s specified attribute (string)",
                         function(done) {
                         $("#test").append("<div id=\"test1\">");
@@ -290,7 +301,7 @@ define(function() {
                     });
                 });
 
-                describe("removeDataBinding()", function() {
+                describe("instance.removeDataBinding()", function() {
                     it("should remove the Element's HTMLElement(s)'s innerHTML bindings to the instance by default " +
                         "for non-input HTML elements", function(done) {
                         $("#test").append("<div id=\"test1\">");
@@ -434,7 +445,7 @@ define(function() {
                     });
                 });
 
-                describe("hasDataBindings()", function() {
+                describe("instance.hasDataBindings()", function() {
                     it("should return whether the Element has any data bindings", function(done) {
                         $("#test").append("<div id=\"test1\">");
                         $("#test").append("<div id=\"test2\">");
@@ -452,7 +463,7 @@ define(function() {
                     });
                 });
 
-                describe("isDataBound()", function() {
+                describe("instance.isDataBound()", function() {
                     it("should return whether the Element is data bound to the specified instance", function(done) {
                         $("#test").append("<div id=\"test1\">");
                         $("#test").append("<div id=\"test2\">");
