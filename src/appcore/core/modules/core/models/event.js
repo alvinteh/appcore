@@ -71,7 +71,7 @@ define(function(require) {
             @param {mixed} value                    The desired value
         */
         prototype.set = function(attribute, value) {
-            if (value !== undefined) {
+            if (typeof value !== "undefined") {
                 this[_getAttributes](_key)[attribute] = value;
             }
             else {
@@ -94,7 +94,7 @@ define(function(require) {
             @return {boolean}
         */
         prototype.has = function(attribute) {
-            return this[_getAttributes](_key)[attribute] !== undefined &&
+            return typeof this[_getAttributes](_key)[attribute] !== "undefined" &&
                 this[_getAttributes](_key)[attribute] !== null;
         };
 
