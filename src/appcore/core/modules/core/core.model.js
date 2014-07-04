@@ -52,7 +52,7 @@ define(function(require) {
 
                         if (arguments) {
                             for (var i = 0, length = attributes.length; i < length; i++) {
-                                values[attributes[i]] = arguments[i] !== undefined ? arguments[i] : null;
+                                values[attributes[i]] = typeof arguments[i] !== "undefined" ? arguments[i] : null;
                             }
                         }
 
@@ -119,7 +119,7 @@ define(function(require) {
     };
 
     return (function() {
-        if (_singleton === null || _singleton === undefined) {
+        if (_singleton === null || typeof _singleton === "undefined") {
             _singleton = ModelModule;
         }
 
