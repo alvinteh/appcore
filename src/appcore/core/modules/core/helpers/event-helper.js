@@ -73,7 +73,7 @@ define(function() {
 
                 @param {object} target                  The desired object to stop observing
                 @param {string} event                   The desired event to stop observing
-                @param {function} eventListener         The desired event listener
+                @param [{function}] eventListener       The desired event listener
             */
             unobserve: function(target, event, eventListener) {
                 for (var i = 0, iLength = data.length; i < iLength; i++) {
@@ -88,16 +88,13 @@ define(function() {
                     if (!eventListenerRecords) {
                         return;
                     }
-                        
-                    for (var j = 0, jLength = eventListenerRecords.length; j < jLength; j++) {
-                        if (eventListenerRecords[j].func !== eventListener) {
-                            continue;
-                        }
 
-                        delete eventListenerRecords[j];
-                        break;
+                    for (var j = eventListenerRecords.length - 1; j >= 0; j--) {
+                        if (eventListenerRecords[j].func === eventListener || typeof eventListener === "undefined") {
+                            eventListenerRecords.splice(j, 1);
+                        }
                     }
-                        
+
                     break;
                 }
             },
@@ -122,7 +119,7 @@ define(function() {
                     if (!eventListenerRecords) {
                         return;
                     }
-                        
+
                     for (var j = 0, jLength = eventListenerRecords.length; j < jLength; j++) {
                         eventListenerRecords[j].func(event);
                     }
