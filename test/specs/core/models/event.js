@@ -98,7 +98,7 @@ define(function() {
                         var event = new Am.Event.Event(person, "say", { message: "Hello" });
                         var object = event.toObject();
 
-                        expect(object.target.name).to.equal(person.name);
+                        expect(object.target.name).to.equal(person.get("name"));
                         expect(object.name).to.equal("say");
                         expect(object.data.message).to.equal("Hello");
 
