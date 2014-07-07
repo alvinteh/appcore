@@ -269,6 +269,22 @@ define(function() {
 
                     done();
                 });
+
+                it("should set the value of specified attributes", function(done) {
+                    var Person = Am.Model.create("Person", ["firstName", "lastName"]);
+
+                    var person = new Person("John", "Doe");
+
+                    person.set({
+                        firstName: "Tom",
+                        lastName: "Smith"
+                    });
+
+                    expect(person.get("firstName")).to.equal("Tom");
+                    expect(person.get("lastName")).to.equal("Smith");
+
+                    done();
+                });
             });
 
             describe("modelInstance.has()", function() {
