@@ -2,7 +2,6 @@ define(function(require) {
     "use strict";
 
     var Ac = require("../../../../appcore");
-    var EventHelper = require("../../core/helpers/event-helper");
     var Promise = require("../../core/models/promise");
 
     /*
@@ -73,14 +72,14 @@ define(function(require) {
                         status: xhr.status,
                     });
 
-                    EventHelper.trigger(this, "success", me);
+                    Ac.Event.trigger(this, "success", me);
 
                     resolve(xhr.responseText);
                 }
                 else {
                     me.set("status", xhr.status);
 
-                    EventHelper.trigger(this, "fail", me);
+                    Ac.Event.trigger(this, "fail", me);
 
                     reject(new Error("Unable to process XMLHttpRequest."));
                 }

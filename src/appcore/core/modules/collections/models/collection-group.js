@@ -2,8 +2,6 @@ define(function(require) {
     "use strict";
 
     var Ac = require("../../../../appcore");
-    var Event = require("../../core/models/event");
-    var EventHelper = require("../../core/helpers/event-helper");
 
     /*
         @class CollectionGroup
@@ -42,7 +40,7 @@ define(function(require) {
 
     */
     var triggerItemAdd = function(event) {
-        EventHelper.trigger(new Event(this, "item_add", {
+        Ac.Event.trigger(new Ac.Event.Event(this, "item_add", {
             collection: event.getTarget(),
             item: event.getData().item
         }));
@@ -57,7 +55,7 @@ define(function(require) {
 
     */
     var triggerItemChange = function(event) {
-        EventHelper.trigger(new Event(this, "item_change", {
+        Ac.Event.trigger(new Ac.Event.Event(this, "item_change", {
             collection: event.getTarget(),
             item: event.getData().item,
             changes: event.getData().changes
@@ -73,7 +71,7 @@ define(function(require) {
 
     */
     var triggerItemRemove = function(event) {
-        EventHelper.trigger(new Event(this, "item_remove", {
+        Ac.Event.trigger(new Ac.Event.Event(this, "item_remove", {
             collection: event.getTarget(),
             item: event.getData().item
         }));
@@ -106,10 +104,10 @@ define(function(require) {
 
         collections[collection.get("name")] = collection;
 
-        EventHelper.observe(collection, "item_add", triggerItemAdd);
-        EventHelper.observe(collection, "item_change", triggerItemChange);
-        EventHelper.observe(collection, "item_remove", triggerItemRemove);
-        EventHelper.trigger(new Event(this, "collection_add", { collection: collection }));
+        Ac.Event.observe(collection, "item_add", triggerItemAdd);
+        Ac.Event.observe(collection, "item_change", triggerItemChange);
+        Ac.Event.observe(collection, "item_remove", triggerItemRemove);
+        Ac.Event.trigger(new Ac.Event.Event(this, "collection_add", { collection: collection }));
     });
 
     /*
@@ -135,10 +133,10 @@ define(function(require) {
         var tmpCollection = collections[targetCollectionName];
         delete collections[targetCollectionName];
 
-        EventHelper.unobserve(tmpCollection, "item_add", triggerItemAdd);
-        EventHelper.unobserve(tmpCollection, "item_change", triggerItemChange);
-        EventHelper.unobserve(tmpCollection, "item_remove", triggerItemRemove);
-        EventHelper.trigger(new Event(this, "collection_remove", { collection: tmpCollection }));
+        Ac.Event.unobserve(tmpCollection, "item_add", triggerItemAdd);
+        Ac.Event.unobserve(tmpCollection, "item_change", triggerItemChange);
+        Ac.Event.unobserve(tmpCollection, "item_remove", triggerItemRemove);
+        Ac.Event.trigger(new Ac.Event.Event(this, "collection_remove", { collection: tmpCollection }));
     });
 
     /*

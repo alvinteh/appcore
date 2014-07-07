@@ -2,8 +2,6 @@ define(function(require) {
     "use strict";
 
     var Ac = require("../../../../appcore");
-    var Event = require("../../core/models/event");
-    var EventHelper = require("../../core/helpers/event-helper");
     var Predicate = require("../../util/models/predicate");
 
     /*
@@ -66,7 +64,7 @@ define(function(require) {
 
     */
     var triggerItemChange = function(event) {
-        EventHelper.trigger(new Event(this, "item_change", {
+        Ac.Event.trigger(new Ac.Event.Event(this, "item_change", {
             item: event.getTarget(),
             changes: event.getData()
         }));
@@ -84,8 +82,8 @@ define(function(require) {
     var removeItem = function(id, items) {
         var tmpItem = items[id];
         delete items[id];
-        EventHelper.unobserve(tmpItem, "change", triggerItemChange);
-        EventHelper.trigger(new Event(this, "item_remove", { item: tmpItem }));
+        Ac.Event.unobserve(tmpItem, "change", triggerItemChange);
+        Ac.Event.trigger(new Ac.Event.Event(this, "item_remove", { item: tmpItem }));
     };
 
 
@@ -511,8 +509,8 @@ define(function(require) {
         }
 
         items[id] = item;
-        EventHelper.trigger(new Event(this, "item_add", { item: item }));
-        EventHelper.observe(item, "change", triggerItemChange);
+        Ac.Event.trigger(new Ac.Event.Event(this, "item_add", { item: item }));
+        Ac.Event.observe(item, "change", triggerItemChange);
     });
 
     return Collection;

@@ -2,7 +2,6 @@ define(function(require) {
     "use strict";
 
     var Ac = require("../../../../appcore");
-    var EventHelper = require("../../core/helpers/event-helper");
     var FunctionHelper = require("../../util/helpers/function-helper");
 
     /*
@@ -37,11 +36,11 @@ define(function(require) {
 
                 var listeners = this.get("listeners");
 
-                EventHelper.observe(collectionGroup, "item_add", listeners.itemAdd);
-                EventHelper.observe(collectionGroup, "item_change", listeners.itemChange);
-                EventHelper.observe(collectionGroup, "item_remove", listeners.itemRemove);
-                EventHelper.observe(collectionGroup, "collection_add", listeners.collectionAdd);
-                EventHelper.observe(collectionGroup, "collection_remove", listeners.collectionRemove);
+                Ac.Event.observe(collectionGroup, "item_add", listeners.itemAdd);
+                Ac.Event.observe(collectionGroup, "item_change", listeners.itemChange);
+                Ac.Event.observe(collectionGroup, "item_remove", listeners.itemRemove);
+                Ac.Event.observe(collectionGroup, "collection_add", listeners.collectionAdd);
+                Ac.Event.observe(collectionGroup, "collection_remove", listeners.collectionRemove);
             }
         }
     );
