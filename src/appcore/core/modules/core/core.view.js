@@ -28,17 +28,14 @@ define(function(require) {
             for (var i = 0, length = appData.eventListeners.length; i < length; i++) {
                 eventListener = appData.eventListeners[i];
 
-
-                if (eventListener.element === event.target) {
-                    if (eventListener.event === event.type) {
-                        eventListener.listener.apply(undefined, [event]);
-                    }
-                }
-                else if (eventListener.event === "mutation" && event instanceof window.MutationRecord) {
+                if (eventListener.event === "mutation" && event instanceof window.MutationRecord) {
                     if (eventListener.element === event.target ||
                         (event.type === "characterData" && eventListener.element === event.target.parentElement)) {
                         eventListener.listener.apply(undefined, [event]);
                     }
+                }
+                else if (eventListener.element === event.target && eventListener.event === event.type) {
+                    eventListener.listener.apply(undefined, [event]);
                 }
             }
         };
@@ -51,8 +48,11 @@ define(function(require) {
         }
 
         //Monitor DOM for changes
+        //NOTE: A polyfill (not provided) is required for this to work IE 9 and 10
+        //NOTE: IE11 incorrectly reports characterData changes in child nodes as childList mutations
         var mutationObserver = new window[(window.MutationObserver ? "" : "WebKit") + "MutationObserver"](
             function(mutations) {
+
             mutations.forEach(function(mutation) {
                 handleEventListeners(mutation);
             });
@@ -72,6 +72,7 @@ define(function(require) {
 
             var instance = args[0];
             var objectProperty = args[1];
+            var options = args[2];
             var elementProperties = (function(elementProperties) {
                 if (typeof elementProperties === "undefined") {
                     return (typeof context.getElements()[0].value === "undefined" ? ["innerHTML"] : ["value"]);
@@ -79,9 +80,9 @@ define(function(require) {
                 else {
                     return elementProperties instanceof Array ? elementProperties : [elementProperties];
                 }
-            })(args[2]);
-            var direction = args[2] && typeof args[2].direction !== "undefined" ?
-                args[2].direction : Element.TWO_WAY_BINDING;
+            })(options ? options.elementProperties : undefined);
+            var direction = args[2] && typeof options.direction !== "undefined" ?
+                options.direction : Element.TWO_WAY_BINDING;
 
             if (direction === Element.ONE_WAY_BINDING) {
                 return;
@@ -90,8 +91,8 @@ define(function(require) {
             var events = ["change", "input"];
 
             var elements = context.getElements();
-            var element;
-            var backwardTransform = args[5], value;
+            var element, value;
+            var backwardTransform = args[2] ? args[2].backwardTransform : null;
 
             for (var i = 0, iLength = elements.length; i < iLength; i++) {
                 element = elements[i];
@@ -122,7 +123,12 @@ define(function(require) {
                         listener: function(mutation) {
                             if (mutation.type === "attributes") {
                                 if (elementProperties.indexOf(mutation.attributeName) !== -1) {
-                                    value = element[mutation.attributeName];
+                                    if (mutation.attributeName.indexOf("data-") === 0) {
+                                        value = element.dataset[mutation.attributeName.substring(5)];
+                                    }
+                                    else {
+                                        value = element[mutation.attributeName];
+                                    }
 
                                     if (backwardTransform) {
                                         value = backwardTransform(value);
@@ -132,7 +138,7 @@ define(function(require) {
                                     ViewModule.refresh(instance);
                                 }
                             }
-                            else if (mutation.type === "characterData") {
+                            else if (mutation.type === "characterData" || mutation.type === "childList") {
                                 if (elementProperties.indexOf("innerHTML") !== -1) {
                                     value = element.innerHTML;
 
@@ -180,7 +186,7 @@ define(function(require) {
                         for (var k = 0, kLength = appData.eventListeners.length; k < kLength; k++) {
                             eventListener = appData.eventListeners[k];
 
-                            if (eventListener.element === element && eventListener.event === event) {
+                            if (eventListener.element === element && events.indexOf(eventListener.event) !== -1) {
                                 appData.eventListeners.splice(k, 1);
                                 k--;
                                 kLength--;
@@ -192,7 +198,7 @@ define(function(require) {
                     for (var l = 0, lLength = appData.eventListeners.length; l < lLength; l++) {
                         eventListener = appData.eventListeners[l];
 
-                        if (eventListener.element === element && eventListener.event === event) {
+                        if (eventListener.element === element && events.indexOf(eventListener.event) !== -1) {
                             appData.eventListeners.splice(l, 1);
                             l--;
                             lLength--;
