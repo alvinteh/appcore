@@ -1,6 +1,7 @@
 define(function(require) {
     "use strict";
 
+    var CoreController = require("./core.controller");
     var CoreEvent = require("./core.event");
     var CoreHelper = require("./core.helper");
     var CoreModel = require("./core.model");
@@ -17,9 +18,11 @@ define(function(require) {
         //Private instance members
         var Core = {};
         var data = {
+            controllers: [],
             views: []
         };
 
+        Core.Controller = new CoreController(Core, data);
         Core.Event = new CoreEvent();
         Core.Helper = new CoreHelper();
         Core.Model = new CoreModel(Core);
