@@ -142,6 +142,24 @@ define(["ampedjs/core/modules/core/models/controller"], function(Controller) {
                         done();
                     });
                 });
+
+                describe("getActions()", function() {
+                    it("should return all of the controller's action", function(done) {
+                        var controller = new Controller();
+                        var func1 = function() {};
+                        var func2 = function() {};
+                        controller.addAction("action1", func1);
+                        controller.addAction("action2", func2);
+
+                        var actions = controller.getActions();
+
+                        expect(actions.length).to.equal(2);
+                        expect(actions[0].function).to.equal(func1);
+                        expect(actions[1].function).to.equal(func2);
+
+                        done();
+                    });
+                });
             });
         });
     });

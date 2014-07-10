@@ -76,12 +76,23 @@ define(function(require) {
 
             @param {string} name        The action name
 
-            @return {Action}
+            @return {object}
         */
         prototype.getAction = function(name) {
-            var actions =  this[_getAttributes](_key).actions;
+            var actions = this[_getAttributes](_key).actions;
 
             return actions[name];
+        };
+
+        /*
+            @function getActions
+
+            Retrieves the controller's actions
+
+            @return {object[]}
+        */
+        prototype.getActions = function() {
+            return this[_getAttributes](_key).actions;
         };
 
         /*
