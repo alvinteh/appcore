@@ -7,9 +7,6 @@ define(function(require) {
 
     var HelperModule = function() {
         //Private instance members
-        //(None)
-
-        //Public instance members
         var HelperModule = {
             /*
                 @function create
@@ -42,6 +39,7 @@ define(function(require) {
             }
         };
 
+        //Public instance members
         return HelperModule;
     };
 

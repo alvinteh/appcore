@@ -8,7 +8,7 @@ define(function(require) {
     var _singleton = null;
 
     var ModelModule = function(App) {
-        //Public instance members
+        //Private instance members
         var ModelModule = {
             /*
                 @function create
@@ -115,6 +115,7 @@ define(function(require) {
             }
         };
 
+        //Public instance members
         return ModelModule;
     };
 

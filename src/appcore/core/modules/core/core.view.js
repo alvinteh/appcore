@@ -7,7 +7,8 @@ define(function(require) {
 
     var _singleton = null;
 
-    var ViewModule = function(App, appData) {
+    var ViewModule = function() {
+        //Private instance variables
         //Initialize events
         /*
             Array of event listeners. Adheres to the following format:
@@ -20,13 +21,14 @@ define(function(require) {
                 }
             ]
         */
-        appData.eventListeners = [];
+        var eventListeners = [];
+        var views = [];
 
         var handleEventListeners = function(event) {
             var eventListener;
 
-            for (var i = 0, length = appData.eventListeners.length; i < length; i++) {
-                eventListener = appData.eventListeners[i];
+            for (var i = 0, length = eventListeners.length; i < length; i++) {
+                eventListener = eventListeners[i];
 
                 if (eventListener.event === "mutation" && event instanceof window.MutationRecord) {
                     if (eventListener.element === event.target ||
@@ -100,7 +102,7 @@ define(function(require) {
                 //jshint -W083
                 if (elementProperties.indexOf("value") !== -1) {
                     for (var j = 0, jLength = events.length; j < jLength; j++) {
-                        appData.eventListeners.push({
+                        eventListeners.push({
                             element: element,
                             event: events[j],
                             listener: function() {
@@ -117,7 +119,7 @@ define(function(require) {
                     }
                 }
                 else {
-                    appData.eventListeners.push({
+                    eventListeners.push({
                         element: element,
                         event: "mutation",
                         listener: function(mutation) {
@@ -183,11 +185,11 @@ define(function(require) {
                     "undefined") || (typeof elementProperties !== "undefined" && elementProperties.indexOf("value") !==
                     -1)) {
                     for (var j = 0, jLength = events.length; j < jLength; j++) {
-                        for (var k = 0, kLength = appData.eventListeners.length; k < kLength; k++) {
-                            eventListener = appData.eventListeners[k];
+                        for (var k = 0, kLength = eventListeners.length; k < kLength; k++) {
+                            eventListener = eventListeners[k];
 
                             if (eventListener.element === element && events.indexOf(eventListener.event) !== -1) {
-                                appData.eventListeners.splice(k, 1);
+                                eventListeners.splice(k, 1);
                                 k--;
                                 kLength--;
                             }
@@ -195,11 +197,11 @@ define(function(require) {
                     }
                 }
                 else {
-                    for (var l = 0, lLength = appData.eventListeners.length; l < lLength; l++) {
-                        eventListener = appData.eventListeners[l];
+                    for (var l = 0, lLength = eventListeners.length; l < lLength; l++) {
+                        eventListener = eventListeners[l];
 
                         if (eventListener.element === element && events.indexOf(eventListener.event) !== -1) {
-                            appData.eventListeners.splice(l, 1);
+                            eventListeners.splice(l, 1);
                             l--;
                             lLength--;
                         }
@@ -209,7 +211,6 @@ define(function(require) {
             }
         });
 
-        //Public instance members
         var ViewModule = {
             /*
                 @function add
@@ -220,11 +221,11 @@ define(function(require) {
             */
             add: function(view) {
                 //Ignore views which already exist in the internal records
-                if (appData.views.indexOf(view) !== -1) {
+                if (views.indexOf(view) !== -1) {
                     return;
                 }
 
-                appData.views.push(view);
+                views.push(view);
             },
 
             /*
@@ -235,10 +236,10 @@ define(function(require) {
                 @param {object} view        The desired view
             */
             remove: function(view) {
-                var index = appData.views.indexOf(view);
+                var index = views.indexOf(view);
 
                 if (index !== -1) {
-                    appData.views.splice(index, 1);
+                    views.splice(index, 1);
                 }
             },
 
@@ -250,7 +251,7 @@ define(function(require) {
                 @param {object} view        The desired view
             */
             has: function(view) {
-                return appData.views.indexOf(view) !== -1;
+                return views.indexOf(view) !== -1;
             },
 
             /*
@@ -263,7 +264,7 @@ define(function(require) {
             create: function(elements) {
                 var view = new View(elements);
 
-                appData.views.push(view);
+                views.push(view);
 
                 return view;
             },
@@ -277,8 +278,8 @@ define(function(require) {
                 @param [{object}] instance      The desired model instance.
             */
             refresh: function(instance) {
-                for (var i = 0, length = appData.views.length; i < length; i++) {
-                    appData.views[i].refresh(instance);
+                for (var i = 0, length = views.length; i < length; i++) {
+                    views[i].refresh(instance);
                 }
             },
 
@@ -311,6 +312,7 @@ define(function(require) {
             View: View
         };
 
+        //Public instance variables
         return ViewModule;
     };
 

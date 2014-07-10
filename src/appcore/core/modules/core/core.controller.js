@@ -5,9 +5,10 @@ define(function(require) {
 
     var _singleton = null;
 
-    var ControllerModule = function(App, appData) {
+    var ControllerModule = function() {
+        //Private instance members
+        var controllers = [];
 
-        //Public instance members
         var ControllerModule = {
             /*
                 @function add
@@ -18,11 +19,11 @@ define(function(require) {
             */
             add: function(controller) {
                 //Ignore views which already exist in the internal records
-                if (appData.controllers.indexOf(controller) !== -1) {
+                if (controllers.indexOf(controller) !== -1) {
                     return;
                 }
 
-                appData.controllers.push(controller);
+                controllers.push(controller);
             },
 
             /*
@@ -33,10 +34,10 @@ define(function(require) {
                 @param {Controller} controller        The desired controller
             */
             remove: function(controller) {
-                var index = appData.controllers.indexOf(controller);
+                var index = controllers.indexOf(controller);
 
                 if (index !== -1) {
-                    appData.controllers.splice(index, 1);
+                    controllers.splice(index, 1);
                 }
             },
 
@@ -48,7 +49,7 @@ define(function(require) {
                 @param {Controller} controller        The desired controller
             */
             has: function(controller) {
-                return appData.controllers.indexOf(controller) !== -1;
+                return controllers.indexOf(controller) !== -1;
             },
 
             /*
@@ -61,7 +62,7 @@ define(function(require) {
             create: function(models) {
                 var controller = new Controller(models);
 
-                appData.controllers.push(controller);
+                controllers.push(controller);
 
                 return controller;
             },
@@ -69,6 +70,7 @@ define(function(require) {
             Controller: Controller
         };
 
+        //Public instance members
         return ControllerModule;
     };
 

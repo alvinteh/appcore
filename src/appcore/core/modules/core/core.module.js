@@ -10,7 +10,6 @@ define(function(require) {
         //Private instance members
         var modules = {};
 
-        //Public instance members
         var ModuleModule = {
             /*
                 @function create
@@ -98,6 +97,7 @@ define(function(require) {
             }
         };
 
+        //Public instance members
         return ModuleModule;
     };
 

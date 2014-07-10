@@ -8,9 +8,6 @@ define(function(require) {
 
     var EventModule = function() {
         //Private instance members
-        //(None)
-
-        //Public instance members
         var EventModule = {
             /*
                 @function observe
@@ -47,6 +44,7 @@ define(function(require) {
             Event: Event
         };
 
+        //Public instance members
         return EventModule;
     };
 

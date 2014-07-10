@@ -17,17 +17,13 @@ define(function(require) {
     var Core = (function() {
         //Private instance members
         var Core = {};
-        var data = {
-            controllers: [],
-            views: []
-        };
 
-        Core.Controller = new CoreController(Core, data);
+        Core.Controller = new CoreController();
         Core.Event = new CoreEvent();
         Core.Helper = new CoreHelper();
         Core.Model = new CoreModel(Core);
         Core.Module = new CoreModule();
-        Core.View = new CoreView(Core, data);
+        Core.View = new CoreView();
 
         //Public instance members
         return Core;
