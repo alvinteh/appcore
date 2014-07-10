@@ -1,4 +1,4 @@
-define(["appcore/core/modules/core/models/view"], function(View) {
+define(["ampedjs/core/modules/core/models/view"], function(View) {
     var Am = window.Am;
 
     describe("Am", function() {
@@ -7,7 +7,7 @@ define(["appcore/core/modules/core/models/view"], function(View) {
                 afterEach(function() {
                     $("#test").html("");
                 });
-                
+
                 describe("View()", function() {
                     it("should accept a single HTMLElement argument", function(done) {
                         $("#test").append("<div id=\"test1\">");
@@ -25,7 +25,7 @@ define(["appcore/core/modules/core/models/view"], function(View) {
                         expect(view.getContainerElement()).to.equal($("#test1")[0]);
 
                         done();
-                    }); 
+                    });
                 });
 
                 describe("instance.getContainerElement()", function() {

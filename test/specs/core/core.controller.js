@@ -1,4 +1,4 @@
-define(["appcore/core/modules/core/models/controller"], function(Controller) {
+define(["ampedjs/core/modules/core/models/controller"], function(Controller) {
     var Am = window.Am;
 
     describe("Am", function() {

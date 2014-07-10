@@ -15,7 +15,7 @@ module.exports = function(grunt) {
         },
         clean: {
             dev: {
-                src: ["test/dependencies/appcore"]
+                src: ["test/dependencies/ampedjs"]
             },
             dist: {
                 src: ["dist"]
@@ -61,7 +61,7 @@ module.exports = function(grunt) {
                 options: {
                     baseUrl: "src",
                     optimize: "none",
-                    out: "dist/appcore.js",
+                    out: "dist/ampedjs.js",
                     name: "app",
                     paths: {
                         jquery: "../test/dependencies/jquery/jquery",
@@ -73,7 +73,7 @@ module.exports = function(grunt) {
                 options: {
                     baseUrl: "src",
                     optimize: "uglify2",
-                    out: "dist/appcore.min.js",
+                    out: "dist/ampedjs.min.js",
                     name: "app",
                     paths: {
                         jquery: "../test/dependencies/jquery/jquery",

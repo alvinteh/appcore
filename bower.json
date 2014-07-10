@@ -1,5 +1,5 @@
 {
-    "name": "appcore",
+    "name": "ampedjs",
     "version": "0.0.1",
     "ignore": [
         "**/.*",
@@ -11,13 +11,13 @@
         "bower.json"
     ],
     "keywords": [
-        "appcore",
+        "ampedjs",
         "javascript",
         "mvc"
     ],
     "dependencies": {
         "requirejs": "~2.1.9",
-        "jquery": ">=2.0"
+        "jquery": "~2.1.0"
     },
     "devDependencies": {
         "blanket": "~1.1.5",

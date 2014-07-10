@@ -1,4 +1,4 @@
-define(["appcore/core/modules/core/models/view"], function(View) {
+define(["ampedjs/core/modules/core/models/view"], function(View) {
     var Am = window.Am;
 
     describe("Am", function() {
