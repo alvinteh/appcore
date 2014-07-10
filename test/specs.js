@@ -1,11 +1,13 @@
 define([
     "specs/util/models/promise.js",
     "specs/framework.js",
+    "specs/core/models/controller.js",
     "specs/core/models/element.js",
     "specs/core/models/event.js",
     "specs/core/models/helper.js",
     "specs/core/models/model.js",
     "specs/core/models/view.js",
+    "specs/core/core.controller.js",
     "specs/core/core.event.js",
     "specs/core/core.helper.js",
     "specs/core/core.model.js",
