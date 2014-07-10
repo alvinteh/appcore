@@ -3,11 +3,17 @@ define(function() {
 
     describe("Am", function() {
         describe("View", function() {
-            afterEach(function() {
-                $("#test").html("");
-            });
-
             describe("Element", function() {
+                afterEach(function() {
+                    $("#test").html("");
+                });
+
+                it("should be defined", function(done) {
+                    expect(Am.View).to.exist;
+
+                    done();
+                });
+
                 describe("instance.getElement()", function() {
                     it("should return the appropriate HTMLElement", function(done) {
                         $("#test").append("<div id=\"test1\">");
