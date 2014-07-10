@@ -4,9 +4,9 @@ require.config({
     urlArgs: (new Date()).getTime().toString().substring(8),
     packages: [
         {
-            name: "appcore",
-            location: "../../src/appcore",
-            main: "appcore"
+            name: "ampedjs",
+            location: "../../src/ampedjs",
+            main: "ampedjs"
         }
     ],
     paths: {
@@ -22,7 +22,7 @@ require.config({
 
 //Setup JavaScript dependencies
 require([
-        "appcore/appcore",
+        "ampedjs/ampedjs",
         "chai",
         "chai-as-promised/lib/chai-as-promised",
         "sinon/lib/sinon",
@@ -38,7 +38,7 @@ require([
         "sinon/lib/sinon/test_case",
         "sinon/lib/sinon/assert",
         "sinon/lib/sinon/match",
-    ], function(Am, chai, chaiAsPromised) {
+    ], function(Am, chai, chaiAsPromised, sinon) {
 
     chai.use(chaiAsPromised);
 
@@ -52,10 +52,11 @@ require([
         return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
     };
 
-    //Setup Mocha
+    //Setup Mocha and Sinon
     chai.should();
     window.expect = chai.expect;
     window.mocha.setup("bdd");
+    window.sinon = sinon;
 
     //Run tests
     require(["jquery", "specs.js"], function($) {
