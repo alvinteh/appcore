@@ -306,7 +306,9 @@ define(function(require) {
                     ONE_WAY_BINDING: Element.ONE_WAY_BINDING,
                     TWO_WAY_BINDING: Element.TWO_WAY_BINDING
                 };
-            })()
+            })(),
+
+            View: View
         };
 
         return ViewModule;
