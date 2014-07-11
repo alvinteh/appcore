@@ -7,7 +7,7 @@ define(function(require) {
 
     var _singleton = null;
 
-    var ModelModule = function(App) {
+    var ModelModule = function(Am) {
         //Private instance members
         var ModelModule = {
             /*
@@ -93,7 +93,7 @@ define(function(require) {
 
                         childClass.prototype[ModelHelper.getSetter(attribute)] = function(value) {
                             this.set(attribute, value);
-                            App.View.refresh(this);
+                            Am.View.refresh(this);
                         };
                     })(attributes[i]);
                     //jshint +W083
@@ -102,13 +102,13 @@ define(function(require) {
                 childClass.prototype.set = FunctionHelper.override(childClass.prototype.set,
                     function(originalFunction, context, args) {
                     originalFunction.apply(context, args);
-                    App.View.refresh(context);
+                    Am.View.refresh(context);
                 });
 
                 childClass.prototype.setId = FunctionHelper.override(childClass.prototype.setId,
                     function(originalFunction, context, args) {
                     originalFunction.apply(context, args);
-                    App.View.refresh(context);
+                    Am.View.refresh(context);
                 });
 
                 return childClass;
