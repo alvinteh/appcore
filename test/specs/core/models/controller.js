@@ -153,8 +153,8 @@ define(["ampedjs/core/modules/core/models/controller"], function(Controller) {
 
                         var actions = controller.getActions();
 
-                        expect(actions["action1"].function).to.equal(func1);
-                        expect(actions["action2"].function).to.equal(func2);
+                        expect(actions.action1.function).to.equal(func1);
+                        expect(actions.action2.function).to.equal(func2);
 
                         done();
                     });
