@@ -1,6 +1,8 @@
 define(function(require) {
     "use strict";
 
+    var Event = require("../models/event");
+    var EventHelper = require("../helpers/event-helper");
     var UuidHelper = require("../helpers/uuid-helper");
 
     var _key = {};
@@ -143,6 +145,43 @@ define(function(require) {
             for (var i = 0, length = elements.length; i < length; i++) {
                 elements[i].refresh(instance);
             }
+        };
+
+        /*
+            @function trigger
+
+            Triggers an event on the item.
+
+            @param {string} event       The desired event name
+            @param [{object}] args      Additional arguments for the event
+        */
+        prototype.trigger = function(event, args) {
+            EventHelper.trigger(new Event(this, event, args));
+        };
+
+        /*
+            @function observe
+
+            Observes the item for the specified event such that the specified event listener is called
+            when the aforementioned event fires.
+
+            @param {string} event                   The desired event to be observed
+            @param {function} eventListener         The desired event listener
+        */
+        prototype.observe = function(event, eventListener) {
+            EventHelper.observe(this, event, eventListener);
+        };
+
+        /*
+            @function unobserve
+
+            Stops observing the item for the specified and specified event listener.
+
+            @param {string} event                   The desired event to stop observing
+            @param {function} eventListener         The desired event listener
+        */
+        prototype.unobserve = function(event, eventListener) {
+            EventHelper.unobserve(this, event, eventListener);
         };
 
         return prototype;
