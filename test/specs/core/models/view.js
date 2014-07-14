@@ -139,6 +139,102 @@ define(["ampedjs/core/modules/core/models/view"], function(View) {
                         done();
                     });
                 });
+
+                describe("instance.trigger()/instance.observe()", function() {
+                    it("should return an Event with the correct target when fired", function(done) {
+                        $("#test").append("<div id=\"test1\">");
+                        var view = Am.View.create("#test1");
+
+                        var eventTarget = null;
+
+                        view.observe("test", function(event) {
+                            eventTarget = event.getTarget();
+                        });
+
+                        view.trigger("test");
+
+                        expect(eventTarget).to.equal(view);
+
+                        done();
+                    });
+
+                    it("should return an Event with the correct event data when fired", function(done) {
+                        $("#test").append("<div id=\"test1\">");
+                        var view = Am.View.create("#test1");
+
+                        var eventData = null;
+
+                        view.observe("test", function(event) {
+                            eventData = event.getData();
+                        });
+
+                        view.trigger("test", { message: "Hello" });
+
+                        expect(eventData.message).to.equal("Hello");
+
+                        done();
+                    });
+                });
+
+                describe("instance.unobserve()", function() {
+                    it("should cause the appropriate observe() listener(s) to stop firing", function(done) {
+                        $("#test").append("<div id=\"test1\">");
+                        var view = Am.View.create("#test1");
+
+                        var test1Trigger = 0;
+                        var test2Trigger = 0;
+
+                        var test1Listener1 = function() {
+                            test1Trigger += 1;
+                        };
+
+                        view.observe("test1", test1Listener1);
+
+                        view.observe("test1", function() {
+                            test1Trigger += 2;
+                        });
+
+                        view.observe("test2", function() {
+                           test2Trigger += 1;
+                        });
+
+                        view.observe("test2", function() {
+                            test2Trigger += 2;
+                        });
+
+                        view.unobserve("test1", test1Listener1);
+
+                        view.trigger("test1");
+                        view.trigger("test2");
+
+                        expect(test1Trigger).to.equal(2);
+                        expect(test2Trigger).to.equal(3);
+
+                        test1Trigger = 0;
+                        test2Trigger = 0;
+
+                        view.unobserve("test2", test1Listener1);
+
+                        view.trigger("test1");
+                        view.trigger("test2");
+
+                        expect(test1Trigger).to.equal(2);
+                        expect(test2Trigger).to.equal(3);
+
+                        test1Trigger = 0;
+                        test2Trigger = 0;
+
+                        view.unobserve("test2");
+
+                        view.trigger("test1");
+                        view.trigger("test2");
+
+                        expect(test1Trigger).to.equal(2);
+                        expect(test2Trigger).to.equal(0);
+
+                        done();
+                    });
+                });
             });
         });
     });
