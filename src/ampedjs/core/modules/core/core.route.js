@@ -25,15 +25,22 @@ define(function(require) {
         var routes = [];
         var currentPath = null;
 
-        var processRoute = function(path) {
-            currentPath = null;
+        var getRouteMatches = function(requestPath, routePath) {
+            var routePathRegex = new RegExp(routePath.replace(/:[^\s/]+/g, "([\\w-]+)"));
+            return requestPath.match(routePathRegex);
+        };
+
+        var processRoute = function(requestPath) {
+            currentPath = "/";
 
             for (var i = 0, length = routes.length; i < length; i++) {
                 var route = routes[i];
-                if (route.path === path) {
+                var matches = getRouteMatches(requestPath, route.path);
+
+                if (matches !== null) {
                     var action = route.controller.getAction(route.action);
 
-                    currentPath = route.path;
+                    currentPath = requestPath;
 
                     //Raise enter event on route's action's view if applicable
                     if (action.view !== null) {
@@ -41,7 +48,8 @@ define(function(require) {
                     }
 
                     //Execute the action function
-                    action.function.apply(route.controller, []);
+                    matches.shift();
+                    action.function.apply(route.controller, matches);
 
                     break;
                 }
@@ -58,7 +66,7 @@ define(function(require) {
             */
             isBound: function(path) {
                 for (var i = 0, length = routes.length; i < length; i++) {
-                    if (routes[i].path === path) {
+                    if (getRouteMatches(path, routes[i].path) !== null) {
                         return true;
                     }
                 }
@@ -89,7 +97,8 @@ define(function(require) {
             /*
                 @function bind
 
-                Binds the specified path to the specified controller (and, if applicable, action).
+                Binds the specified path to the specified controller (and, if applicable, action). Use colons to denote
+                parameters (e.g. /users/:id/posts/:postId will match /users/1/posts/2).
 
                 @param {string} path                The desired path
                 @param {Controller} controller      The desired controller
@@ -199,7 +208,7 @@ define(function(require) {
                 if (RouteModule.isBound(currentPath)) {
                     for (var i = 0, length = routes.length; i < length; i++) {
                         //Raise leave event on current route's action's view if applicable
-                        if (routes[i].path === currentPath) {
+                        if (getRouteMatches(currentPath, routes[i].path) !== null) {
                             var view = routes[i].action.view;
 
                             if (view !== null) {
@@ -210,7 +219,7 @@ define(function(require) {
                 }
 
                 if (path === "/") {
-                    currentPath = null;
+                    currentPath = "/";
                     history.pushState(null, null, RouteModule.getBaseUrl());
                 }
                 else {
@@ -225,7 +234,6 @@ define(function(require) {
         baseUrl = window.location.href;
 
         if (baseUrl.lastIndexOf("/") === baseUrl.length - 1) {
-            //baseUrl = baseUrl.substring(0, baseUrl.length - 1);
             isBaseUrlFolder = true;
         }
 
@@ -234,7 +242,7 @@ define(function(require) {
             if (RouteModule.isBound(currentPath)) {
                 for (var i = 0, length = routes.length; i < length; i++) {
                     //Raise leave event on current route's action's view if applicable
-                    if (routes[i].path === currentPath) {
+                    if (getRouteMatches(currentPath, routes[i].path)) {
                         var view = routes[i].controller.getAction(routes[i].action).view;
 
                         if (view !== null) {

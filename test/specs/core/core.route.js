@@ -14,6 +14,14 @@ define(function() {
                 test = "users.edit";
             },{ view: view });
 
+            usersController.addAction("test", function(param1, param2, param3) {
+                test = {
+                    param1: param1,
+                    param2: param2,
+                    param3: param3,
+                };
+            },{ view: view });
+
             var test = "";
 
             afterEach(function() {
@@ -191,6 +199,32 @@ define(function() {
 
                     expect(test).to.equal("users.view");
                     expect(window.location.href).to.equal(Am.Route.getBaseUrl() + "view");
+
+                    done();
+                });
+
+                it("should call the action with the respective arguments", function(done) {
+                    Am.Route.bind("/test/:param1/:param2/:param3", usersController, "test");
+
+                    Am.go("/test/value1/value2/value3");
+
+                    expect(test.param1).to.equal("value1");
+                    expect(test.param2).to.equal("value2");
+                    expect(test.param3).to.equal("value3");
+                    expect(window.location.href).to.equal(Am.Route.getBaseUrl() + "test/value1/value2/value3");
+
+                    done();
+                });
+
+                it("should correctly route paths with arguments", function(done) {
+                    Am.Route.bind("/test/:param1/test2/:param2/:param3", usersController, "test");
+
+                    Am.go("/test/value1/test2/value2/value3");
+
+                    expect(test.param1).to.equal("value1");
+                    expect(test.param2).to.equal("value2");
+                    expect(test.param3).to.equal("value3");
+                    expect(window.location.href).to.equal(Am.Route.getBaseUrl() + "test/value1/test2/value2/value3");
 
                     done();
                 });
