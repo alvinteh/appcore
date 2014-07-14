@@ -333,6 +333,149 @@ define(function() {
                 });
             });
 
+            describe("modelInstance.observe()", function() {
+                it("should return an Event with the correct target when fired", function(done) {
+                    var Person = Am.Model.create("Person", ["name"]);
+                    var person = new Person("John");
+
+                    var eventTarget = null;
+
+                    Person.addMethod("say", function(message) {
+                        this.trigger("say", { message: message });
+                    });
+
+                    person.observe("say", function(event) {
+                        eventTarget = event.getTarget();
+                    });
+
+                    person.say("Hello");
+
+                    expect(eventTarget).to.equal(person);
+
+                    done();
+                });
+
+                it("should return an Event with the correct event data when fired", function(done) {
+                    var Person = Am.Model.create("Person", ["name"]);
+                    var person = new Person("John");
+
+                    var eventData = null;
+
+                    Person.addMethod("say", function(message) {
+                        this.trigger("say", { message: message });
+                    });
+
+                    person.observe("say", function(event) {
+                        eventData = event.getData();
+                    });
+
+                    person.say("Hello");
+
+                    expect(eventData.message).to.equal("Hello");
+
+                    done();
+                });
+            });
+
+            describe("modelInstance.unobserve()", function() {
+                it("should cause the appropriate observe() listener(s) to stop firing", function(done) {
+                    var Person = Am.Model.create("Person", ["name"]);
+
+                    Person.addMethod("shout", function(message) {
+                        this.trigger("shout", { message: message });
+                    });
+
+                    Person.addMethod("whisper", function(message) {
+                        this.trigger("whisper", { message: message });
+                    });
+
+                    var person = new Person("John");
+
+                    var shoutTrigger = 0;
+                    var whisperTrigger = 0;
+
+                    var shoutListener1 = function() {
+                        shoutTrigger += 1;
+                    };
+
+                    person.observe("shout", shoutListener1);
+
+                    person.observe("shout", function() {
+                        shoutTrigger += 2;
+                    });
+
+                    person.observe("whisper", function() {
+                       whisperTrigger += 1;
+                    });
+
+                    person.observe("whisper", function() {
+                        whisperTrigger += 2;
+                    });
+
+                    person.unobserve("shout", shoutListener1);
+
+                    person.shout("Hello");
+                    person.whisper("Hello");
+
+                    expect(shoutTrigger).to.equal(2);
+                    expect(whisperTrigger).to.equal(3);
+
+                    shoutTrigger = 0;
+                    whisperTrigger = 0;
+
+                    person.unobserve("whisper", shoutListener1);
+
+                    person.shout("Hello");
+                    person.whisper("Hello");
+
+                    expect(shoutTrigger).to.equal(2);
+                    expect(whisperTrigger).to.equal(3);
+
+                    shoutTrigger = 0;
+                    whisperTrigger = 0;
+
+                    person.unobserve("whisper");
+
+                    person.shout("Hello");
+                    person.whisper("Hello");
+
+                    expect(shoutTrigger).to.equal(2);
+                    expect(whisperTrigger).to.equal(0);
+
+                    done();
+                });
+
+                it("should not throw errors if there are no event listeners for the specified object", function(done) {
+                    var Person = Am.Model.create("Person", ["name"]);
+
+                    Person.addMethod("say", function(message) {
+                        this.trigger("say", { message: message });
+                    });
+
+                    var person = new Person("John");
+
+                    expect(function() { person.unobserve("say"); }).to.not.throw();
+
+                    done();
+                });
+
+                it("should not throw errors if there are no event listeners for the specified event", function(done) {
+                    var Person = Am.Model.create("Person", ["name"]);
+
+                    var person = new Person("John");
+
+                    person.observe("say", function() {
+                        //Do something
+                    });
+
+                    expect(function() { person.unobserve("say", function() {}); }).to.not.throw();
+
+                    expect(function() { person.unobserve("fakeEvent"); }).to.not.throw();
+
+                    done();
+                });
+            });
+
             describe("modelInstance.toObject()", function() {
                 it("should return an object representation of the caller", function(done) {
                     var Person = Am.Model.create("Person", ["firstName", "lastName"]);
