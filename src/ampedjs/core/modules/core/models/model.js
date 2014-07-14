@@ -375,6 +375,31 @@ define(function(require) {
             };
 
             /*
+                @function observe
+
+                Observes the item for the specified event such that the specified event listener is called
+                when the aforementioned event fires.
+
+                @param {string} event                   The desired event to be observed
+                @param {function} eventListener         The desired event listener
+            */
+            prototype.observe = function(event, eventListener) {
+                EventHelper.observe(this, event, eventListener);
+            };
+
+            /*
+                @function unobserve
+
+                Stops observing the item for the specified and specified event listener.
+
+                @param {string} event                   The desired event to stop observing
+                @param {function} eventListener         The desired event listener
+            */
+            prototype.unobserve = function(event, eventListener) {
+                EventHelper.unobserve(this, event, eventListener);
+            };
+
+            /*
                 @function validate
 
                 Validates the current item.
