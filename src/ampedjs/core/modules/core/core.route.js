@@ -21,6 +21,7 @@ define(function(require) {
             ]
         */
         var baseUrl;
+        var isBaseUrlFolder = false;
         var routes = [];
         var currentPath = null;
 
@@ -88,7 +89,7 @@ define(function(require) {
             /*
                 @function bind
 
-                Binds the specified route to the specified controller (and, if applicable, action).
+                Binds the specified path to the specified controller (and, if applicable, action).
 
                 @param {string} path                The desired path
                 @param {Controller} controller      The desired controller
@@ -98,12 +99,14 @@ define(function(require) {
                 var newRoutes = [];
                 var normalizedPath = path;
 
-                //Normalize the route to ensure it begins with a "/" and ends without a "/")
-                if (normalizedPath.charAt(0) !== "/") {
-                    normalizedPath = "/" + normalizedPath;
-                }
-                if (normalizedPath.lastIndexOf("/") === normalizedPath.length - 1) {
-                    normalizedPath = normalizedPath.substring(0, normalizedPath.length - 1);
+                //Normalize the path to ensure it begins with a "/" and ends without a "/")
+                if (normalizedPath !== "/") {
+                    if (normalizedPath.charAt(0) !== "/") {
+                        normalizedPath = "/" + normalizedPath;
+                    }
+                    if (normalizedPath.lastIndexOf("/") === normalizedPath.length - 1) {
+                        normalizedPath = normalizedPath.substring(0, normalizedPath.length - 1);
+                    }
                 }
 
                 //Determine the route entries to be added
@@ -125,7 +128,7 @@ define(function(require) {
                         path: normalizedPath,
                         controller: controller,
                         action: action,
-                        inferred: true,
+                        inferred: false,
                     });
                 }
 
@@ -153,14 +156,46 @@ define(function(require) {
             },
 
             /*
+                @function unbind
+
+                Unbinds the specified path, including child paths if the cascade.
+
+                @param {string} path            The desired path
+                @param {boolean} cascade        Flag indicating whether the operation should cascade to child paths
+            */
+            unbind: function(path, cascade) {
+                cascade = cascade === true;
+                var normalizedPath = path;
+
+                //Normalize the route to ensure it begins with a "/" and ends without a "/")
+                if (normalizedPath.length !== "/") {
+                    if (normalizedPath.charAt(0) !== "/") {
+                        normalizedPath = "/" + normalizedPath;
+                    }
+                    if (normalizedPath.lastIndexOf("/") === normalizedPath.length - 1) {
+                        normalizedPath = normalizedPath.substring(0, normalizedPath.length - 1);
+                    }
+                }
+
+
+                for (var i = routes.length - 1; i >= 0; i--) {
+                    if (routes[i].path === normalizedPath ||
+                        (cascade &&
+                        routes[i].path.indexOf(normalizedPath === "/" ? "/" : normalizedPath + "/") === 0)) {
+                        routes.splice(i, 1);
+                    }
+                }
+            },
+
+            /*
                 @function go
 
-                Navigates to the specified route
+                Navigates to the specified path
 
-                @param {string} route               The desired route
+                @param {string} path        The desired path
 
             */
-            go: function(route) {
+            go: function(path) {
                 if (RouteModule.isBound(currentPath)) {
                     for (var i = 0, length = routes.length; i < length; i++) {
                         //Raise leave event on current route's action's view if applicable
@@ -174,8 +209,15 @@ define(function(require) {
                     }
                 }
 
-                history.pushState(null, null, route.substring(1));
-                processRoute(route);
+                if (path === "/") {
+                    currentPath = null;
+                    history.pushState(null, null, RouteModule.getBaseUrl());
+                }
+                else {
+                    history.pushState(null, null, RouteModule.getBaseUrl() +
+                        (isBaseUrlFolder ? path.substring(1) : path));
+                    processRoute(path);
+                }
             }
         };
 
@@ -183,7 +225,8 @@ define(function(require) {
         baseUrl = window.location.href;
 
         if (baseUrl.lastIndexOf("/") === baseUrl.length - 1) {
-            baseUrl = baseUrl.substring(0, baseUrl.length - 1);
+            //baseUrl = baseUrl.substring(0, baseUrl.length - 1);
+            isBaseUrlFolder = true;
         }
 
         //Listen for changes in history state so that the route can be processed
@@ -192,7 +235,7 @@ define(function(require) {
                 for (var i = 0, length = routes.length; i < length; i++) {
                     //Raise leave event on current route's action's view if applicable
                     if (routes[i].path === currentPath) {
-                        var view = routes[i].action.view;
+                        var view = routes[i].controller.getAction(routes[i].action).view;
 
                         if (view !== null) {
                             EventHelper.trigger(new Event(view, "leave", { path: currentPath }));
@@ -201,12 +244,9 @@ define(function(require) {
                 }
             }
 
-            //Process the route
+            //Process the route if it is within the path of the base URL
             if (window.location.href.indexOf(baseUrl) === 0) {
                 processRoute(window.location.href.substring(baseUrl.length));
-            }
-            else {
-                currentPath = null;
             }
         });
 
