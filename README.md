@@ -16,7 +16,6 @@ Dependencies
 To-do
 -------
 
-* Implement support for routes with parameters
 * Implement unit tests for Ajax, Collections and Persistence modules
 * Fix issues with persistence module
 * Implement dependency injection
