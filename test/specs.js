@@ -12,6 +12,7 @@ define([
     "specs/core/core.helper.js",
     "specs/core/core.model.js",
     "specs/core/core.module.js",
+    "specs/core/core.route.js",
     "specs/core/core.view.js",
     "specs/util/helpers/function-helper.js",
     "specs/util/helpers/model-helper.js",
