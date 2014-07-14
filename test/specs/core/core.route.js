@@ -42,7 +42,7 @@ define(function() {
                 var eventTest = "";
                 var view = usersController.getAction("view").view;
 
-                Am.Event.observe(view, "enter", function() {
+                view.observe("enter", function() {
                     eventTest = "enter";
                 });
 
@@ -61,7 +61,7 @@ define(function() {
                 var eventTest = "";
                 var view = usersController.getAction("view").view;
 
-                Am.Event.observe(view, "leave", function() {
+                view.observe("leave", function() {
                     eventTest = "leave";
                 });
 
