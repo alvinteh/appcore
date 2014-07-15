@@ -11,7 +11,8 @@ require.config({
     ],
     paths: {
         chai: "chai/chai",
-        jquery: "//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min"
+        jquery: "//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min",
+        sinon: "sinon/index"
     },
     use: {
         mocha: {
@@ -25,20 +26,8 @@ require([
         "ampedjs/ampedjs",
         "chai",
         "chai-as-promised/lib/chai-as-promised",
-        "sinon/lib/sinon",
-        "sinon/lib/sinon/spy",
-        "sinon/lib/sinon/call",
-        "sinon/lib/sinon/behavior",
-        "sinon/lib/sinon/stub",
-        "sinon/lib/sinon/mock",
-        "sinon/lib/sinon/collection",
-        "sinon/lib/sinon/assert",
-        "sinon/lib/sinon/sandbox",
-        "sinon/lib/sinon/test",
-        "sinon/lib/sinon/test_case",
-        "sinon/lib/sinon/assert",
-        "sinon/lib/sinon/match",
-    ], function(Am, chai, chaiAsPromised, sinon) {
+        "sinon"
+    ], function(Am, chai, chaiAsPromised) {
 
     chai.use(chaiAsPromised);
 
@@ -56,7 +45,6 @@ require([
     chai.should();
     window.expect = chai.expect;
     window.mocha.setup("bdd");
-    window.sinon = sinon;
 
     //Run tests
     require(["jquery", "specs.js"], function($) {
