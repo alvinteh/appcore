@@ -52,7 +52,7 @@ define(function() {
                     expect(eventTest).to.equal("enter");
 
                     done();
-                }, 0);
+                }, 100);
             });
 
             it("should call the appropriate leave events on views", function(done) {
@@ -73,7 +73,7 @@ define(function() {
                     expect(window.location.href).to.equal(Am.Route.getBaseUrl());
 
                     done();
-                }, 0);
+                }, 100);
             });
 
             describe("isBound()", function() {
