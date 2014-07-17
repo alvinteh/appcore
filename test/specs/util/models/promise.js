@@ -24,17 +24,32 @@ define(function() {
                                 }
                             };
 
-                            var promise1 = new Promise(function(fulfillCallback, rejectCallback) {
-                                fulfillCallback("value");
+                            var promise1 = (function(value) {
+                                return new Promise(function(fulfillCallback, rejectCallback) {
+                                    setTimeout(function() {
+                                        fulfillCallback(value + 1);
+                                    }, 0);
+                                });
+                            })(1);
+
+                            expect(promise1).to.become(2).and.notify(notify);
+
+                            var promise2 = (function(value) {
+                                return new Promise(function(fulfillCallback, rejectCallback) {
+                                    setTimeout(function() {
+                                        rejectCallback(value + 1);
+                                    }, 0);
+                                });
+                            })(1);
+
+                            //For some reason, chai-as-promised expect(promise2).to.be.fulfilled/rejected pass
+                            //regardless of the actual status, so use then().
+
+                            promise2.then(function(error) {
+                                done(error);
+                            }, function() {
+                                notify();
                             });
-
-                            expect(promise1).to.become("value").and.notify(notify);
-
-                            var promise2 = new Promise(function(fulfillCallback, rejectCallback) {
-                                rejectCallback(new Error("error"));
-                            });
-
-                            expect(promise2).to.be.rejected.and.notify(notify);
                         });
                     });
 
@@ -141,6 +156,7 @@ define(function() {
                                 var promise = new Promise();
 
                                 setTimeout(function() {
+                                    console.log("Resolving test1 with ", value);
                                     promise.resolve(value + 2);
                                 }, 50);
 
@@ -151,14 +167,11 @@ define(function() {
                                 var promise = new Promise();
 
                                 setTimeout(function() {
+                                    console.log("Resolving test2 with ", value);
                                     promise.resolve(value + 4);
                                 }, 50);
 
                                 return promise;
-                            };
-
-                            var test3 = function(value) {
-                                return value;
                             };
 
                             var testError = function(value) {
@@ -173,19 +186,42 @@ define(function() {
 
                             var promise1 = new Promise();
 
-                            expect(promise1.then(test1).then(test2).then(test3)).to.become(7).and.notify(notify);
+                            promise1.then(test1).then(test2).then(
+                                function(value) {
+                                    expect(value).to.equal(7);
+                                    notify();
+                                },
+                                function(error) {
+                                    done(error);
+                                }
+                            );
 
                             promise1.resolve(1);
 
+
                             var promise2 = new Promise();
 
-                            expect(promise2.then(test1).then(test2).then(testError)).to.be.rejected.and.notify(notify);
+                            promise1.then(test1).then(test2).then(testError).then(
+                                function() {
+                                    done("Should not be fulfilled");
+                                },
+                                function() {
+                                    notify();
+                                }
+                            );
 
                             promise2.resolve(1);
 
                             var promise3 = new Promise();
 
-                            expect(promise3.then(test1).then(testError).then(test2)).to.be.rejected.and.notify(notify);
+                            promise3.then(test1).then(testError).then(test2).then(
+                                function() {
+                                    done("Should not be fulfilled");
+                                },
+                                function() {
+                                    notify();
+                                }
+                            );
 
                             promise3.resolve(1);
                         });
