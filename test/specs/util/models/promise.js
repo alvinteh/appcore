@@ -156,7 +156,6 @@ define(function() {
                                 var promise = new Promise();
 
                                 setTimeout(function() {
-                                    console.log("Resolving test1 with ", value);
                                     promise.resolve(value + 2);
                                 }, 50);
 
@@ -167,7 +166,6 @@ define(function() {
                                 var promise = new Promise();
 
                                 setTimeout(function() {
-                                    console.log("Resolving test2 with ", value);
                                     promise.resolve(value + 4);
                                 }, 50);
 
