@@ -16,7 +16,7 @@ Dependencies
 To-do
 -------
 
-* Implement unit tests for Ajax, Collections and Persistence modules
+* Implement unit tests for Collections and Persistence modules
 * Fix issues with persistence module
 * Implement dependency injection
   * Implement support for calling Am.Controller.create() using model names (as opposed to references)
