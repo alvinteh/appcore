@@ -36,16 +36,22 @@ define(function(require) {
     Xhr.addStaticAttribute("METHOD_PUT", "PUT");
 
     //Private static members
-    var BrowserXhr = (function() {
-        if (window.XMLHttpRequest) {
-            return window.XMLHttpRequest;
-        }
-        else if (window.ActiveXObject) {
-            return window.ActiveXObject("Microsoft.XMLHTTP");
-        }
+    var serialize = function(object) {
+        var pairs = [];
 
-        return null;
-    })();
+        for (var property in object) {
+            if (!object.hasOwnProperty(property)) {
+                continue;
+            }
+            if (Object.prototype.toString.call(object[property]) === "[object Object]") {
+                pairs.push(serialize(object[property]));
+                continue;
+            }
+
+            pairs.push(property + "=" + object[property]);
+        }
+        return pairs.join("&");
+    };
 
     //Public prototype members
     /*
@@ -58,12 +64,14 @@ define(function(require) {
     Xhr.addMethod("send", function() {
         var me = this;
 
-        return new Promise(function(resolve, reject) {
-            if (!BrowserXhr) {
-                reject(new Error("Unable to create XMLHttpRequest."));
-            }
+        var promise = new Promise();
+        var BrowserXhr;
 
-            var xhr = new BrowserXhr();
+        if (!window.XMLHttpRequest) {
+            promise.reject(new Error("Unable to create XMLHttpRequest."));
+        }
+        else {
+            var xhr = new window.XMLHttpRequest();
 
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4) {
@@ -72,47 +80,21 @@ define(function(require) {
                         status: xhr.status,
                     });
 
-                    Am.Event.trigger(this, "success", me);
+                    Am.Event.trigger(new Am.Event.Event(me, "success"));
 
-                    resolve(xhr.responseText);
+                    promise.resolve(xhr.responseText);
                 }
-                else {
-                    me.set("status", xhr.status);
-
-                    Am.Event.trigger(this, "fail", me);
-
-                    reject(new Error("Unable to process XMLHttpRequest."));
-                }
-
             };
 
-            var serialize = function(object) {
-                var pairs = [];
-
-                for (var property in object) {
-                    if (!object.hasOwnProperty(property)) {
-                        continue;
-                    }
-                    if (Object.prototype.toString.call(object[property]) === "[object Object]") {
-                        pairs.push(serialize(object[property]));
-                        continue;
-                    }
-
-                    pairs.push(property + "=" + object[property]);
-                }
-                return pairs.join("&");
-            };
-
-            var data = this.get("data");
-            var method = this.get("method");
-            var url = this.get("url");
+            var data = me.get("data");
+            var method = me.get("method");
+            var url = me.get("url");
 
             if (data) {
                 if (method === Xhr.METHOD_GET) {
                     url += "?" + serialize(data);
                 }
                 else {
-                    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
                     data = serialize(data);
                 }
             }
@@ -121,8 +103,15 @@ define(function(require) {
             }
 
             xhr.open(method, url);
+
+            if (data && method !== Xhr.METHOD_GET) {
+                xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            }
+
             xhr.send(data);
-      });
+        }
+
+        return promise;
     });
 
     return Xhr;
