@@ -16,7 +16,7 @@ define(function(require) {
         Constructs a Collection instance.
 
         @param {string} name        The desired name
-        @param {function} model     The desired model the collection will contain items of
+        @param {Model} model        The desired model the collection will contain items of
     */
     var Collection = Am.Model.create("Collection",
         ["name", "model", "currentAutoIncrementNo", "items"],
@@ -26,7 +26,8 @@ define(function(require) {
                     name: name,
                     model: model,
                     currentAutoIncrementNo: 1,
-                    items: []
+                    items: [],
+                    itemCount: 0
                  });
             }
         }
@@ -34,33 +35,11 @@ define(function(require) {
 
     //Private static members
     /*
-        @function normalizePredicates
-
-        Normalizes predicates from the following format:
-
-        {
-            attribute: value
-        }
-
-        to the following format:
-
-        [
-            {
-                attribute
-                , value
-                , operation = "===""
-            }
-        ]
-
-        @return {object[]}
-    */
-
-    /*
         @function triggerItemChange
 
         Triggers the item_change event on the collection
 
-        @param {int} event      The desired event
+        @param {Event} event        The desired event
 
     */
     var triggerItemChange = function(event) {
@@ -79,13 +58,17 @@ define(function(require) {
         @param {object[]]} items        The desired collection
 
     */
-    var removeItem = function(id, items) {
+    var removeItem = function(collection, id) {
+        var items = collection.getItems();
         var tmpItem = items[id];
+
+        if (items[id]) {
+            collection.set("itemCount", collection.get("itemCount") - 1);
+        }
         delete items[id];
         Am.Event.unobserve(tmpItem, "change", triggerItemChange);
-        Am.Event.trigger(new Am.Event.Event(this, "item_remove", { item: tmpItem }));
+        Am.Event.trigger(new Am.Event.Event(collection, "item_remove", { item: tmpItem }));
     };
-
 
     //Public prototype members
     /*
@@ -309,7 +292,7 @@ define(function(require) {
 
         for (var i = 0, length = items.length; i < length; i++) {
             if (items[i].get(attribute) === value) {
-                removeItem(i, items);
+                removeItem(this, i);
                 break;
             }
         }
@@ -330,7 +313,7 @@ define(function(require) {
 
         for (var i = 0, length = items.length; i < length; i++) {
             if (items[i].get(attribute) === value) {
-                removeItem(i, items);
+                removeItem(this, i);
             }
         }
     });
@@ -360,7 +343,7 @@ define(function(require) {
             }
 
             if (itemSatisfactory) {
-                removeItem(i, items);
+                removeItem(this, i);
                 break;
             }
         }
@@ -391,7 +374,7 @@ define(function(require) {
             }
 
             if (itemSatisfactory) {
-                removeItem(i, items);
+                removeItem(this, i);
             }
         }
     });
@@ -484,7 +467,7 @@ define(function(require) {
 
         for (var i = 0, length = items.length; i < length; i++) {
             if (i === item || items[i] === item) {
-                removeItem(i, items);
+                removeItem(this, i);
                 break;
             }
         }
@@ -508,9 +491,15 @@ define(function(require) {
             id = item.getId();
         }
 
-        items[id] = item;
-        Am.Event.trigger(new Am.Event.Event(this, "item_add", { item: item }));
-        Am.Event.observe(item, "change", triggerItemChange);
+        if (items[id] !== item) {
+            if (!items[id]) {
+                this.set("itemCount", this.get("itemCount") + 1);
+            }
+
+            items[id] = item;
+            Am.Event.trigger(new Am.Event.Event(this, "item_add", { item: item }));
+            Am.Event.observe(item, "change", triggerItemChange);
+        }
     });
 
     return Collection;
