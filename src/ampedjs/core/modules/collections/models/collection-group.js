@@ -31,16 +31,21 @@ define(function(require) {
     );
 
     //Private static members
+    var itemAddListeners = [];
+    var itemChangeListeners = [];
+    var itemRemoveListeners = [];
+
     /*
         @function triggerItemAdd
 
         Triggers the item_add event on the collection group.
 
-        @param {int} event      The desired event
+        @param {CollectionGroup} collectionGroup        The desired collection group
+        @param {Event} event                            The desired event
 
     */
-    var triggerItemAdd = function(event) {
-        Am.Event.trigger(new Am.Event.Event(this, "item_add", {
+    var triggerItemAdd = function(collectionGroup, event) {
+        Am.Event.trigger(new Am.Event.Event(collectionGroup, "item_add", {
             collection: event.getTarget(),
             item: event.getData().item
         }));
@@ -51,11 +56,12 @@ define(function(require) {
 
         Triggers the item_change event on the collection group.
 
-        @param {int} event      The desired event
+        @param {CollectionGroup} collectionGroup        The desired collection group
+        @param {int} event                              The desired event
 
     */
-    var triggerItemChange = function(event) {
-        Am.Event.trigger(new Am.Event.Event(this, "item_change", {
+    var triggerItemChange = function(collectionGroup, event) {
+        Am.Event.trigger(new Am.Event.Event(collectionGroup, "item_change", {
             collection: event.getTarget(),
             item: event.getData().item,
             changes: event.getData().changes
@@ -67,11 +73,12 @@ define(function(require) {
 
         Triggers the item_remove event on the collection group.
 
-        @param {int} event      The desired event
+        @param {CollectionGroup} collectionGroup        The desired collection group
+        @param {int} event                              The desired event
 
     */
-    var triggerItemRemove = function(event) {
-        Am.Event.trigger(new Am.Event.Event(this, "item_remove", {
+    var triggerItemRemove = function(collectionGroup, event) {
+        Am.Event.trigger(new Am.Event.Event(collectionGroup, "item_remove", {
             collection: event.getTarget(),
             item: event.getData().item
         }));
@@ -97,16 +104,40 @@ define(function(require) {
 
         Adds the specified Collection to the CollectionGroup.
 
-        @param {object} collection      The desired collection
+        @param {Collection} collection      The desired collection
     */
     CollectionGroup.addMethod("addCollection", function(collection) {
         var collections = this.get("collections");
 
         collections[collection.get("name")] = collection;
 
-        Am.Event.observe(collection, "item_add", triggerItemAdd);
-        Am.Event.observe(collection, "item_change", triggerItemChange);
-        Am.Event.observe(collection, "item_remove", triggerItemRemove);
+        var collectionGroup = this;
+        var itemAddListener = {
+            collection: collection,
+            function: function(event) {
+                triggerItemAdd(collectionGroup, event);
+            }
+        };
+        var itemChangeListener = {
+            collection: collection,
+            function: function(event) {
+                triggerItemChange(collectionGroup, event);
+            }
+        };
+        var itemRemoveListener = {
+            collection: collection,
+            function: function(event) {
+                triggerItemRemove(collectionGroup, event);
+            }
+        };
+
+        itemAddListeners.push(itemAddListener);
+        itemChangeListeners.push(itemChangeListener);
+        itemRemoveListeners.push(itemRemoveListener);
+
+        Am.Event.observe(collection, "item_add", itemAddListener.function);
+        Am.Event.observe(collection, "item_change", itemChangeListener.function);
+        Am.Event.observe(collection, "item_remove", itemRemoveListener.function);
         Am.Event.trigger(new Am.Event.Event(this, "collection_add", { collection: collection }));
     });
 
@@ -115,51 +146,46 @@ define(function(require) {
 
         Removes the specified Collection from the CollectionGroup.
 
-        @param {object|string} collection      The desired collection or its identifier
+        @param {Collection|string} collection       The desired collection or its name
     */
     CollectionGroup.addMethod("removeCollection", function(collection) {
         var collections = this.get("collections");
 
-        var targetCollectionName = typeof collection === "string" ? collection.get("name") : null;
-
-        if (!targetCollectionName) {
-            for (var collectionName in collections) {
-                if (collectionName === collection) {
-                    targetCollectionName = collectionName;
-                }
-            }
-        }
+        var targetCollectionName = typeof collection === "string" ? null : collection.get("name");
 
         var tmpCollection = collections[targetCollectionName];
         delete collections[targetCollectionName];
 
-        Am.Event.unobserve(tmpCollection, "item_add", triggerItemAdd);
-        Am.Event.unobserve(tmpCollection, "item_change", triggerItemChange);
-        Am.Event.unobserve(tmpCollection, "item_remove", triggerItemRemove);
-        Am.Event.trigger(new Am.Event.Event(this, "collection_remove", { collection: tmpCollection }));
-    });
+        var i, itemAddListener, itemChangeListener, itemRemoveListener;
 
-    /*
-        @func removeCollection
+        for (i in itemAddListeners) {
+            itemAddListener = itemAddListeners[i];
 
-        Removes the specified Collection from the CollectionGroup.
-
-        @param {object|string} collection      The desired collection or its identifier
-    */
-    CollectionGroup.addMethod("getCollectionItems", function(collection) {
-        var collections = this.get("collections");
-
-        var targetCollection = typeof collection === "string" ? null : collection.get("name");
-
-        if (!targetCollection) {
-            for (var collectionName in collections) {
-                if (collectionName === collection) {
-                    targetCollection = collections[collectionName];
-                }
+            if (itemAddListener.collection === tmpCollection) {
+                Am.Event.unobserve(tmpCollection, "item_add", itemAddListener.function);
+                break;
             }
         }
 
-        return targetCollection.getItems();
+        for (i in itemChangeListeners) {
+            itemChangeListener = itemChangeListeners[i];
+
+            if (itemChangeListener.collection === tmpCollection) {
+                Am.Event.unobserve(tmpCollection, "item_change", itemChangeListener.function);
+                break;
+            }
+        }
+
+        for (i in itemRemoveListeners) {
+            itemRemoveListener = itemRemoveListeners[i];
+
+            if (itemRemoveListener.collection === tmpCollection) {
+                Am.Event.unobserve(tmpCollection, "item_remove", itemRemoveListener.function);
+                break;
+            }
+        }
+
+        Am.Event.trigger(new Am.Event.Event(this, "collection_remove", { collection: tmpCollection }));
     });
 
     return CollectionGroup;
