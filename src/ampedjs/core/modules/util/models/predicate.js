@@ -16,7 +16,7 @@ define(function(require) {
 
         @param {string} attribute       The desired attribute
         @param {mixed} value            The desired value
-        @param {string} operationg      The desired operation (===/==/</<=/>/>=/user-defined function)
+        @param {string} operation       The desired operation (===/==/</<=/>/>=/user-defined function)
     */
     var Predicate = Am.Model.create("Predicate",
         ["attribute", "value", "operation"],
