@@ -19,13 +19,13 @@ define(function(require) {
 
         Constructs a RestSyncer instance.
 
-        @param {function} collectionGroup     The desired collection group.
+        @param {string} rootUrl       The desired REST API's root URL
     */
     var RestSyncer = Am.Model.create("RestSyncer",
-        ["server"],
+        ["rootUrl"],
         {
-            constructor: function(collectionGroup, server) {
-                this.set("server", server);
+            constructor: function(rootUrl) {
+                this.set("rootUrl", rootUrl);
             },
             parent: Syncer
         }
@@ -50,20 +50,20 @@ define(function(require) {
         };
 
         var map = this.get("map");
-        var server = this.get("server");
+        var rootUrl = this.get("rootUrl");
 
         //Use specified mapping if it is available
         if (map[model] && map[model][action]) {
-            ret.url = server + "/" + map[model][action];
+            ret.url = rootUrl + "/" + map[model][action];
         }
 
         //Determine URL
         if (ret.url === "") {
             if (map[model] && map[model]["*"]) {
-                ret.url = server + "/" + map[model]["*"] + "/" + action;
+                ret.url = rootUrl + "/" + map[model]["*"] + "/" + action;
             }
             else {
-                ret.url = server + "/" + model.getName() + "/" + action;
+                ret.url = rootUrl + "/" + model.getName() + "/" + action;
             }
         }
 
