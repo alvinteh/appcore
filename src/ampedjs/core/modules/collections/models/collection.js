@@ -40,7 +40,8 @@ define(function(require) {
 
         Triggers the item_change event on the collection
 
-        @param {Event} event        The desired event
+        @param {Collection} collection      The desired collection
+        @param {Event} event                The desired event
 
     */
     var triggerItemChange = function(collection, event) {
@@ -55,9 +56,8 @@ define(function(require) {
 
         Removes the item with the specified identifier from the specified collection.
 
-        @param {int} id                 The desired item's identifier
-        @param {object[]]} items        The desired collection
-
+        @param {Collection} collection      The desired collection
+        @param {int} id                     The desired item's identifier
     */
     var removeItem = function(collection, id) {
         var items = collection.getItems();
