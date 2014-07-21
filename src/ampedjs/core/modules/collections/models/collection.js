@@ -2,7 +2,6 @@ define(function(require) {
     "use strict";
 
     var Am = require("../../../../ampedjs");
-    var Predicate = require("../../util/models/predicate");
 
     /*
         @class Collection
@@ -34,6 +33,8 @@ define(function(require) {
     );
 
     //Private static members
+    var itemChangeListeners = [];
+
     /*
         @function triggerItemChange
 
@@ -42,8 +43,8 @@ define(function(require) {
         @param {Event} event        The desired event
 
     */
-    var triggerItemChange = function(event) {
-        Am.Event.trigger(new Am.Event.Event(this, "item_change", {
+    var triggerItemChange = function(collection, event) {
+        Am.Event.trigger(new Am.Event.Event(collection, "item_change", {
             item: event.getTarget(),
             changes: event.getData()
         }));
@@ -66,7 +67,16 @@ define(function(require) {
             collection.set("itemCount", collection.get("itemCount") - 1);
         }
         delete items[id];
-        Am.Event.unobserve(tmpItem, "change", triggerItemChange);
+
+        var itemChangeListener;
+        for (var i in itemChangeListeners) {
+            itemChangeListener = itemChangeListeners[i];
+
+            if (itemChangeListener.item.get("id") === id) {
+                Am.Event.unobserve(tmpItem, "change", itemChangeListener.function);
+                break;
+            }
+        }
         Am.Event.trigger(new Am.Event.Event(collection, "item_remove", { item: tmpItem }));
     };
 
@@ -77,20 +87,20 @@ define(function(require) {
         Checks if any item in the collection meets the specified predicates. Note that attribute retrival is
         performed by calling getX() (where X is the attribute name) on each item in the collection.
 
-        @param {object[]} predicates        The desired predicates
+        @param {Predicate[]} predicates        The desired predicates
 
         @return {boolean}
     */
     Collection.addMethod("hasItemWhere", function(predicates) {
         var items = this.get("items");
+        var item, itemSatisfactory;
 
-        for (var i = 0, iLength = items.length; i < iLength; i++) {
-            var item = items[i];
-            var itemSatisfactory = false;
-            var normalizedPredicates = Predicate.normalize(predicates);
+        for (var i in items) {
+            item = items[i];
+            itemSatisfactory = false;
 
-            for (var j = 0, jLength = normalizedPredicates.length; j < jLength; j++) {
-                itemSatisfactory = normalizedPredicates[j].test(item);
+            for (var j = 0, jLength = predicates.length; j < jLength; j++) {
+                itemSatisfactory = predicates[j].test(item);
 
                 if (!itemSatisfactory) {
                     break;
@@ -111,20 +121,20 @@ define(function(require) {
         Gets the first item in the collection which meets the specified predicates. Note that attribute retrival is
         performed by calling getX() (where X is the attribute name) on each item in the collection.
 
-        @param {object[]} predicates        The desired predicates
+        @param {Predicate[]} predicates        The desired predicates
 
         @return {object|null}
     */
     Collection.addMethod("findItemWhere", function(predicates) {
         var items = this.get("items");
+        var item, itemSatisfactory;
 
-        for (var i = 0, iLength = items.length; i < iLength; i++) {
-            var item = items[i];
-            var itemSatisfactory = false;
-            var normalizedPredicates = Predicate.normalize(predicates);
+        for (var i in items) {
+            item = items[i];
+            itemSatisfactory = false;
 
-            for (var j = 0, jLength = normalizedPredicates.length; j < jLength; j++) {
-                itemSatisfactory = normalizedPredicates[j].test(item);
+            for (var j = 0, jLength = predicates.length; j < jLength; j++) {
+                itemSatisfactory = predicates[j].test(item);
 
                 if (!itemSatisfactory) {
                     break;
@@ -145,22 +155,22 @@ define(function(require) {
         Gets items in the collection which meet the specified predicates. Note that attribute retrival is
         performed by calling getX() (where X is the property name) on each item in the collection.
 
-        @param {object[]} predicates        The desired predicates
+        @param {Predicate[]} predicates        The desired predicates
 
         @return {object[]|null}
     */
     Collection.addMethod("findItemsWhere", function(predicates) {
         var items = this.get("items");
+        var item, itemSatisfactory;
 
         var ret = [];
 
-        for (var i = 0, iLength = items.length; i < iLength; i++) {
-            var item = items[i];
-            var itemSatisfactory = false;
-            var normalizedPredicates = Predicate.normalize(predicates);
+        for (var i in items) {
+            item = items[i];
+            itemSatisfactory = false;
 
-            for (var j = 0, jLength = normalizedPredicates.length; j < jLength; j++) {
-                itemSatisfactory = normalizedPredicates[j].test(item);
+            for (var j = 0, jLength = predicates.length; j < jLength; j++) {
+                itemSatisfactory = predicates[j].test(item);
 
                 if (!itemSatisfactory) {
                     break;
@@ -189,7 +199,7 @@ define(function(require) {
     Collection.addMethod("hasItemLike", function(attribute, value) {
         var items = this.get("items");
 
-        for (var i = 0, length = items.length; i < length; i++) {
+        for (var i in items) {
             if (items[i].get(attribute) === value) {
                 return true;
             }
@@ -213,7 +223,7 @@ define(function(require) {
     Collection.addMethod("findItemLike", function(attribute, value) {
         var items = this.get("items");
 
-        for (var i = 0, length = items.length; i < length; i++) {
+        for (var i in items) {
             if (items[i].get(attribute) === value) {
                 return items[i];
             }
@@ -239,7 +249,7 @@ define(function(require) {
 
         var ret = [];
 
-        for (var i = 0, length = items.length; i < length; i++) {
+        for (var i in items) {
             if (items[i].get(attribute) === value) {
                 ret.push(items[i]);
             }
@@ -266,7 +276,7 @@ define(function(require) {
 
         var ret = [];
 
-        for (var i = 0, length = items.length; i < length; i++) {
+        for (var i in items) {
             var value = items[i].get(attribute);
 
             if (value >= value1 && value <= value2) {
@@ -290,7 +300,7 @@ define(function(require) {
     Collection.addMethod("removeItemLike", function(attribute, value) {
         var items = this.get("items");
 
-        for (var i = 0, length = items.length; i < length; i++) {
+        for (var i in items) {
             if (items[i].get(attribute) === value) {
                 removeItem(this, i);
                 break;
@@ -311,7 +321,7 @@ define(function(require) {
     Collection.addMethod("removeItemsLike", function(attribute, value) {
         var items = this.get("items");
 
-        for (var i = 0, length = items.length; i < length; i++) {
+        for (var i in items) {
             if (items[i].get(attribute) === value) {
                 removeItem(this, i);
             }
@@ -324,18 +334,18 @@ define(function(require) {
         Removes the first item in the collection which meets the specified predicates. Note that attribute retrival is
         performed by calling getX() (where X is the attribute name) on each item in the collection.
 
-        @param {object[]} predicates        The desired predicates
+        @param {Predicate[]} predicates        The desired predicates
     */
     Collection.addMethod("removeItemWhere", function(predicates) {
         var items = this.get("items");
+        var item, itemSatisfactory;
 
-        for (var i = 0, iLength = items.length; i < iLength; i++) {
-            var item = items[i];
-            var itemSatisfactory = false;
-            var normalizedPredicates = Predicate.normalize(predicates);
+        for (var i in items) {
+            item = items[i];
+            itemSatisfactory = false;
 
-            for (var j = 0, jLength = normalizedPredicates.length; j < jLength; j++) {
-                itemSatisfactory = normalizedPredicates[j].test(item);
+            for (var j = 0, jLength = predicates.length; j < jLength; j++) {
+                itemSatisfactory = predicates[j].test(item);
 
                 if (!itemSatisfactory) {
                     break;
@@ -355,18 +365,18 @@ define(function(require) {
         Removes items in the collection which meet the specified predicates. Note that attribute retrival is
         performed by calling getX() (where X is the attribute name) on each item in the collection.
 
-        @param {object[]} predicates        The desired predicates
+        @param {Predicate[]} predicates        The desired predicates
     */
     Collection.addMethod("removeItemsWhere", function(predicates) {
         var items = this.get("items");
+        var item, itemSatisfactory;
 
-        for (var i = 0, iLength = items.length; i < iLength; i++) {
-            var item = items[i];
-            var itemSatisfactory = false;
-            var normalizedPredicates = Predicate.normalize(predicates);
+        for (var i in items) {
+            item = items[i];
+            itemSatisfactory = false;
 
-            for (var j = 0, jLength = normalizedPredicates.length; j < jLength; j++) {
-                itemSatisfactory = normalizedPredicates[j].test(item);
+            for (var j = 0, jLength = predicates.length; j < jLength; j++) {
+                itemSatisfactory = predicates[j].test(item);
 
                 if (!itemSatisfactory) {
                     break;
@@ -498,7 +508,15 @@ define(function(require) {
 
             items[id] = item;
             Am.Event.trigger(new Am.Event.Event(this, "item_add", { item: item }));
-            Am.Event.observe(item, "change", triggerItemChange);
+            var collection = this;
+            var itemChangeListenerObject = {
+                function: function(event) {
+                    triggerItemChange(collection, event);
+                },
+                item: item
+            };
+            itemChangeListeners.push(itemChangeListenerObject);
+            Am.Event.observe(item, "change", itemChangeListenerObject.function);
         }
     });
 
