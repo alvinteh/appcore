@@ -86,7 +86,10 @@ define(function() {
                         it("should trigger the item_add event on the collection", function(done) {
                             var collection = new Collection("people", Person);
 
-                            Am.Event.observe(collection, "item_add", function() {
+                            Am.Event.observe(collection, "item_add", function(event) {
+                                expect(event.getTarget()).to.equal(collection);
+                                expect(event.getData().item).to.equal(person);
+
                                 done();
                             });
 
@@ -98,7 +101,15 @@ define(function() {
                             "specified item", function(done) {
                             var collection = new Collection("people", Person);
 
-                            Am.Event.observe(collection, "item_change", function() {
+                            Am.Event.observe(collection, "item_change", function(event) {
+                                expect(event.getTarget()).to.equal(collection);
+                                expect(event.getData().item).to.equal(person);
+
+                                var changes = event.getData().changes;
+                                expect(changes[0].attribute).to.equal("firstName");
+                                expect(changes[0].newValue).to.equal("Johnny");
+                                expect(changes[0].oldValue).to.equal("John");
+
                                 done();
                             });
 
