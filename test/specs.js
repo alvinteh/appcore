@@ -15,6 +15,7 @@ define([
     "specs/core/core.route.js",
     "specs/core/core.view.js",
     "specs/ajax/models/xhr.js",
+    "specs/collections/models/collection.js",
     "specs/util/helpers/function-helper.js",
     "specs/util/helpers/model-helper.js",
     "specs/util/helpers/storage-helper.js",
