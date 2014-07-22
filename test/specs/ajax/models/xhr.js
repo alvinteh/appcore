@@ -13,7 +13,7 @@ define(function() {
                         done();
                     });
 
-                    describe("send()", function() {
+                    describe("instance.send()", function() {
                         var server;
 
                         beforeEach(function() {

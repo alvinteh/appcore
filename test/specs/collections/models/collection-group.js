@@ -54,7 +54,7 @@ define(function() {
                         });
                     });
 
-                    describe("getCollection()", function() {
+                    describe("instance.getCollection()", function() {
                         it("should retrieve the collection with the specified name", function(done) {
                             var collectionGroup = new CollectionGroup("default");
                             collectionGroup.addCollection(personCollection);
@@ -73,7 +73,7 @@ define(function() {
                         });
                     });
 
-                    describe("addCollection()", function() {
+                    describe("instance.addCollection()", function() {
                         it("should add the specified collection to the collection group", function(done) {
                             var collectionGroup = new CollectionGroup("default");
                             collectionGroup.addCollection(personCollection);
@@ -149,7 +149,7 @@ define(function() {
                         });
                     });
 
-                    describe("removeCollection()", function() {
+                    describe("instance.removeCollection()", function() {
                         it("should remove the specified collection from the collection group", function(done) {
                             var collectionGroup = new CollectionGroup("default");
                             collectionGroup.addCollection(personCollection);

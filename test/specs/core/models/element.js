@@ -59,7 +59,7 @@ define(function() {
                     });
                 });
 
-                describe("addDataBinding()", function() {
+                describe("instance.addDataBinding()", function() {
                     it("should automatically call refresh() for non-reverse bindings", function(done) {
                         $("#test").append("<input id=\"test1\" type=\"text\">");
                         $("#test").append("<input id=\"test2\" type=\"text\">");

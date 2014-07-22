@@ -34,7 +34,7 @@ define(function() {
                         });
                     });
 
-                    describe("addItem()", function() {
+                    describe("instance.addItem()", function() {
                         it("should add the specified item to the Collection", function(done) {
                             var collection = new Collection("people", Person);
 
@@ -140,7 +140,7 @@ define(function() {
                         });
                     });
 
-                    describe("removeItem()", function() {
+                    describe("instance.removeItem()", function() {
                         it("should remove the specified item from the collection", function(done) {
                             var collection = new Collection("people", Person);
 
@@ -193,7 +193,7 @@ define(function() {
                         });
                     });
 
-                    describe("getNextAutoIncrementNo()", function() {
+                    describe("instance.getNextAutoIncrementNo()", function() {
                         it("should return the next auto increment number", function(done) {
                             var collection = new Collection("people", Person);
 
@@ -207,8 +207,8 @@ define(function() {
                         });
                     });
 
-                    describe("resetNextAutoIncrementNo()", function() {
-                        it("should", function(done) {
+                    describe("instance.resetNextAutoIncrementNo()", function() {
+                        it("should reset the auto increment number", function(done) {
                             var collection = new Collection("people", Person);
 
                             var person1 = new Person("John", "Doe");
@@ -225,7 +225,7 @@ define(function() {
                         });
                     });
 
-                    describe("hasItem()", function() {
+                    describe("instance.hasItem()", function() {
                         it("should return true if the items exists in the collection", function(done) {
                             var collection = new Collection("people", Person);
 
@@ -248,7 +248,7 @@ define(function() {
                         });
                     });
 
-                    describe("hasItemLike()", function() {
+                    describe("instance.hasItemLike()", function() {
                         it("should return true if there is at least one item matching the specified attribute/value",
                             function(done) {
                             var collection = new Collection("people", Person);
@@ -288,7 +288,7 @@ define(function() {
                         });
                     });
 
-                    describe("hasItemWhere()", function() {
+                    describe("instance.hasItemWhere()", function() {
                         it("should return true if there is at least one item satisfying the specified predicate",
                             function(done) {
                             var collection = new Collection("people", Person);
@@ -328,7 +328,7 @@ define(function() {
                         });
                     });
 
-                    describe("findItem()", function() {
+                    describe("instance.findItem()", function() {
                         it("should retrieve the item matching the specified Id", function(done) {
                             var collection = new Collection("people", Person);
 
@@ -350,7 +350,7 @@ define(function() {
                         });
                     });
 
-                    describe("findOrAddItem()", function() {
+                    describe("instance.findOrAddItem()", function() {
                         it("should retrieve the item matching the specified attribute if it exists in the " +
                             "collection", function(done) {
                             var collection = new Collection("people", Person);
@@ -379,7 +379,7 @@ define(function() {
                         });
                     });
 
-                    describe("findItemLike()", function() {
+                    describe("instance.findItemLike()", function() {
                         it("should retrieve exactly one item matching the specified attribute/value", function(done) {
                             var collection = new Collection("people", Person);
 
@@ -401,7 +401,7 @@ define(function() {
                         });
                     });
 
-                    describe("findItemsLike()", function() {
+                    describe("instance.findItemsLike()", function() {
                         it("should retrieve all items matching the specified attribute/value", function(done) {
                             var collection = new Collection("people", Person);
 
@@ -425,7 +425,7 @@ define(function() {
                         });
                     });
 
-                    describe("findItemWhere()", function() {
+                    describe("instance.findItemWhere()", function() {
                         it("should retrieve exactly one item satisfying the specified predicate", function(done) {
                             var collection = new Collection("people", Person);
 
@@ -467,7 +467,7 @@ define(function() {
                         });
                     });
 
-                    describe("findItemsWhere()", function() {
+                    describe("instance.findItemsWhere()", function() {
                         it("should retrieve all items satisfying the specified predicate", function(done) {
                             var collection = new Collection("people", Person);
 
@@ -491,7 +491,7 @@ define(function() {
                         });
                     });
 
-                    describe("findItemsBetween()", function() {
+                    describe("instance.findItemsBetween()", function() {
                         it("should retrieve all items with values between the specified attribute/value (inclusive)",
                             function(done) {
                             var collection = new Collection("people", Person);
@@ -517,7 +517,7 @@ define(function() {
                         });
                     });
 
-                    describe("removeItemLike()", function() {
+                    describe("instance.removeItemLike()", function() {
                         it("should remove exactly one item matching the specified attribute/value", function(done) {
                             var collection = new Collection("people", Person);
 
@@ -544,7 +544,7 @@ define(function() {
                         });
                     });
 
-                    describe("removeItemsLike()", function() {
+                    describe("instance.removeItemsLike()", function() {
                         it("should remove all items matching the specified attribute/value", function(done) {
                             var collection = new Collection("people", Person);
 
@@ -571,7 +571,7 @@ define(function() {
                         });
                     });
 
-                    describe("removeItemWhere()", function() {
+                    describe("instance.removeItemWhere()", function() {
                         it("should remove exactly one item satisfying the specified predicate", function(done) {
                             var collection = new Collection("people", Person);
 
@@ -608,7 +608,7 @@ define(function() {
                         });
                     });
 
-                    describe("removeItemsWhere()", function() {
+                    describe("instance.removeItemsWhere()", function() {
                         it("should remove all items satisfying the specified predicate", function(done) {
                             var collection = new Collection("people", Person);
 
