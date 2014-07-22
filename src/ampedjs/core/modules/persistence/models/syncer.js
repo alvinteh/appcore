@@ -2,7 +2,6 @@ define(function(require) {
     "use strict";
 
     var Am = require("../../../../ampedjs");
-    var FunctionHelper = require("../../util/helpers/function-helper");
 
     /*
         @abstract
@@ -15,32 +14,15 @@ define(function(require) {
         @constructor Syncer
 
         Constructs a Syncer instance.
-
-        @param {function} collectionGroup     The desired collection group.
     */
     var Syncer = Am.Model.create("Syncer",
-        ["collectionGroup", "map", "listeners", "syncData"],
+        ["data"],
         {
-            constructor: function(collectionGroup) {
+            constructor: function() {
                 this.set({
-                    collectionGroup: collectionGroup,
-                    listeners: {
-                        itemAdd: FunctionHelper.noop(),
-                        itemChange: FunctionHelper.noop(),
-                        itemRemove: FunctionHelper.noop(),
-                        collectionAdd: FunctionHelper.noop(),
-                        collectionRemove: FunctionHelper.noop()
-                    },
-                    syncData: []
+                    map: {},
+                    data: []
                  });
-
-                var listeners = this.get("listeners");
-
-                Am.Event.observe(collectionGroup, "item_add", listeners.itemAdd);
-                Am.Event.observe(collectionGroup, "item_change", listeners.itemChange);
-                Am.Event.observe(collectionGroup, "item_remove", listeners.itemRemove);
-                Am.Event.observe(collectionGroup, "collection_add", listeners.collectionAdd);
-                Am.Event.observe(collectionGroup, "collection_remove", listeners.collectionRemove);
             }
         }
     );
@@ -71,8 +53,13 @@ define(function(require) {
     */
     Syncer.addMethod("map", function(model, action, endpoint) {
         var map = this.get("map");
+        var modelName = model.getModelName();
 
-        map[model][action] = endpoint;
+        if (!map[modelName]) {
+            map[modelName] = {};
+        }
+
+        map[modelName][action] = endpoint;
     });
 
     /*
@@ -83,14 +70,14 @@ define(function(require) {
         @param {object} item       The desired item
     */
     Syncer.addMethod("getSyncStatus", function(item) {
-        var syncData = this.get("syncData");
-        var syncDataItem;
+        var data = this.get("data");
+        var dataItem;
 
-        for (var i = 0, length = syncData.length; i < length; i++) {
-            syncDataItem = syncData[i];
+        for (var i = 0, length = data.length; i < length; i++) {
+            dataItem = data[i];
 
-            if (syncDataItem.item === item) {
-                return syncDataItem.status;
+            if (dataItem.item === item) {
+                return dataItem.status;
             }
         }
 
@@ -98,9 +85,36 @@ define(function(require) {
     });
 
     /*
+        @function setSyncStatus
+
+        Sets the synchronization status of the specified item
+
+        @param {object} item       The desired item
+        @param {String} status     The desired sync status
+    */
+    Syncer.addMethod("setSyncStatus", function(item, status) {
+        var data = this.get("data");
+        var dataItem;
+
+        for (var i = 0, length = data.length; i < length; i++) {
+            dataItem = data[i];
+
+            if (dataItem.item === item) {
+                dataItem.status = status;
+                return;
+            }
+        }
+
+        data.push({
+            item: item,
+            status: status
+        });
+    });
+
+    /*
         @function getSyncAction
 
-        Gets the action that should be done to synchronie the specified item
+        Gets the action that should be done to synchronize the specified item
 
         @param {object} item       The desired item
     */
@@ -120,22 +134,33 @@ define(function(require) {
     });
 
     /*
-        @function pull
+        @function load
+        @abstract
 
-        Pulls item(s) from the source to the collection group.
+        Loads item(s) from the source to the collection group.
+
+        @param {Model} model                The desired model
+        @param {Predicate[]} predicates     The desired predicates
+
+        @return {Promise}
     */
     //jshint unused:false
-    Syncer.addMethod("pull", function(model, criteria) {
+    Syncer.addMethod("load", function(model, predicates) {
     });
     //jshint unused:true
 
     /*
-        @function push
+        @function save
+        @abstract
 
-        Pushes the specified item( from the collection group to the source.
+        Saves the specified item to the source.
+
+        @param {object} item        The desired item
+
+        @return {Promise}
     */
     //jshint unused:false
-    Syncer.addMethod("push", function(item) {
+    Syncer.addMethod("save", function(item) {
     });
     //jshint unused:true
 

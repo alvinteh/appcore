@@ -4,7 +4,6 @@ define(function(require) {
     var Am = require("../../../../ampedjs");
     var StringHelper = require("../../util/helpers/string-helper");
     var Syncer = require("./syncer");
-    var Predicate = require("../../util/models/predicate");
     var Promise = require("../../core/models/promise");
     var Xhr = require("../../ajax/models/xhr");
 
@@ -37,33 +36,36 @@ define(function(require) {
 
         Gets the REST API endpoint for the specified model, action and identifier.
 
-        @param {function} model     The desired model
-        @param {string} action      The desired action
-        @param [{int}] id           The item identifier
+        @param {RestSyncer} restSyncer      The desired REST syncer
+        @param {Model} model                The desired model
+        @param {string} action              The desired action
+        @param [{int}] id                   The item identifier
 
         @return {object}
     */
-    var getEndpoint = function(model, action, id) {
+    var getEndpoint = function(restSyncer, model, action, id) {
         var ret = {
             url: "",
             method: ""
         };
 
-        var map = this.get("map");
-        var rootUrl = this.get("rootUrl");
+        var map = restSyncer.get("map");
+        var modelName = model.getModelName();
+        var rootUrl = restSyncer.get("rootUrl");
 
         //Use specified mapping if it is available
-        if (map[model] && map[model][action]) {
-            ret.url = rootUrl + "/" + map[model][action];
+        if (map[modelName] && map[modelName][action]) {
+            ret.url = rootUrl + "/" + map[modelName][action].url;
+            ret.method = map[modelName][action].method || "";
         }
 
         //Determine URL
         if (ret.url === "") {
             if (map[model] && map[model]["*"]) {
-                ret.url = rootUrl + "/" + map[model]["*"] + "/" + action;
+                ret.url = rootUrl + "/" + map[modelName]["*"];
             }
             else {
-                ret.url = rootUrl + "/" + model.getName() + "/" + action;
+                ret.url = rootUrl + "/" + (StringHelper.convertToSnakeCase(modelName)).toLowerCase();
             }
         }
 
@@ -73,20 +75,13 @@ define(function(require) {
 
         //Determine method
         if (ret.method === "") {
-            switch (action) {
-                case Syncer.ACTION_CREATE:
-                    ret.method = RestSyncer.METHOD_POST;
-                    break;
-                case Syncer.ACTION_DELETE:
-                    ret.method = RestSyncer.METHOD_DELETE;
-                    break;
-                case Syncer.ACTION_VIEW:
-                    ret.method = RestSyncer.METHOD_GET;
-                    break;
-                case Syncer.ACTION_UPDATE:
-                    ret.method = RestSyncer.METHOD_PUT;
-                    break;
-            }
+            var methodMap = {};
+            methodMap[Syncer.ACTION_CREATE] = RestSyncer.METHOD_POST;
+            methodMap[Syncer.ACTION_DELETE] = RestSyncer.METHOD_DELETE;
+            methodMap[Syncer.ACTION_READ] = RestSyncer.METHOD_GET;
+            methodMap[Syncer.ACTION_VIEW] = RestSyncer.METHOD_PUT;
+
+            ret.method = methodMap[action];
         }
 
         return ret;
@@ -100,77 +95,104 @@ define(function(require) {
 
         @param {function} model             The desired model
         @param [{string}] action            The desired action
-        @param {object|string} endpoint     The desired endpoint
+        @param {object|string} endpoint     The desired endpoint (object comprising url/method properties/ a URL string)
     */
     RestSyncer.addMethod("map", function(model, action, endpoint) {
         var map = this.get("map");
+        var modelName = model.getModelName();
 
-        map[model][action] = {
-            url: (typeof endpoint.url === "string" ? endpoint.url : (typeof endpoint === "string" ? endpoint: null)),
+        if (!map[modelName]) {
+            map[modelName] = {};
+        }
+
+        map[modelName][action] = {
+            url: (typeof endpoint.url === "string" ? endpoint.url : (typeof endpoint === "string" ? endpoint : null)),
             method: (typeof endpoint.method === "string" ? endpoint.method : null)
         };
     });
 
     /*
-        @function pull
+        @function load
 
-        Pulls item(s) from the source to the collection group.
+        Loads item(s) from the source to the collection group.
 
-        @param {string} collection          The desired collection name
-        @param [{object[]}] predicates      The desired predicates
+        @param {Model} model                    The desired model
+        @param [{Predicate[]}] predicates       The desired predicates
 
         @return {Promise}
     */
-    RestSyncer.addMethod("pull", function(collection, predicates) {
-        var me = this;
+    RestSyncer.addMethod("load", function(model, predicates) {
+        var promise = new Promise();
+        var data = {};
+        var predicate, operation;
 
-        //jshint unused:true
-        return new Promise(function(resolve, reject) {
-        //jshint unused:false
-            var normalizedPredicates = Predicate.normalize(predicates);
-            var queryString = "";
-            var predicate, operation;
-
-            for (var i = 0, length = normalizedPredicates.length; i < length; i++) {
-                predicate = normalizedPredicates[i];
-                operation = predicate.getOperation();
-                queryString += encodeURIComponent(StringHelper.convertToSnakeCase(predicate.getAttribute()) + "=" +
-                (operation === "===" || operation === "==" ? "" : operation) + predicate.getValue());
+        if (Array.isArray(predicates)) {
+            for (var i = 0, length = predicates.length; i < length; i++) {
+                predicate = predicates[i];
+                operation = predicate.get("operation");
+                data[StringHelper.convertToSnakeCase(predicate.get("attribute"))] =
+                    (operation === "===" || operation === "==" ? "" : operation) + predicate.get("value");
             }
+        }
 
-            var endpoint = getEndpoint(collection.getModel(), Syncer.ACTION_VIEW);
+        var xhr, endpoint;
 
-            var xhr = new Xhr(endpoint.url, endpoint.method);
+        if (Array.isArray(predicates) && predicates.length === 1 && predicates[0].get("attribute") === "id" &&
+            (predicates[0].get("operation") === "===" || predicates[0].get("operation") === "==")) {
+            endpoint = getEndpoint(this, model, Syncer.ACTION_READ, predicates[0].get("value"));
+            xhr = new Xhr(endpoint.url, endpoint.method)
+        }
+        else {
+            endpoint = getEndpoint(this, model, Syncer.ACTION_READ);
+            xhr = new Xhr(endpoint.url, endpoint.method)
 
-            return xhr.send().then(function(response) {
-                return new Promise(function(resolve, reject) {
-                    try {
-                        var data = JSON.parse(response);
+            if (predicates && predicates.length > 0) {
+                xhr.setData(data);
+            }
+        }
+
+        xhr.send().then(
+            function(response) {
+                try {
+                    if (xhr.getStatus() >= 400 && xhr.getStatus() <= 600) {
+                        throw new Error("The response was a HTTP " + xhr.getStatus() + " error");
                     }
-                    catch (e) {
-                        reject(new Error("The response could not be parsed as JSON."));
-                    }
 
-                    var collection = me.getCollection(collection);
+                    var itemsJson = JSON.parse(response);
+                    var items = [];
 
-                    for (var i = 0, length = response.length; i < length; i++) {
-                        collection.addItem(response[i]);
+                    if (Array.isArray(itemsJson)) {
+                        for (var i in itemsJson) {
+                            items.push(model.fromObject(itemsJson[i]));
+                        }
                     }
-                });
-            });
-        });
+                    else {
+                        items.push(model.fromObject(itemsJson));
+                    }
+                    promise.resolve(items);
+                }
+                catch (e) {
+                    promise.reject(new Error("The response could not be parsed as JSON."));
+                }
+            },
+            function(error) {
+                promise.reject(error);
+            }
+        );
+
+        return promise;
     });
 
     /*
-        @function push
+        @function save
 
-        Pushes the specified item from the collection group to the source.
+        Saves the specified item to the source.
 
         @param {object} item    The desired item
 
         @return {Promise}
     */
-    RestSyncer.addMethod("push", function(item) {
+    RestSyncer.addMethod("save", function(item) {
         return new Promise(function(resolve, reject) {
             var syncAction = this.getSyncAction(item);
 
@@ -178,9 +200,10 @@ define(function(require) {
                 reject(new Error("Item is unchanged."));
             }
 
-            var endpoint = getEndpoint(item.getModel(), syncAction, item.getId());
+            var endpoint = getEndpoint(this, item.getModel(), syncAction, item.getId());
 
             var xhr = new Xhr(endpoint.url, endpoint.method);
+            xhr.setData(item.toObject());
             resolve(xhr.send());
         });
     });
