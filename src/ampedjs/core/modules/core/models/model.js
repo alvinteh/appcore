@@ -181,6 +181,30 @@ define(function(require) {
             };
 
             /*
+                @function fromObject()
+
+                Create an instance of the model
+
+                @param {object} object      The desired object
+
+                @return {object}
+            */
+            model.fromObject = function(object) {
+                //jshint -W055
+                var instance = new model();
+                //jshint +W055
+
+                for (var property in object) {
+                    if (object.hasOwnProperty(property) &&
+                        typeof object[property] !== "object" && typeof object[property] !== "function") {
+                        instance.set(StringHelper.convertToCamelCase(property), object[property]);
+                    }
+                }
+
+                return instance;
+            };
+
+            /*
                 @function getValidationRules
 
                 Gets the validation rules for the specified model.

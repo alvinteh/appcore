@@ -14,6 +14,21 @@ define(function() {
                 });
             });
 
+            describe("instance.fromObject()", function() {
+                it("should create a model instance from an object", function(done) {
+                    var Person = Am.Model.create("Person", ["firstName", "lastName"]);
+                    var person = Person.fromObject({
+                        first_name: "John",
+                        last_name: "Doe"
+                    });
+
+                    expect(person.get("firstName")).to.equal("John");
+                    expect(person.get("lastName")).to.equal("Doe");
+
+                    done();
+                });
+            });
+
             describe("instance.addMethod()", function() {
                 it("should create a public method", function(done) {
                     var Person = Am.Model.create("Person", []);
