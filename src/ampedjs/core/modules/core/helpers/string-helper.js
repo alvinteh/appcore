@@ -26,7 +26,13 @@ define(function() {
                 @return {string}
             */
             convertToSnakeCase: function(string) {
-                return string.replace(/([A-Z])/g, function($1) { return "_" + $1.toLowerCase(); });
+                var ret = string.replace(/([A-Z])/g, function($1) { return "_" + $1.toLowerCase(); });
+
+                if (ret.charAt(0) === "_") {
+                    ret = ret.substring(1, 2).toLowerCase() + ret.substring(2);
+                }
+
+                return ret;
             },
 
             /*
