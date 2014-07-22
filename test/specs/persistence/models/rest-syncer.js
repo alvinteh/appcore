@@ -226,6 +226,58 @@ define(function() {
                                 done();
                             });
                         });
+
+                        it("should use specific mapped URLs if they are available", function(done) {
+                            var restSyncer = new RestSyncer("http://test");
+
+                            var tmpXhr;
+
+                            server.respondWith(function(xhr) {
+                                tmpXhr = xhr;
+                                xhr.respond(200, null, JSON.stringify(
+                                    {
+                                        first_name: "John",
+                                        last_name: "Doe"
+                                    }
+                                ));
+                            });
+
+                            restSyncer.map(Person, Syncer.ACTION_READ, "people/view");
+
+                            restSyncer.load(Person).then(function(itemArray) {
+                                expect(tmpXhr.url).to.equal("http://test/people/view");
+                                expect(itemArray).to.have.length(1);
+                                expect(itemArray[0].get("firstName")).to.equal("John");
+                                expect(itemArray[0].get("lastName")).to.equal("Doe");
+                                done();
+                            });
+                        });
+
+                        it("should use generic mapped URLs if they are available", function(done) {
+                            var restSyncer = new RestSyncer("http://test");
+
+                            var tmpXhr;
+
+                            server.respondWith(function(xhr) {
+                                tmpXhr = xhr;
+                                xhr.respond(200, null, JSON.stringify(
+                                    {
+                                        first_name: "John",
+                                        last_name: "Doe"
+                                    }
+                                ));
+                            });
+
+                            restSyncer.map(Person, "*", "users");
+
+                            restSyncer.load(Person).then(function(itemArray) {
+                                expect(tmpXhr.url).to.equal("http://test/users");
+                                expect(itemArray).to.have.length(1);
+                                expect(itemArray[0].get("firstName")).to.equal("John");
+                                expect(itemArray[0].get("lastName")).to.equal("Doe");
+                                done();
+                            });
+                        });
                     });
                 });
             });
