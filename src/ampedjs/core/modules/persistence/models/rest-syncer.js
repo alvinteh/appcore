@@ -61,8 +61,8 @@ define(function(require) {
 
         //Determine URL
         if (ret.url === "") {
-            if (map[model] && map[model]["*"]) {
-                ret.url = rootUrl + "/" + map[modelName]["*"];
+            if (map[modelName] && map[modelName]["*"]) {
+                ret.url = rootUrl + "/" + map[modelName]["*"].url;
             }
             else {
                 ret.url = rootUrl + "/" + (StringHelper.convertToSnakeCase(modelName)).toLowerCase();
