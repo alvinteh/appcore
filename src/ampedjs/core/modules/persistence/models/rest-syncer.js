@@ -69,17 +69,18 @@ define(function(require) {
             }
         }
 
-        if (id) {
+        if (action !== Syncer.ACTION_CREATE && action !== Syncer.ACTION_LIST) {
             ret.url += "/" + id;
         }
 
         //Determine method
         if (ret.method === "") {
             var methodMap = {};
-            methodMap[Syncer.ACTION_CREATE] = RestSyncer.METHOD_POST;
-            methodMap[Syncer.ACTION_DELETE] = RestSyncer.METHOD_DELETE;
-            methodMap[Syncer.ACTION_READ] = RestSyncer.METHOD_GET;
-            methodMap[Syncer.ACTION_VIEW] = RestSyncer.METHOD_PUT;
+            methodMap[Syncer.ACTION_CREATE] = Xhr.METHOD_POST;
+            methodMap[Syncer.ACTION_DELETE] = Xhr.METHOD_DELETE;
+            methodMap[Syncer.ACTION_READ] = Xhr.METHOD_GET;
+            methodMap[Syncer.ACTION_UPDATE] = Xhr.METHOD_PUT;
+            methodMap[Syncer.ACTION_LIST] = Xhr.METHOD_GET;
 
             ret.method = methodMap[action];
         }
@@ -122,6 +123,7 @@ define(function(require) {
         @return {Promise}
     */
     RestSyncer.addMethod("load", function(model, predicates) {
+        var me = this;
         var promise = new Promise();
         var data = {};
         var predicate, operation;
@@ -140,11 +142,12 @@ define(function(require) {
         if (Array.isArray(predicates) && predicates.length === 1 && predicates[0].get("attribute") === "id" &&
             (predicates[0].get("operation") === "===" || predicates[0].get("operation") === "==")) {
             endpoint = getEndpoint(this, model, Syncer.ACTION_READ, predicates[0].get("value"));
-            xhr = new Xhr(endpoint.url, endpoint.method)
+            xhr = new Xhr(endpoint.url, endpoint.method);
         }
         else {
-            endpoint = getEndpoint(this, model, Syncer.ACTION_READ);
-            xhr = new Xhr(endpoint.url, endpoint.method)
+            endpoint = getEndpoint(this, model, Syncer.ACTION_LIST);
+
+            xhr = new Xhr(endpoint.url, endpoint.method);
 
             if (predicates && predicates.length > 0) {
                 xhr.setData(data);
@@ -153,6 +156,8 @@ define(function(require) {
 
         xhr.send().then(
             function(response) {
+                var item;
+
                 try {
                     if (xhr.getStatus() >= 400 && xhr.getStatus() <= 600) {
                         throw new Error("The response was a HTTP " + xhr.getStatus() + " error");
@@ -163,11 +168,15 @@ define(function(require) {
 
                     if (Array.isArray(itemsJson)) {
                         for (var i in itemsJson) {
-                            items.push(model.fromObject(itemsJson[i]));
+                            item = model.fromObject(itemsJson[i]);
+                            items.push(item);
+                            me.setSyncStatus(item, Syncer.STATUS_UNCHANGED);
                         }
                     }
                     else {
-                        items.push(model.fromObject(itemsJson));
+                        item = model.fromObject(itemsJson);
+                        items.push(item);
+                        me.setSyncStatus(item, Syncer.STATUS_UNCHANGED);
                     }
                     promise.resolve(items);
                 }
@@ -193,6 +202,7 @@ define(function(require) {
         @return {Promise}
     */
     RestSyncer.addMethod("save", function(item) {
+        var me = this;
         var promise = new Promise();
 
         var syncAction = this.getSyncAction(item);
@@ -204,24 +214,35 @@ define(function(require) {
         var endpoint = getEndpoint(this, item.getModel(), syncAction, item.getId());
 
         var xhr = new Xhr(endpoint.url, endpoint.method);
-        xhr.setData(item.toObject());
+
+        if (syncAction !== Syncer.ACTION_DELETE) {
+            var data = item.toObject();
+            delete data.id;
+
+            xhr.setData(data);
+        }
+
         xhr.send().then(
             function(response) {
                 try {
-                    var responseObject = JSON.parse(response);
-                    var changes = {};
+                    if (syncAction !== Syncer.ACTION_DELETE) {
+                        var responseObject = JSON.parse(response);
+                        var changes = {};
 
-                    //Compare the item and response for differences and update the former accordingly
-                    var property, attribute;
-                    for (property in responseObject) {
-                        attribute = StringHelper.convertToCamelCase(property);
+                        //Compare the item and response for differences and update the former accordingly
+                        var property, attribute;
+                        for (property in responseObject) {
+                            attribute = StringHelper.convertToCamelCase(property);
 
-                        if (item.get(attribute) !== responseObject[property]) {
-                            changes[attribute] = responseObject[property];
+                            if (item.get(attribute) !== responseObject[property]) {
+                                changes[attribute] = responseObject[property];
+                            }
                         }
+
+                        item.set(changes, { silent: true });
                     }
 
-                    item.set(changes);
+                    me.setSyncStatus(item, Syncer.STATUS_UNCHANGED);
 
                     promise.resolve(item);
                 }

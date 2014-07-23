@@ -79,7 +79,7 @@ define(function() {
                         it("should return a Promise with the loaded item if a single object is returned", function(done) {
                             var restSyncer = new RestSyncer("http://test");
 
-                            server.respondWith(function(xhr) {
+                            server.respondWith("GET", "http://test/person", function(xhr) {
                                 xhr.respond(200, null, JSON.stringify(
                                     {
                                         first_name: "John",
@@ -99,7 +99,7 @@ define(function() {
                         it("should return a Promise with the loaded items if an Array is returned", function(done) {
                             var restSyncer = new RestSyncer("http://test");
 
-                            server.respondWith(function(xhr) {
+                            server.respondWith("GET", "http://test/person", function(xhr) {
                                 xhr.respond(200, null, JSON.stringify([
                                     {
                                         first_name: "John",
@@ -125,7 +125,7 @@ define(function() {
                         it("should return a rejected Promise if the response is invalid JSON", function(done) {
                             var restSyncer = new RestSyncer("http://test");
 
-                            server.respondWith(function(xhr) {
+                            server.respondWith("GET", "http://test/person", function(xhr) {
                                 xhr.respond(200, null, "invalid");
                             });
 
@@ -142,7 +142,7 @@ define(function() {
                         it("should return a rejected Promise if an invalid HTTP status is returned", function(done) {
                             var restSyncer = new RestSyncer("http://test");
 
-                            server.respondWith(function(xhr) {
+                            server.respondWith("GET", "http://test/person", function(xhr) {
                                 xhr.respond(404, null, "");
                             });
 
@@ -162,7 +162,7 @@ define(function() {
                             var tmp = window.XMLHttpRequest;
                             window.XMLHttpRequest = null;
 
-                            server.respondWith(function(xhr) {
+                            server.respondWith("GET", "http://test/person", function(xhr) {
                                 xhr.respond(404, null, "i");
                             });
 
@@ -180,12 +180,31 @@ define(function() {
                             );
                         });
 
+                        it("should set the loaded item(s)' sync status to unchanged", function(done) {
+                            var restSyncer = new RestSyncer("http://test");
+
+                            server.respondWith("GET", "http://test/person", function(xhr) {
+                                xhr.respond(200, null, JSON.stringify(
+                                    {
+                                        first_name: "John",
+                                        last_name: "Doe"
+                                    }
+                                ));
+                            });
+
+                            restSyncer.load(Person).then(function(itemArray) {
+                                expect(restSyncer.getSyncStatus(itemArray[0])).to.equal(Syncer.STATUS_UNCHANGED);
+                                done();
+                            });
+                        });
+
                         it("should pass the predicates in the request URL, if there are any specified", function(done) {
                             var restSyncer = new RestSyncer("http://test");
 
                             var tmpXhr;
 
-                            server.respondWith(function(xhr) {
+                            server.respondWith("GET", "http://test/person?first_name=John&last_name=Doe",
+                                function(xhr) {
                                 tmpXhr = xhr;
                                 xhr.respond(200, null, JSON.stringify([
                                     {
@@ -207,7 +226,7 @@ define(function() {
 
                             var tmpXhr;
 
-                            server.respondWith(function(xhr) {
+                            server.respondWith("GET", "http://test/person/1", function(xhr) {
                                 tmpXhr = xhr;
                                 xhr.respond(200, null, JSON.stringify(
                                     {
@@ -236,6 +255,7 @@ define(function() {
                                 tmpXhr = xhr;
                                 xhr.respond(200, null, JSON.stringify(
                                     {
+                                        id: 1,
                                         first_name: "John",
                                         last_name: "Doe"
                                     }
@@ -244,8 +264,8 @@ define(function() {
 
                             restSyncer.map(Person, Syncer.ACTION_READ, "people/view");
 
-                            restSyncer.load(Person).then(function(itemArray) {
-                                expect(tmpXhr.url).to.equal("http://test/people/view");
+                            restSyncer.load(Person, Predicate.normalize({ id: 1 })).then(function(itemArray) {
+                                expect(tmpXhr.url).to.equal("http://test/people/view/1");
                                 expect(itemArray).to.have.length(1);
                                 expect(itemArray[0].get("firstName")).to.equal("John");
                                 expect(itemArray[0].get("lastName")).to.equal("Doe");
@@ -258,7 +278,7 @@ define(function() {
 
                             var tmpXhr;
 
-                            server.respondWith(function(xhr) {
+                            server.respondWith("GET", "http://test/users", function(xhr) {
                                 tmpXhr = xhr;
                                 xhr.respond(200, null, JSON.stringify(
                                     {
@@ -275,6 +295,58 @@ define(function() {
                                 expect(itemArray).to.have.length(1);
                                 expect(itemArray[0].get("firstName")).to.equal("John");
                                 expect(itemArray[0].get("lastName")).to.equal("Doe");
+                                done();
+                            });
+                        });
+
+                        it("should use GET for read operations", function(done) {
+                            var restSyncer = new RestSyncer("http://test");
+
+                            server.respondWith("GET", "http://test/person/1", function(xhr) {
+                                xhr.respond(200, null, JSON.stringify(
+                                    {
+                                        id: 1,
+                                        first_name: "John",
+                                        last_name: "Doe"
+                                    }
+                                ));
+                            });
+
+                            restSyncer.load(Person, Predicate.normalize({ id: 1})).then(function(itemArray) {
+                                expect(itemArray).to.have.length(1);
+                                expect(itemArray[0].get("firstName")).to.equal("John");
+                                expect(itemArray[0].get("lastName")).to.equal("Doe");
+                                expect(restSyncer.getSyncStatus(itemArray[0])).to.equal(Syncer.STATUS_UNCHANGED);
+                                done();
+                            });
+                        });
+
+                        it("should use GET for list operations", function(done) {
+                            var restSyncer = new RestSyncer("http://test");
+
+                            server.respondWith("GET", "http://test/person", function(xhr) {
+                                xhr.respond(200, null, JSON.stringify([
+                                    {
+                                        id: 3,
+                                        first_name: "John",
+                                        last_name: "Doe"
+                                    },
+                                    {
+                                        id: 4,
+                                        first_name: "Alan",
+                                        last_name: "Poe"
+                                    }
+                                ]));
+                            });
+
+                            restSyncer.load(Person).then(function(itemArray) {
+                                expect(itemArray).to.have.length(2);
+                                expect(itemArray[0].get("firstName")).to.equal("John");
+                                expect(itemArray[0].get("lastName")).to.equal("Doe");
+                                expect(restSyncer.getSyncStatus(itemArray[0])).to.equal(Syncer.STATUS_UNCHANGED);
+                                expect(itemArray[1].get("firstName")).to.equal("Alan");
+                                expect(itemArray[1].get("lastName")).to.equal("Poe");
+                                expect(restSyncer.getSyncStatus(itemArray[1])).to.equal(Syncer.STATUS_UNCHANGED);
                                 done();
                             });
                         });
@@ -370,7 +442,6 @@ define(function() {
                             );
                         });
 
-
                         it("should return a rejected Promise if the specified item's sync status is invalid",
                             function(done) {
                             var restSyncer = new RestSyncer("http://test");
@@ -393,6 +464,96 @@ define(function() {
                                     done();
                                 }
                             );
+                        });
+
+                        it("should set the specified item's sync status to unchanged if the save suceeds",
+                            function(done) {
+                            var restSyncer = new RestSyncer("http://test");
+
+                            var person = new Person("John", "Doe");
+                            restSyncer.setSyncStatus(person, Syncer.STATUS_CREATED);
+
+                            server.respondWith(function(xhr) {
+                                xhr.respond(201, null, JSON.stringify(
+                                    {
+                                        id: 5,
+                                        first_name: "John",
+                                        last_name: "Doe"
+                                    }
+                                ));
+                            });
+
+                            restSyncer.save(person).then(function() {
+                                expect(restSyncer.getSyncStatus(person)).to.equal(Syncer.STATUS_UNCHANGED);
+                                done();
+                            });
+                        });
+
+                        it("should use POST for create operations",
+                            function(done) {
+                            var restSyncer = new RestSyncer("http://test");
+
+                            var person = new Person("John", "Doe");
+                            restSyncer.setSyncStatus(person, Syncer.STATUS_CREATED);
+
+                            server.respondWith("POST", "http://test/person", function(xhr) {
+                                xhr.respond(201, null, JSON.stringify(
+                                    {
+                                        id: 5,
+                                        first_name: "John",
+                                        last_name: "Doe"
+                                    }
+                                ));
+                            });
+
+                            restSyncer.save(person).then(function() {
+                                expect(restSyncer.getSyncStatus(person)).to.equal(Syncer.STATUS_UNCHANGED);
+                                expect(person.get("id")).to.equal(5);
+                                done();
+                            });
+                        });
+
+                        it("should use PUT for update operations",
+                            function(done) {
+                            var restSyncer = new RestSyncer("http://test");
+
+                            var person = new Person("John", "Doe");
+                            person.set("id", 5);
+                            restSyncer.setSyncStatus(person, Syncer.STATUS_UPDATED);
+
+                            server.respondWith("PUT", "http://test/person/5", function(xhr) {
+                                xhr.respond(200, null, JSON.stringify(
+                                    {
+                                        id: 5,
+                                        first_name: "Johnny",
+                                        last_name: "Doe"
+                                    }
+                                ));
+                            });
+
+                            restSyncer.save(person).then(function() {
+                                expect(restSyncer.getSyncStatus(person)).to.equal(Syncer.STATUS_UNCHANGED);
+                                expect(person.get("firstName")).to.equal("Johnny");
+                                done();
+                            });
+                        });
+
+                        it("should use DELETE for delete operations",
+                            function(done) {
+                            var restSyncer = new RestSyncer("http://test");
+
+                            var person = new Person("John", "Doe");
+                            person.set("id", 5);
+                            restSyncer.setSyncStatus(person, Syncer.STATUS_DELETED);
+
+                            server.respondWith("DELETE", "http://test/person/5", function(xhr) {
+                                xhr.respond(204, null, "");
+                            });
+
+                            restSyncer.save(person).then(function() {
+                                expect(restSyncer.getSyncStatus(person)).to.equal(Syncer.STATUS_UNCHANGED);
+                                done();
+                            });
                         });
                     });
                 });
