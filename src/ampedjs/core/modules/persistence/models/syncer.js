@@ -121,16 +121,13 @@ define(function(require) {
     Syncer.addMethod("getSyncAction", function(item) {
         var syncStatus = this.getSyncStatus(item);
 
-        switch (syncStatus) {
-            case Syncer.STATUS_CREATED:
-                return Syncer.ACTION_CREATE;
-            case Syncer.STATUS_DELETED:
-                return Syncer.ACTION_DELETE;
-            case Syncer.STATUS_UNCHANGED:
-                return null;
-            case Syncer.STATUS_UPDATED:
-                return Syncer.ACTION_UPDATE;
-        }
+        var map = {};
+        map[Syncer.STATUS_CREATED] = Syncer.ACTION_CREATE;
+        map[Syncer.STATUS_DELETED] = Syncer.ACTION_DELETE;
+        map[Syncer.STATUS_UNCHANGED] = null;
+        map[Syncer.STATUS_UPDATED] = Syncer.ACTION_UPDATE;
+
+        return map[syncStatus];
     });
 
     /*
