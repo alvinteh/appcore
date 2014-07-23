@@ -32,6 +32,7 @@ define(function(require) {
     Syncer.addStaticAttribute("ACTION_DELETE", "delete");
     Syncer.addStaticAttribute("ACTION_READ", "read");
     Syncer.addStaticAttribute("ACTION_UPDATE", "update");
+    Syncer.addStaticAttribute("ACTION_LIST", "list");
 
     Syncer.addStaticAttribute("STATUS_CREATED", "created");
     Syncer.addStaticAttribute("STATUS_DELETED", "deleted");
