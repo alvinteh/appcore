@@ -122,7 +122,7 @@ define(function() {
                             });
                         });
 
-                        it("should return a rejected Promise if invalid JSON is returned", function(done) {
+                        it("should return a rejected Promise if the response is invalid JSON", function(done) {
                             var restSyncer = new RestSyncer("http://test");
 
                             server.respondWith(function(xhr) {
@@ -143,7 +143,7 @@ define(function() {
                             var restSyncer = new RestSyncer("http://test");
 
                             server.respondWith(function(xhr) {
-                                xhr.respond(404, null, "i");
+                                xhr.respond(404, null, "");
                             });
 
                             restSyncer.load(Person).then(
@@ -277,6 +277,122 @@ define(function() {
                                 expect(itemArray[0].get("lastName")).to.equal("Doe");
                                 done();
                             });
+                        });
+                    });
+
+                    describe("instance.save()", function() {
+                        it("should return a Promise with the saved item if the save succeeds", function(done) {
+                            var restSyncer = new RestSyncer("http://test");
+
+                            var person = new Person("John", "Doe");
+                            restSyncer.setSyncStatus(person, Syncer.STATUS_CREATED);
+
+                            server.respondWith(function(xhr) {
+                                xhr.respond(201, null, JSON.stringify(
+                                    {
+                                        id: 5,
+                                        first_name: "John",
+                                        last_name: "Doe"
+                                    }
+                                ));
+                            });
+
+                            restSyncer.save(person).then(function() {
+                                expect(person.get("id")).to.equal(5);
+                                done();
+                            });
+                        });
+
+                        it("should return a rejected Promise if the response is invalid JSON", function(done) {
+                            var restSyncer = new RestSyncer("http://test");
+
+                            var person = new Person("John", "Doe");
+                            restSyncer.setSyncStatus(person, Syncer.STATUS_CREATED);
+
+                            server.respondWith(function(xhr) {
+                                xhr.respond(201, null, "invalid");
+                            });
+
+                            restSyncer.save(person).then(
+                                function() {
+                                    done("Should not be here");
+                                },
+                                function() {
+                                    done();
+                                }
+                            );
+                        });
+
+                        it("should return a rejected Promise if an invalid HTTP status is returned", function(done) {
+                            var restSyncer = new RestSyncer("http://test");
+
+                            var person = new Person("John", "Doe");
+                            restSyncer.setSyncStatus(person, Syncer.STATUS_CREATED);
+
+                            server.respondWith(function(xhr) {
+                                xhr.respond(404, null, "");
+                            });
+
+                            restSyncer.save(person).then(
+                                function() {
+                                    done("Should not be here");
+                                },
+                                function() {
+                                    done();
+                                }
+                            );
+                        });
+
+                        it("should return a rejected Promise if problems occur with the AJAX request", function(done) {
+                            var restSyncer = new RestSyncer("http://test");
+
+                            var tmp = window.XMLHttpRequest;
+                            window.XMLHttpRequest = null;
+
+                            var person = new Person("John", "Doe");
+                            restSyncer.setSyncStatus(person, Syncer.STATUS_CREATED);
+
+                            server.respondWith(function(xhr) {
+                                xhr.respond(404, null, "");
+                            });
+
+                            restSyncer.save(person).then(
+                                function() {
+                                    window.XMLHttpRequest = tmp;
+                                    server = sinon.fakeServer.create();
+                                    done("Should not be here");
+                                },
+                                function() {
+                                    window.XMLHttpRequest = tmp;
+                                    server = sinon.fakeServer.create();
+                                    done();
+                                }
+                            );
+                        });
+
+
+                        it("should return a rejected Promise if the specified item's sync status is invalid",
+                            function(done) {
+                            var restSyncer = new RestSyncer("http://test");
+
+                            var person = new Person("John", "Doe");
+
+                            var test = true;
+
+                            server.respondWith(function(xhr) {
+                                test = false;
+                                xhr.respond(404, null, "");
+                            });
+
+                            restSyncer.save(person).then(
+                                function() {
+                                    done("Should not be here");
+                                },
+                                function() {
+                                    expect(test).to.be.true;
+                                    done();
+                                }
+                            );
                         });
                     });
                 });
