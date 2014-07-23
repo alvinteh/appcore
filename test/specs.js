@@ -17,6 +17,7 @@ define([
     "specs/ajax/models/xhr.js",
     "specs/collections/models/collection.js",
     "specs/collections/models/collection-group.js",
+    "specs/persistence/models/rest-syncer.js",
     "specs/util/helpers/function-helper.js",
     "specs/util/helpers/model-helper.js",
     "specs/util/helpers/storage-helper.js",
