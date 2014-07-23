@@ -193,19 +193,49 @@ define(function(require) {
         @return {Promise}
     */
     RestSyncer.addMethod("save", function(item) {
-        return new Promise(function(resolve, reject) {
-            var syncAction = this.getSyncAction(item);
+        var promise = new Promise();
 
-            if (!syncAction) {
-                reject(new Error("Item is unchanged."));
+        var syncAction = this.getSyncAction(item);
+
+        if (!syncAction) {
+            promise.reject(new Error("Item is unchanged."));
+        }
+
+        var endpoint = getEndpoint(this, item.getModel(), syncAction, item.getId());
+
+        var xhr = new Xhr(endpoint.url, endpoint.method);
+        xhr.setData(item.toObject());
+        xhr.send().then(
+            function(response) {
+                try {
+                    var responseObject = JSON.parse(response);
+                    var changes = {};
+
+                    //Compare the item and response for differences and update the former accordingly
+                    var property, attribute;
+                    for (property in responseObject) {
+                        attribute = StringHelper.convertToCamelCase(property);
+
+                        if (item.get(attribute) !== responseObject[property]) {
+                            changes[attribute] = responseObject[property];
+                        }
+                    }
+
+                    item.set(changes);
+
+                    promise.resolve(item);
+                }
+                catch (e) {
+                    promise.reject(e);
+                }
+            },
+            function(error) {
+                promise.reject(error);
             }
+        );
 
-            var endpoint = getEndpoint(this, item.getModel(), syncAction, item.getId());
 
-            var xhr = new Xhr(endpoint.url, endpoint.method);
-            xhr.setData(item.toObject());
-            resolve(xhr.send());
-        });
+        return promise;
     });
 
     return RestSyncer;
