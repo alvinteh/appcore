@@ -7,6 +7,7 @@ define(function() {
         var CollectionGroup = Am.Module.get("Collections").CollectionGroup;
         var Collection = Am.Module.get("Collections").Collection;
         var RestSyncer = Am.Module.get("Persistence").RestSyncer;
+        var Syncer = Am.Module.get("Persistence").Syncer;
 
         describe("Am", function() {
             describe("Collections", function() {
@@ -15,6 +16,7 @@ define(function() {
                     var personCollection;
                     var Job;
                     var jobCollection;
+                    var server;
 
                     before(function() {
                         Person = Am.Model.create("Person", ["firstName", "lastName"]);
@@ -24,6 +26,13 @@ define(function() {
                     beforeEach(function() {
                         personCollection = new Collection("people", Person);
                         jobCollection = new Collection("jobs", Job);
+
+                        server = sinon.fakeServer.create();
+                        server.autoRespond = true;
+                    });
+
+                    afterEach(function() {
+                        server.restore();
                     });
 
                     it("should be defined.", function(done) {
@@ -109,6 +118,31 @@ define(function() {
                             personCollection.addItem(person);
                         });
 
+                        it("should trigger item saving when items are added to the collection", function(done) {
+                            var restSyncer = new RestSyncer("http://test");
+                            var collectionGroup = new CollectionGroup("default", restSyncer);
+                            collectionGroup.addCollection(personCollection);
+
+                            server.respondWith("POST", "http://test/person", function(xhr) {
+                                xhr.respond(201, null, JSON.stringify(
+                                    {
+                                        id: 7,
+                                        first_name: "John",
+                                        last_name: "Doe"
+                                    }
+                                ));
+                            });
+
+                            var person = new Person("John", "Doe");
+                            personCollection.addItem(person);
+
+                            setTimeout(function() {
+                                expect(person.get("id")).to.equal(7);
+                                expect(restSyncer.getSyncStatus(person)).to.equal(Syncer.STATUS_UNCHANGED);
+                                done();
+                            }, 100);
+                        });
+
                         it("should trigger the item_change event when changes are made to items in the collection",
                             function(done) {
                             var collectionGroup = new CollectionGroup("default");
@@ -131,6 +165,50 @@ define(function() {
                             person.set("firstName", "Johnny");
                         });
 
+                        it("should trigger item saving when changes are made to items in the collection",
+                            function(done) {
+                            var restSyncer = new RestSyncer("http://test");
+                            var collectionGroup = new CollectionGroup("default", restSyncer, { autoSave: true });
+                            collectionGroup.addCollection(personCollection);
+
+                            server.respondWith("POST", "http://test/person", function(xhr) {
+                                xhr.respond(201, null, JSON.stringify(
+                                    {
+                                        id: 7,
+                                        first_name: "John",
+                                        last_name: "Doe"
+                                    }
+                                ));
+                            });
+
+                            var person = new Person("John", "Doe");
+                            personCollection.addItem(person);
+                            collectionGroup.save(personCollection).then(function() {
+                                var hasCalledServer = false;
+
+                                server.respondWith("PUT", "http://test/person/7", function(xhr) {
+                                    hasCalledServer = true;
+
+                                    xhr.respond(201, null, JSON.stringify(
+                                        {
+                                            id: 7,
+                                            first_name: "Johnny",
+                                            last_name: "Doe"
+                                        }
+                                    ));
+                                });
+
+                                person.set("firstName", "Johnny");
+
+                                setTimeout(function() {
+                                    expect(person.get("id")).to.equal(7);
+                                    expect(hasCalledServer).to.be.true;
+                                    expect(restSyncer.getSyncStatus(person)).to.equal(Syncer.STATUS_UNCHANGED);
+                                    done();
+                                }, 100);
+                            });
+                        });
+
                         it("should trigger the item_remove event when items are removed from the collection",
                             function(done) {
                             var collectionGroup = new CollectionGroup("default");
@@ -146,6 +224,42 @@ define(function() {
                             var person = new Person("John", "Doe");
                             personCollection.addItem(person);
                             personCollection.removeItem(person);
+                        });
+
+                        it("should trigger item saving when items are removed from the collection", function(done) {
+                            var restSyncer = new RestSyncer("http://test");
+                            var collectionGroup = new CollectionGroup("default", restSyncer, { autoSave: true });
+                            collectionGroup.addCollection(personCollection);
+
+                            server.respondWith("POST", "http://test/person", function(xhr) {
+                                xhr.respond(201, null, JSON.stringify(
+                                    {
+                                        id: 7,
+                                        first_name: "John",
+                                        last_name: "Doe"
+                                    }
+                                ));
+                            });
+
+                            var person = new Person("John", "Doe");
+                            personCollection.addItem(person);
+                            collectionGroup.save(personCollection).then(function() {
+                                var hasCalledServer = false;
+
+                                server.respondWith("DELETE", "http://test/person/7", function(xhr) {
+                                    hasCalledServer = true;
+
+                                    xhr.respond(201, null, null);
+                                });
+
+                                personCollection.removeItem(person);
+
+                                setTimeout(function() {
+                                    expect(hasCalledServer).to.be.true;
+                                    expect(restSyncer.getSyncStatus(person)).to.equal(Syncer.STATUS_UNCHANGED);
+                                    done();
+                                }, 100);
+                            });
                         });
                     });
 
