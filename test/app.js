@@ -12,7 +12,7 @@ require.config({
     paths: {
         chai: "chai/chai",
         jquery: "//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min",
-        sinon: "sinon/index"
+        sinon: "sinonjs/sinon",
     },
     use: {
         mocha: {
