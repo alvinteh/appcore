@@ -65,7 +65,6 @@ define(function(require) {
         var me = this;
 
         var promise = new Promise();
-        var BrowserXhr;
 
         if (!window.XMLHttpRequest) {
             promise.reject(new Error("Unable to create XMLHttpRequest."));
