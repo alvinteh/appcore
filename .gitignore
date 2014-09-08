@@ -1,0 +1,13 @@
+.project
+.settings
+*~
+*.diff
+*.patch
+.DS_Store
+.bower.json
+.sizecache.json
+bower_components
+node_modules
+.sass-cache
+/test/dependencies
+/test/css/app.min.css

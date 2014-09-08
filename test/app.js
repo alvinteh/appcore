@@ -1,0 +1,55 @@
+//Setup RequireJS
+require.config({
+    baseUrl: "dependencies",
+    urlArgs: (new Date()).getTime().toString().substring(8),
+    packages: [
+        {
+            name: "ampedjs",
+            location: "../../src/ampedjs",
+            main: "ampedjs"
+        }
+    ],
+    paths: {
+        chai: "chai/chai",
+        jquery: "//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min",
+        sinon: "sinon/index"
+    },
+    use: {
+        mocha: {
+            attach: "mocha"
+        }
+    }
+});
+
+//Setup JavaScript dependencies
+require([
+        "ampedjs/ampedjs",
+        "chai",
+        "chai-as-promised/lib/chai-as-promised",
+        "sinon"
+    ], function(Am, chai, chaiAsPromised) {
+
+    chai.use(chaiAsPromised);
+
+    window.Am = Am;
+
+    //Setup utility get URL parameter function
+    window.getUrlParam = function(name) {
+        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(location.search);
+        return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    };
+
+    //Setup Mocha and Sinon
+    chai.should();
+    window.expect = chai.expect;
+    window.mocha.setup("bdd");
+
+    //Run tests
+    require(["jquery", "specs.js"], function($) {
+        $(function() {
+            window.mocha.run();
+        });
+    });
+});

@@ -1,0 +1,29 @@
+{
+    "name": "ampedjs",
+    "version": "0.0.1",
+    "ignore": [
+        "**/.*",
+        "build",
+        "test",
+        "*.md",
+        "Gruntfile.js",
+        "package.json",
+        "bower.json"
+    ],
+    "keywords": [
+        "ampedjs",
+        "javascript",
+        "mvc"
+    ],
+    "dependencies": {
+        "requirejs": "~2.1.9",
+        "jquery": "~2.1.0"
+    },
+    "devDependencies": {
+        "blanket": "~1.1.5",
+        "chai": "~1.9.1",
+        "chai-as-promised": "~4.1.1",
+        "mocha": "~1.20.1",
+        "sinon": "http://sinonjs.org/releases/sinon-1.10.3.js"
+    }
+}
