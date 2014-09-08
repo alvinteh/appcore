@@ -16,7 +16,6 @@ Dependencies
 To-do
 -------
 
-* Re-implement syncing for Collections.CollectionGroup.
 * Implement dependency injection
   * Implement support for calling Am.Controller.create() using model names (as opposed to references)
   * Implement default routes for controller actions based on a provided list of controller names
