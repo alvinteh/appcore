@@ -5,13 +5,13 @@ require.config({
     packages: [
         {
             name: "ampedjs",
-            location: "../../src/ampedjs",
+            location: "ampedjs",
             main: "ampedjs"
         }
     ],
     paths: {
         chai: "chai/chai",
-        jquery: "//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min",
+        jquery: "jquery/jquery",
         sinon: "sinonjs/sinon",
     },
     use: {
