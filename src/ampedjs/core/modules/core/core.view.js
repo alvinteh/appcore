@@ -52,20 +52,22 @@ define(function(require) {
         //Monitor DOM for changes
         //NOTE: A polyfill (not provided) is required for this to work IE 9 and 10
         //NOTE: IE11 incorrectly reports characterData changes in child nodes as childList mutations
-        var mutationObserver = new window[(window.MutationObserver ? "" : "WebKit") + "MutationObserver"](
-            function(mutations) {
+        if (window.MutationObserver || window.WebkitMutationObserver) {
+            var mutationObserver = new window[(window.MutationObserver ? "" : "WebKit") + "MutationObserver"](
+                function(mutations) {
 
-            mutations.forEach(function(mutation) {
-                handleEventListeners(mutation);
+                mutations.forEach(function(mutation) {
+                    handleEventListeners(mutation);
+                });
             });
-        });
 
-        mutationObserver.observe(window.document.querySelector("body"), {
-            attributes: true,
-            characterData: true,
-            childList: true,
-            subtree: true
-        });
+            mutationObserver.observe(window.document.querySelector("body"), {
+                attributes: true,
+                characterData: true,
+                childList: true,
+                subtree: true
+            });
+        }
 
         Element.prototype.addDataBinding = FunctionHelper.override(Element.prototype.addDataBinding,
             function(originalFunction, context, args) {
