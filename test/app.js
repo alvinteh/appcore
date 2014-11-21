@@ -21,35 +21,41 @@ require.config({
     }
 });
 
-//Setup JavaScript dependencies
-require([
+var test = function() {
+    require([
         "ampedjs/ampedjs",
         "chai",
         "chai-as-promised/lib/chai-as-promised",
         "sinon"
     ], function(Am, chai, chaiAsPromised) {
 
-    chai.use(chaiAsPromised);
+        chai.use(chaiAsPromised);
 
-    window.Am = Am;
+        window.Am = Am;
 
-    //Setup utility get URL parameter function
-    window.getUrlParam = function(name) {
-        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-        results = regex.exec(location.search);
-        return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-    };
+        //Setup utility get URL parameter function
+        window.getUrlParam = function(name) {
+            name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+            var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+            results = regex.exec(location.search);
+            return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+        };
 
-    //Setup Mocha and Sinon
-    chai.should();
-    window.expect = chai.expect;
-    window.mocha.setup("bdd");
+        //Setup Mocha and Sinon
+        chai.should();
+        window.expect = chai.expect;
+        window.mocha.setup("bdd");
 
-    //Run tests
-    require(["jquery", "specs.js"], function($) {
-        $(function() {
-            window.mocha.run();
+        //Run tests
+        require(["jquery", "specs.js"], function($) {
+            $(function() {
+                window.mocha.run();
+            });
         });
     });
-});
+};
+
+//Setup JavaScript dependencies
+if (!window.MutationObserver && !window.WebkitMutationObserver) {
+    require(["mutationobserver-shim"], test);
+}
