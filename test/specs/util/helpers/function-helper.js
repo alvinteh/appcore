@@ -20,7 +20,7 @@ define(function() {
                         Am.Module.load("Util").then(function() {
                             var FunctionHelper = Am.Module.get("Util").FunctionHelper;
 
-                            expect(FunctionHelper.noop().toString().replace(" ", "")).to.deep.equal("function(){}");
+                            expect(FunctionHelper.noop.toString().replace(" ", "")).to.deep.equal("function(){}");
 
                             done();
                         });
