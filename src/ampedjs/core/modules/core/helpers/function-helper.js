@@ -11,7 +11,6 @@ define(function() {
                 @return {function}
             */
             noop: function() {
-                return function(){};
             },
 
             /*
