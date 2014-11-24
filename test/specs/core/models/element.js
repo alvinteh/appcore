@@ -1,5 +1,6 @@
 define(function() {
     var Am = window.Am;
+    var TEST_TIMEOUT = 50;
 
     describe("Am", function() {
         describe("View", function() {
@@ -138,13 +139,8 @@ define(function() {
                         window.setTimeout(function() {
                             expect(person.get("name")).to.equal("John");
 
-                            //element2.refresh();
-
-                            //expect($("#test2").html()).to.equal("John");
-                            //expect($("#test3").html()).to.equal("John");
-
                             done();
-                        }, 0);
+                        }, TEST_TIMEOUT);
                     });
 
                     it("should bind the instance to the Element's HTMLElement(s)' value by default for input " +
@@ -175,7 +171,7 @@ define(function() {
                             //expect($("#test3").html()).to.equal("John");
 
                             done();
-                        }, 0);
+                        }, TEST_TIMEOUT);
                     });
 
                     it("should respect the backward transform option on characterData if it is specified",
@@ -193,7 +189,7 @@ define(function() {
                         window.setTimeout(function() {
                             expect(person.get("name")).to.equal("john");
                             done();
-                        }, 50);
+                        }, TEST_TIMEOUT);
                     });
 
                     it("should respect the backward transform option on attributes if it is specified",
@@ -220,7 +216,7 @@ define(function() {
                         window.setTimeout(function() {
                             expect(color.get("name")).to.equal("blue");
                             notify();
-                        }, 0);
+                        }, TEST_TIMEOUT);
 
                         $("#test").append("<input id=\"test2\" type=\"text\">");
                         var Input = Am.Model.create("Input", ["type"]);
@@ -237,7 +233,7 @@ define(function() {
                         window.setTimeout(function() {
                             expect(input.get("type")).to.equal("EMAIL");
                             notify();
-                        }, 0);
+                        }, TEST_TIMEOUT);
                     });
 
                     it("should respect the backward transform option on input values if it is specified",
@@ -260,7 +256,7 @@ define(function() {
                         window.setTimeout(function() {
                             expect(person.get("name")).to.equal("john");
                             done();
-                        }, 50);
+                        }, TEST_TIMEOUT);
                     });
 
                     it("should respect the direction option if it is specified, or default to two-way binding",
