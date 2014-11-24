@@ -13,6 +13,11 @@ require.config({
         chai: "chai/chai",
         jquery: "jquery/jquery",
         sinon: "sinonjs/sinon",
+        "mutationobserver-shim": "mutationobserver-shim/MutationObserver"
+    },
+    shim: {
+        "mutationobserver-shim": {
+        }
     },
     use: {
         mocha: {
@@ -58,4 +63,7 @@ var test = function() {
 //Setup JavaScript dependencies
 if (!window.MutationObserver && !window.WebkitMutationObserver) {
     require(["mutationobserver-shim"], test);
+}
+else {
+    test();
 }
