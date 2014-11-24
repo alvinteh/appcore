@@ -24,20 +24,29 @@ define(function(require) {
         var eventListeners = [];
         var views = [];
 
-        var handleEventListeners = function(event) {
+        var handleNormalEventListeners = function(event) {
             var eventListener;
 
             for (var i = 0, length = eventListeners.length; i < length; i++) {
                 eventListener = eventListeners[i];
 
-                if (eventListener.event === "mutation" && event instanceof window.MutationRecord) {
+                if (eventListener.element === event.target && eventListener.event === event.type) {
+                    eventListener.listener.apply(undefined, [event]);
+                }
+            }
+        };
+
+        var handleMutationEventListeners = function(event) {
+            var eventListener;
+
+            for (var i = 0, length = eventListeners.length; i < length; i++) {
+                eventListener = eventListeners[i];
+
+                if (eventListener.event === "mutation") {
                     if (eventListener.element === event.target ||
                         (event.type === "characterData" && eventListener.element === event.target.parentElement)) {
                         eventListener.listener.apply(undefined, [event]);
                     }
-                }
-                else if (eventListener.element === event.target && eventListener.event === event.type) {
-                    eventListener.listener.apply(undefined, [event]);
                 }
             }
         };
@@ -46,7 +55,7 @@ define(function(require) {
         "mouseenter", "mouseleave", "mouseover", "mouseout", "pause", "play", "ratechange", "seeked", "volumechange"];
 
         for (var i  = 0, iLength = events.length; i < iLength; i++) {
-            document.addEventListener(events[i], handleEventListeners);
+            document.addEventListener(events[i], handleNormalEventListeners);
         }
 
         //Monitor DOM for changes
@@ -57,7 +66,7 @@ define(function(require) {
                 function(mutations) {
 
                 mutations.forEach(function(mutation) {
-                    handleEventListeners(mutation);
+                    handleMutationEventListeners(mutation);
                 });
             });
 
