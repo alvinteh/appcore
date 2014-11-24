@@ -223,8 +223,7 @@ define(function(require) {
                     history.pushState(null, null, RouteModule.getBaseUrl());
                 }
                 else {
-                    history.pushState(null, null, RouteModule.getBaseUrl() +
-                        (isBaseUrlFolder ? path.substring(1) : path));
+                    history.pushState(null, null, RouteModule.getBaseUrl() + path.substring(1));
                     processRoute(path);
                 }
             }
@@ -233,8 +232,14 @@ define(function(require) {
         //Determine default base URL
         baseUrl = window.location.href;
 
-        if (baseUrl.lastIndexOf("/") === baseUrl.length - 1) {
-            isBaseUrlFolder = true;
+        //Remove any hashes first
+        if (baseUrl.substr(baseUrl.length - 1) === "#") {
+            baseUrl = baseUrl.substr(0, baseUrl.length - 1);
+        }
+
+        //Handle file names at the end of URLs
+        if (baseUrl.substr(baseUrl.length - 1) !== "/") {
+            baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf("/")) + "/";
         }
 
         //Listen for changes in history state so that the route can be processed

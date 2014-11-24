@@ -95,8 +95,23 @@ define(function() {
             });
 
             describe("getBaseUrl()", function() {
-                it("should retrieve the base URL", function(done) {
-                    expect(Am.Route.getBaseUrl()).to.equal(window.location.href);
+                it("should retrieve the base URL with an ending slash", function(done) {
+
+                    var baseUrl = window.location.href;
+                    
+                    
+                    //Remove any hashes first
+                    if (baseUrl.substr(baseUrl.length - 1) === "#") {
+                        baseUrl = baseUrl.substr(0, baseUrl.length - 1);
+                    }
+
+                    //Append a "/" if necessary
+                    if (baseUrl.substr(baseUrl.length - 1) !== "/") {
+                        baseUrl += "/";
+                    }
+
+                    expect(Am.Route.getBaseUrl()).to.equal(baseUrl);
+                    
                     done();
                 });
             });
