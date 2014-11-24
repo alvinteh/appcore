@@ -21,7 +21,6 @@ define(function(require) {
             ]
         */
         var baseUrl;
-        var isBaseUrlFolder = false;
         var routes = [];
         var currentPath = null;
 
