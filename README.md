@@ -2,6 +2,7 @@ ampedjs
 =========
 
 A JavaScript MV* framework for modern web apps.
+![Build status](https://travis-ci.org/alvinteh/ampedjs.svg?branch=dev)
 
 Usage
 -------
