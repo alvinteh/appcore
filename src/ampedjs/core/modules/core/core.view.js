@@ -24,20 +24,29 @@ define(function(require) {
         var eventListeners = [];
         var views = [];
 
-        var handleEventListeners = function(event) {
+        var handleNormalEventListeners = function(event) {
             var eventListener;
 
             for (var i = 0, length = eventListeners.length; i < length; i++) {
                 eventListener = eventListeners[i];
 
-                if (eventListener.event === "mutation" && event instanceof window.MutationRecord) {
+                if (eventListener.element === event.target && eventListener.event === event.type) {
+                    eventListener.listener.apply(undefined, [event]);
+                }
+            }
+        };
+
+        var handleMutationEventListeners = function(event) {
+            var eventListener;
+
+            for (var i = 0, length = eventListeners.length; i < length; i++) {
+                eventListener = eventListeners[i];
+
+                if (eventListener.event === "mutation") {
                     if (eventListener.element === event.target ||
                         (event.type === "characterData" && eventListener.element === event.target.parentElement)) {
                         eventListener.listener.apply(undefined, [event]);
                     }
-                }
-                else if (eventListener.element === event.target && eventListener.event === event.type) {
-                    eventListener.listener.apply(undefined, [event]);
                 }
             }
         };
@@ -46,26 +55,28 @@ define(function(require) {
         "mouseenter", "mouseleave", "mouseover", "mouseout", "pause", "play", "ratechange", "seeked", "volumechange"];
 
         for (var i  = 0, iLength = events.length; i < iLength; i++) {
-            document.addEventListener(events[i], handleEventListeners);
+            document.addEventListener(events[i], handleNormalEventListeners);
         }
 
         //Monitor DOM for changes
         //NOTE: A polyfill (not provided) is required for this to work IE 9 and 10
         //NOTE: IE11 incorrectly reports characterData changes in child nodes as childList mutations
-        var mutationObserver = new window[(window.MutationObserver ? "" : "WebKit") + "MutationObserver"](
-            function(mutations) {
+        if (window.MutationObserver || window.WebkitMutationObserver) {
+            var mutationObserver = new window[(window.MutationObserver ? "" : "WebKit") + "MutationObserver"](
+                function(mutations) {
 
-            mutations.forEach(function(mutation) {
-                handleEventListeners(mutation);
+                mutations.forEach(function(mutation) {
+                    handleMutationEventListeners(mutation);
+                });
             });
-        });
 
-        mutationObserver.observe(window.document.querySelector("body"), {
-            attributes: true,
-            characterData: true,
-            childList: true,
-            subtree: true
-        });
+            mutationObserver.observe(window.document.querySelector("body"), {
+                attributes: true,
+                characterData: true,
+                childList: true,
+                subtree: true
+            });
+        }
 
         Element.prototype.addDataBinding = FunctionHelper.override(Element.prototype.addDataBinding,
             function(originalFunction, context, args) {

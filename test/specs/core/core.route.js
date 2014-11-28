@@ -25,9 +25,14 @@ define(function() {
             var test = "";
 
             afterEach(function() {
-                test = "";
-                Am.Route.unbind("/", true);
-                Am.go("/");
+                try {
+                    test = "";
+                    Am.Route.unbind("/", true);
+                    Am.go("/");
+                }
+                catch (e) {
+                    //Do nothing
+                }
             });
 
             it("should be defined", function(done) {
@@ -70,7 +75,21 @@ define(function() {
 
                 window.setTimeout(function() {
                     expect(eventTest).to.equal("leave");
-                    expect(window.location.href).to.equal(Am.Route.getBaseUrl());
+
+                    var baseUrl = window.location.href;
+                    
+                    
+                    //Remove any hashes first
+                    if (baseUrl.substr(baseUrl.length - 1) === "#") {
+                        baseUrl = baseUrl.substr(0, baseUrl.length - 1);
+                    }
+
+                    //Handle file names at the end of URLs
+                    if (baseUrl.substr(baseUrl.length - 1) !== "/") {
+                        baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf("/")) + "/";
+                    }
+
+                    expect(baseUrl).to.equal(Am.Route.getBaseUrl());
 
                     done();
                 }, 100);
@@ -95,8 +114,23 @@ define(function() {
             });
 
             describe("getBaseUrl()", function() {
-                it("should retrieve the base URL", function(done) {
-                    expect(Am.Route.getBaseUrl()).to.equal(window.location.href);
+                it("should retrieve the base URL with an ending slash", function(done) {
+
+                    var baseUrl = window.location.href;
+                    
+                    
+                    //Remove any hashes first
+                    if (baseUrl.substr(baseUrl.length - 1) === "#") {
+                        baseUrl = baseUrl.substr(0, baseUrl.length - 1);
+                    }
+
+                    //Handle file names at the end of URLs
+                    if (baseUrl.substr(baseUrl.length - 1) !== "/") {
+                        baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf("/")) + "/";
+                    }
+
+                    expect(Am.Route.getBaseUrl()).to.equal(baseUrl);
+                    
                     done();
                 });
             });

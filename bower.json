@@ -1,6 +1,6 @@
 {
     "name": "ampedjs",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "ignore": [
         "**/.*",
         "build",
@@ -23,7 +23,8 @@
         "blanket": "~1.1.5",
         "chai": "~1.9.1",
         "chai-as-promised": "~4.1.1",
+        "jquery": "~2.1.1",
         "mocha": "~1.20.1",
-        "sinon": "http://sinonjs.org/releases/sinon-1.10.3.js"
+        "sinonjs": "~1.10.2"
     }
 }

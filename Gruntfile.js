@@ -6,7 +6,8 @@ module.exports = function(grunt) {
         bower: {
             test: {
                 options: {
-                    cleanup: true,
+                    cleanBowerDir : true,
+                    cleanTargetDir: false,
                     layout: "byComponent",
                     production: false,
                     targetDir: "test/dependencies"
@@ -21,7 +22,10 @@ module.exports = function(grunt) {
                 src: ["dist"]
             },
             test: {
-                src: ["test/dependencies"]
+                src: [
+                        "test/dependencies/**/*",
+                        "!test/dependencies/webcomponentsjs/**"
+                    ]
             }
         },
         copy: {

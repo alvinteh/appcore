@@ -19,8 +19,8 @@ define(function() {
                     it("should be an empty function", function(done) {
                         Am.Module.load("Util").then(function() {
                             var FunctionHelper = Am.Module.get("Util").FunctionHelper;
-
-                            expect(FunctionHelper.noop().toString().replace(" ", "")).to.deep.equal("function(){}");
+                            
+                            expect(FunctionHelper.noop.toString().replace(/\s/g, "")).to.deep.equal("function(){}");
 
                             done();
                         });
