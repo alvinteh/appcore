@@ -25,6 +25,6 @@
       "scripts": {
         "build": "npm install && grunt",
         "watch": "grunt watch",
-        "test": "grunt test"
+        "test": "grunt test --force"
     }
 }
