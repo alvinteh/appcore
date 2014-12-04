@@ -63,26 +63,18 @@ module.exports = function(grunt) {
         requirejs: {
             distNormal: {
                 options: {
-                    baseUrl: "src",
+                    baseUrl: "src/ampedjs",
                     optimize: "none",
                     out: "dist/ampedjs.js",
-                    name: "app",
-                    paths: {
-                        jquery: "../test/dependencies/jquery/jquery",
-                        app: "../../app"
-                    }
+                    name: "ampedjs"
                 }
             },
             distMin: {
                 options: {
-                    baseUrl: "src",
+                    baseUrl: "src/ampedjs",
                     optimize: "uglify2",
                     out: "dist/ampedjs.min.js",
-                    name: "app",
-                    paths: {
-                        jquery: "../test/dependencies/jquery/jquery",
-                        app: "../../app"
-                    }
+                    name: "ampedjs"
                 }
             }
         },
