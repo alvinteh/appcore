@@ -91,6 +91,21 @@ module.exports = function(grunt) {
                 }
             }
         },
+        usebanner: {
+                dist: {
+                    options: {
+                        position: "top",
+                        banner: "/*!  <%= pkg.name %> <%= pkg.version %> | 2014 Alvin Teh */",
+                        linebreak: true
+                    },
+                    files: {
+                        src: [
+                            "dist/ampedjs.js",
+                            "dist/ampedjs.min.js"
+                        ]
+                    }
+                }
+        },
         watch: {
             dev: {
                 files: "src/**/*.js",
@@ -109,7 +124,8 @@ module.exports = function(grunt) {
     grunt.registerTask("default", [
         "clean:dist",
         "requirejs:distNormal",
-        "requirejs:distMin"
+        "requirejs:distMin",
+        "usebanner:dist"
     ]);
 
     grunt.registerTask("test", [

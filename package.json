@@ -3,7 +3,7 @@
     "author": "Alvin Teh <alvin.teh@outlook.com>",
     "description": "A JavaScript MV* framework for modern web apps.",
     "license": "mit",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "repository": {
         "type": "git",
         "url": "https://github.com/alvinteh/ampedjs.git"
@@ -12,6 +12,7 @@
     },
     "devDependencies": {
         "grunt": "~0.4.5",
+        "grunt-banner": "~0.2.3",
         "grunt-blanket-mocha": "~0.4.1",
         "grunt-bower-task": "~0.4.0",
         "grunt-cli": "~0.1.13",
