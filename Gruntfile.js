@@ -66,7 +66,14 @@ module.exports = function(grunt) {
                     baseUrl: "src/ampedjs",
                     optimize: "none",
                     out: "dist/ampedjs.js",
-                    name: "ampedjs"
+                    name: "ampedjs",
+                    include: [
+                        "core/modules/ajax/ajax",
+                        "core/modules/collections/collections",
+                        "core/modules/persistence/persistence",
+                        "core/modules/util/util"
+
+                    ]
                 }
             },
             distMin: {
@@ -74,7 +81,13 @@ module.exports = function(grunt) {
                     baseUrl: "src/ampedjs",
                     optimize: "uglify2",
                     out: "dist/ampedjs.min.js",
-                    name: "ampedjs"
+                    name: "ampedjs",
+                    include: [
+                        "core/modules/ajax/ajax",
+                        "core/modules/collections/collections",
+                        "core/modules/persistence/persistence",
+                        "core/modules/util/util"
+                    ]
                 }
             }
         },
