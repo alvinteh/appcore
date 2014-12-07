@@ -1,6 +1,7 @@
 {
     "name": "ampedjs",
     "version": "0.1.0",
+    "main": "dist/ampedjs.min.js",
     "ignore": [
         "**/.*",
         "build",
