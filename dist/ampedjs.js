@@ -1,4 +1,116 @@
 /*!  ampedjs 0.1.0 | 2014 Alvin Teh */
+define('core/modules/core/core.config',[],function() {
+    
+
+    var _singleton = null;
+
+    var ConfigModule = function() {
+        //Private instance members
+        var config = {};
+
+        var ConfigModule = {
+            /*
+            @function get
+
+            Retrieves the config data associated with the specified key.
+
+            @param {string} key     The desired key
+
+            @return {mixed}
+            */
+            get: function(key) {
+                var tokens = key.split("."),
+                    token,
+                    currentNestedConfig = config;
+
+                while (tokens.length) {
+                    token = tokens.shift();
+
+                    if (currentNestedConfig[token] === undefined) {
+                        return undefined;
+                    }
+
+                    currentNestedConfig = currentNestedConfig[token];
+                }
+
+                return currentNestedConfig;
+            },
+
+            /*
+            @function set
+
+            Sets the specified config key and value.
+
+            @param {string} key     The desired key
+            @param {mixed} value    The desired value
+            */
+            set: function(key, value) {
+                if (value === undefined) {
+                    //Set the whole config object if method is called with just one argument
+                    config = key;
+                }
+                else {
+                    var tokens = key.split("."),
+                        token,
+                        currentNestedConfig = config;
+
+                    while (tokens.length) {
+                        token = tokens.shift();
+
+                        if (currentNestedConfig[token] === undefined) {
+                            currentNestedConfig[token] = {};
+                        }
+
+                        if (tokens.length) {
+                            currentNestedConfig = currentNestedConfig[token];
+                        }
+                        else {
+                            currentNestedConfig[token] = value;
+                        }
+                    }
+                }
+            },
+
+            /*
+            @function unset
+
+            Unsets the specified config key and value (including child values).
+
+            @param {string} key     The desired key
+            */
+            unset: function(key) {
+                var tokens = key.split("."),
+                token,
+                currentNestedConfig = config;
+
+                while (tokens.length) {
+                    token = tokens.shift();
+
+                    if (currentNestedConfig[token] === undefined) {
+                        currentNestedConfig[token] = {};
+                    }
+
+                    if (tokens.length === 0) {
+                        delete currentNestedConfig[token];
+                        break;
+                    }
+                }
+            },
+        };
+
+        //Public instance members
+        return ConfigModule;
+    };
+
+    return (function() {
+        if (_singleton === null || typeof _singleton === "undefined") {
+            _singleton = ConfigModule;
+        }
+
+        return _singleton;
+    })();
+});
+
 define('core/modules/core/helpers/uuid-helper',[],function() {
     
 
@@ -1971,7 +2083,9 @@ define('core/modules/core/core.route',['require','./models/event','./helpers/eve
 
     var _singleton = null;
 
-    var RouteModule = function() {
+    var RouteModule = function(config) {
+        var w = config.get("Am.Core.Window") || window;
+
         //Private instance members
         /*
             Array of routes. Adheres to the following format:
@@ -2193,39 +2307,41 @@ define('core/modules/core/core.route',['require','./models/event','./helpers/eve
             }
         };
 
-        //Determine default base URL
-        baseUrl = window.location.href;
+        if (w) {
+            //Determine default base URL
+            baseUrl = w.location.href;
 
-        //Remove any hashes first
-        if (baseUrl.substr(baseUrl.length - 1) === "#") {
-            baseUrl = baseUrl.substr(0, baseUrl.length - 1);
-        }
+            //Remove any hashes first
+            if (baseUrl.substr(baseUrl.length - 1) === "#") {
+                baseUrl = baseUrl.substr(0, baseUrl.length - 1);
+            }
 
-        //Handle file names at the end of URLs
-        if (baseUrl.substr(baseUrl.length - 1) !== "/") {
-            baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf("/")) + "/";
-        }
+            //Handle file names at the end of URLs
+            if (baseUrl.substr(baseUrl.length - 1) !== "/") {
+                baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf("/")) + "/";
+            }
 
-        //Listen for changes in history state so that the route can be processed
-        window.addEventListener("popstate", function() {
-            if (RouteModule.isBound(currentPath)) {
-                for (var i = 0, length = routes.length; i < length; i++) {
-                    //Raise leave event on current route's action's view if applicable
-                    if (getRouteMatches(currentPath, routes[i].path)) {
-                        var view = routes[i].controller.getAction(routes[i].action).view;
+            //Listen for changes in history state so that the route can be processed
+            w.addEventListener("popstate", function() {
+                if (RouteModule.isBound(currentPath)) {
+                    for (var i = 0, length = routes.length; i < length; i++) {
+                        //Raise leave event on current route's action's view if applicable
+                        if (getRouteMatches(currentPath, routes[i].path)) {
+                            var view = routes[i].controller.getAction(routes[i].action).view;
 
-                        if (view !== null) {
-                            EventHelper.trigger(new Event(view, "leave", { path: currentPath }));
+                            if (view !== null) {
+                                EventHelper.trigger(new Event(view, "leave", { path: currentPath }));
+                            }
                         }
                     }
                 }
-            }
 
-            //Process the route if it is within the path of the base URL
-            if (window.location.href.indexOf(baseUrl) === 0) {
-                processRoute(window.location.href.substring(baseUrl.length));
-            }
-        });
+                //Process the route if it is within the path of the base URL
+                if (w.location.href.indexOf(baseUrl) === 0) {
+                    processRoute(w.location.href.substring(baseUrl.length));
+                }
+            });
+        }
 
         //Public instance members
         return RouteModule;
@@ -2720,7 +2836,9 @@ define('core/modules/core/core.view',['require','./models/element','./models/vie
 
     var _singleton = null;
 
-    var ViewModule = function() {
+    var ViewModule = function(config) {
+        var w = config.get("Am.Core.Window") || window;
+
         //Private instance variables
         //Initialize events
         /*
@@ -2737,58 +2855,61 @@ define('core/modules/core/core.view',['require','./models/element','./models/vie
         var eventListeners = [];
         var views = [];
 
-        var handleNormalEventListeners = function(event) {
-            var eventListener;
+        if (w) {
+            var handleNormalEventListeners = function(event) {
+                var eventListener;
 
-            for (var i = 0, length = eventListeners.length; i < length; i++) {
-                eventListener = eventListeners[i];
+                for (var i = 0, length = eventListeners.length; i < length; i++) {
+                    eventListener = eventListeners[i];
 
-                if (eventListener.element === event.target && eventListener.event === event.type) {
-                    eventListener.listener.apply(undefined, [event]);
-                }
-            }
-        };
-
-        var handleMutationEventListeners = function(event) {
-            var eventListener;
-
-            for (var i = 0, length = eventListeners.length; i < length; i++) {
-                eventListener = eventListeners[i];
-
-                if (eventListener.event === "mutation") {
-                    if (eventListener.element === event.target ||
-                        (event.type === "characterData" && eventListener.element === event.target.parentElement)) {
+                    if (eventListener.element === event.target && eventListener.event === event.type) {
                         eventListener.listener.apply(undefined, [event]);
                     }
                 }
+            };
+
+            var handleMutationEventListeners = function(event) {
+                var eventListener;
+
+                for (var i = 0, length = eventListeners.length; i < length; i++) {
+                    eventListener = eventListeners[i];
+
+                    if (eventListener.event === "mutation") {
+                        if (eventListener.element === event.target ||
+                            (event.type === "characterData" && eventListener.element === event.target.parentElement)) {
+                            eventListener.listener.apply(undefined, [event]);
+                        }
+                    }
+                }
+            };
+
+            var events = ["blur", "change", "click", "focus", "input", "keypress", "keyup", "mousedown", "mouseup",
+                "mouseenter", "mouseleave", "mouseover", "mouseout", "pause", "play", "ratechange", "seeked",
+                "volumechange"];
+
+            for (var i  = 0, iLength = events.length; i < iLength; i++) {
+                w.document.addEventListener(events[i], handleNormalEventListeners);
             }
-        };
 
-        var events = ["blur", "change", "click", "focus", "input", "keypress", "keyup", "mousedown", "mouseup",
-        "mouseenter", "mouseleave", "mouseover", "mouseout", "pause", "play", "ratechange", "seeked", "volumechange"];
+            //Monitor DOM for changes
+            //NOTE: A polyfill (not provided) is required for this to work IE 9 and 10
+            //NOTE: IE11 incorrectly reports characterData changes in child nodes as childList mutations
+            if (w.MutationObserver || w.WebkitMutationObserver) {
+                var mutationObserver = new w[(w.MutationObserver ? "" : "WebKit") + "MutationObserver"](
+                    function(mutations) {
 
-        for (var i  = 0, iLength = events.length; i < iLength; i++) {
-            document.addEventListener(events[i], handleNormalEventListeners);
-        }
-
-        //Monitor DOM for changes
-        //NOTE: A polyfill (not provided) is required for this to work IE 9 and 10
-        //NOTE: IE11 incorrectly reports characterData changes in child nodes as childList mutations
-        if (window.MutationObserver || window.WebkitMutationObserver) {
-            var mutationObserver = new window[(window.MutationObserver ? "" : "WebKit") + "MutationObserver"](
-                function(mutations) {
-
-                mutations.forEach(function(mutation) {
-                    handleMutationEventListeners(mutation);
+                    mutations.forEach(function(mutation) {
+                        handleMutationEventListeners(mutation);
+                    });
                 });
-            });
 
-            mutationObserver.observe(window.document.querySelector("body"), {
-                attributes: true,
-                characterData: true,
-                childList: true,
-                subtree: true
-            });
+                mutationObserver.observe(w.document.querySelector("body"), {
+                    attributes: true,
+                    characterData: true,
+                    childList: true,
+                    subtree: true
+                });
+            }
         }
 
         Element.prototype.addDataBinding = FunctionHelper.override(Element.prototype.addDataBinding,
@@ -3049,9 +3170,10 @@ define('core/modules/core/core.view',['require','./models/element','./models/vie
     })();
 });
 
-define('core/modules/core/core',['require','./core.controller','./core.event','./core.helper','./core.model','./core.module','./core.route','./core.view'],function(require) {
+define('core/modules/core/core',['require','./core.config','./core.controller','./core.event','./core.helper','./core.model','./core.module','./core.route','./core.view'],function(require) {
     
 
+    var CoreConfig = require("./core.config");
     var CoreController = require("./core.controller");
     var CoreEvent = require("./core.event");
     var CoreHelper = require("./core.helper");
@@ -3066,35 +3188,47 @@ define('core/modules/core/core',['require','./core.controller','./core.event','.
 
         @classdesc Core class.
     */
-    var Core = (function() {
+    var Core = function(config) {
         //Private instance members
         var Core = {};
 
-        Core.Controller = new CoreController();
-        Core.Event = new CoreEvent();
-        Core.Helper = new CoreHelper();
-        Core.Model = new CoreModel(Core);
-        Core.Module = new CoreModule();
-        Core.Route = new CoreRoute();
-        Core.View = new CoreView();
+        Core.Config = new CoreConfig();
+        Core.Config.set(config || null);
 
-        //Additional convenience bindings
-        Core.go = Core.Route.go;
+        Core.init = function() {
+            //Initialize core framework
+            Core.Controller = new CoreController();
+            Core.Event = new CoreEvent();
+            Core.Helper = new CoreHelper();
+            Core.Model = new CoreModel(Core);
+            Core.Module = new CoreModule();
+            Core.Route = new CoreRoute(Core.Config);
+            Core.View = new CoreView(Core.Config);
+
+            //Additional convenience bindings
+            Core.go = Core.Route.go;
+        };
+
+        //Initialize automatically unless configuration specifies otherwise
+        if (Core.Config.get("Am.Core.AutoInit") !== false) {
+            Core.init();
+        }
 
         //Public instance members
         return Core;
-    })();
+    };
 
     return Core;
 });
 
-define('ampedjs',['require','./core/modules/core/core'],function(require) {
+define('ampedjs',['require','exports','module','./core/modules/core/core'],function(require, exports, module) {
     
 
     var Core = require("./core/modules/core/core");
 
-    return Core;
+    return new Core(module.config() || {});
 });
+
 define('core/modules/ajax/models/xhr',['require','../../../../ampedjs','../../core/models/promise'],function(require) {
     
 
