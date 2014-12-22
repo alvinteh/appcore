@@ -25,10 +25,7 @@ To-do
 * Implement support for isomorphic usage
   * Implement support for Am.View in node.js/io.js environments
   * Implement support for Am.Ajax.Xhr in node.js/io.js environments
-* Implement support for quick framework-wide bootstrap configuration through Am.Config
-  * Allow users to define the type (client/server-side) of view that AmpedJS should work with 
-  * Allow users to enable/disable automatic route bindings for controller actions
-  
+  - Implement support for Am.Route in node.js/io.js environments
 
 License
 -------
