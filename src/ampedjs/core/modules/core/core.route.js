@@ -6,7 +6,9 @@ define(function(require) {
 
     var _singleton = null;
 
-    var RouteModule = function() {
+    var RouteModule = function(config) {
+        var w = config.get("Am.Core.Window") || window;
+
         //Private instance members
         /*
             Array of routes. Adheres to the following format:
@@ -228,39 +230,41 @@ define(function(require) {
             }
         };
 
-        //Determine default base URL
-        baseUrl = window.location.href;
+        if (w) {
+            //Determine default base URL
+            baseUrl = w.location.href;
 
-        //Remove any hashes first
-        if (baseUrl.substr(baseUrl.length - 1) === "#") {
-            baseUrl = baseUrl.substr(0, baseUrl.length - 1);
-        }
+            //Remove any hashes first
+            if (baseUrl.substr(baseUrl.length - 1) === "#") {
+                baseUrl = baseUrl.substr(0, baseUrl.length - 1);
+            }
 
-        //Handle file names at the end of URLs
-        if (baseUrl.substr(baseUrl.length - 1) !== "/") {
-            baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf("/")) + "/";
-        }
+            //Handle file names at the end of URLs
+            if (baseUrl.substr(baseUrl.length - 1) !== "/") {
+                baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf("/")) + "/";
+            }
 
-        //Listen for changes in history state so that the route can be processed
-        window.addEventListener("popstate", function() {
-            if (RouteModule.isBound(currentPath)) {
-                for (var i = 0, length = routes.length; i < length; i++) {
-                    //Raise leave event on current route's action's view if applicable
-                    if (getRouteMatches(currentPath, routes[i].path)) {
-                        var view = routes[i].controller.getAction(routes[i].action).view;
+            //Listen for changes in history state so that the route can be processed
+            w.addEventListener("popstate", function() {
+                if (RouteModule.isBound(currentPath)) {
+                    for (var i = 0, length = routes.length; i < length; i++) {
+                        //Raise leave event on current route's action's view if applicable
+                        if (getRouteMatches(currentPath, routes[i].path)) {
+                            var view = routes[i].controller.getAction(routes[i].action).view;
 
-                        if (view !== null) {
-                            EventHelper.trigger(new Event(view, "leave", { path: currentPath }));
+                            if (view !== null) {
+                                EventHelper.trigger(new Event(view, "leave", { path: currentPath }));
+                            }
                         }
                     }
                 }
-            }
 
-            //Process the route if it is within the path of the base URL
-            if (window.location.href.indexOf(baseUrl) === 0) {
-                processRoute(window.location.href.substring(baseUrl.length));
-            }
-        });
+                //Process the route if it is within the path of the base URL
+                if (w.location.href.indexOf(baseUrl) === 0) {
+                    processRoute(w.location.href.substring(baseUrl.length));
+                }
+            });
+        }
 
         //Public instance members
         return RouteModule;

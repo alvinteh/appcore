@@ -8,6 +8,7 @@ define([
     "specs/core/models/model.js",
     "specs/core/models/view.js",
     "specs/core/core.controller.js",
+    "specs/core/core.config.js",
     "specs/core/core.event.js",
     "specs/core/core.helper.js",
     "specs/core/core.model.js",

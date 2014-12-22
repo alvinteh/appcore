@@ -1,7 +1,7 @@
-define(function(require) {
+define(function(require, exports, module) {
     "use strict";
 
     var Core = require("./core/modules/core/core");
 
-    return Core;
+    return new Core(module.config() || {});
 });

@@ -7,7 +7,9 @@ define(function(require) {
 
     var _singleton = null;
 
-    var ViewModule = function() {
+    var ViewModule = function(config) {
+        var w = config.get("Am.Core.Window") || window;
+
         //Private instance variables
         //Initialize events
         /*
@@ -24,58 +26,61 @@ define(function(require) {
         var eventListeners = [];
         var views = [];
 
-        var handleNormalEventListeners = function(event) {
-            var eventListener;
+        if (w) {
+            var handleNormalEventListeners = function(event) {
+                var eventListener;
 
-            for (var i = 0, length = eventListeners.length; i < length; i++) {
-                eventListener = eventListeners[i];
+                for (var i = 0, length = eventListeners.length; i < length; i++) {
+                    eventListener = eventListeners[i];
 
-                if (eventListener.element === event.target && eventListener.event === event.type) {
-                    eventListener.listener.apply(undefined, [event]);
-                }
-            }
-        };
-
-        var handleMutationEventListeners = function(event) {
-            var eventListener;
-
-            for (var i = 0, length = eventListeners.length; i < length; i++) {
-                eventListener = eventListeners[i];
-
-                if (eventListener.event === "mutation") {
-                    if (eventListener.element === event.target ||
-                        (event.type === "characterData" && eventListener.element === event.target.parentElement)) {
+                    if (eventListener.element === event.target && eventListener.event === event.type) {
                         eventListener.listener.apply(undefined, [event]);
                     }
                 }
+            };
+
+            var handleMutationEventListeners = function(event) {
+                var eventListener;
+
+                for (var i = 0, length = eventListeners.length; i < length; i++) {
+                    eventListener = eventListeners[i];
+
+                    if (eventListener.event === "mutation") {
+                        if (eventListener.element === event.target ||
+                            (event.type === "characterData" && eventListener.element === event.target.parentElement)) {
+                            eventListener.listener.apply(undefined, [event]);
+                        }
+                    }
+                }
+            };
+
+            var events = ["blur", "change", "click", "focus", "input", "keypress", "keyup", "mousedown", "mouseup",
+                "mouseenter", "mouseleave", "mouseover", "mouseout", "pause", "play", "ratechange", "seeked",
+                "volumechange"];
+
+            for (var i  = 0, iLength = events.length; i < iLength; i++) {
+                w.document.addEventListener(events[i], handleNormalEventListeners);
             }
-        };
 
-        var events = ["blur", "change", "click", "focus", "input", "keypress", "keyup", "mousedown", "mouseup",
-        "mouseenter", "mouseleave", "mouseover", "mouseout", "pause", "play", "ratechange", "seeked", "volumechange"];
+            //Monitor DOM for changes
+            //NOTE: A polyfill (not provided) is required for this to work IE 9 and 10
+            //NOTE: IE11 incorrectly reports characterData changes in child nodes as childList mutations
+            if (w.MutationObserver || w.WebkitMutationObserver) {
+                var mutationObserver = new w[(w.MutationObserver ? "" : "WebKit") + "MutationObserver"](
+                    function(mutations) {
 
-        for (var i  = 0, iLength = events.length; i < iLength; i++) {
-            document.addEventListener(events[i], handleNormalEventListeners);
-        }
-
-        //Monitor DOM for changes
-        //NOTE: A polyfill (not provided) is required for this to work IE 9 and 10
-        //NOTE: IE11 incorrectly reports characterData changes in child nodes as childList mutations
-        if (window.MutationObserver || window.WebkitMutationObserver) {
-            var mutationObserver = new window[(window.MutationObserver ? "" : "WebKit") + "MutationObserver"](
-                function(mutations) {
-
-                mutations.forEach(function(mutation) {
-                    handleMutationEventListeners(mutation);
+                    mutations.forEach(function(mutation) {
+                        handleMutationEventListeners(mutation);
+                    });
                 });
-            });
 
-            mutationObserver.observe(window.document.querySelector("body"), {
-                attributes: true,
-                characterData: true,
-                childList: true,
-                subtree: true
-            });
+                mutationObserver.observe(w.document.querySelector("body"), {
+                    attributes: true,
+                    characterData: true,
+                    childList: true,
+                    subtree: true
+                });
+            }
         }
 
         Element.prototype.addDataBinding = FunctionHelper.override(Element.prototype.addDataBinding,
