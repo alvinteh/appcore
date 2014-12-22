@@ -28,7 +28,7 @@ define(function() {
                     if (currentNestedConfig[token] === undefined) {
                         return undefined;
                     }
-                    
+
                     currentNestedConfig = currentNestedConfig[token];
                 }
 
@@ -44,22 +44,28 @@ define(function() {
             @param {mixed} value    The desired value
             */
             set: function(key, value) {
-                var tokens = key.split("."),
-                    token,
-                    currentNestedConfig = config;
+                if (value === undefined) {
+                    //Set the whole config object if method is called with just one argument
+                    config = key;
+                }
+                else {
+                    var tokens = key.split("."),
+                        token,
+                        currentNestedConfig = config;
 
-                while (tokens.length) {
-                    token = tokens.shift();
+                    while (tokens.length) {
+                        token = tokens.shift();
 
-                    if (currentNestedConfig[token] === undefined) {
-                        currentNestedConfig[token] = {};
-                    }
+                        if (currentNestedConfig[token] === undefined) {
+                            currentNestedConfig[token] = {};
+                        }
 
-                    if (tokens.length) {
-                        currentNestedConfig = currentNestedConfig[token];
-                    }
-                    else {
-                        currentNestedConfig[token] = value;
+                        if (tokens.length) {
+                            currentNestedConfig = currentNestedConfig[token];
+                        }
+                        else {
+                            currentNestedConfig[token] = value;
+                        }
                     }
                 }
             },

@@ -12,7 +12,7 @@ define(function() {
 
             describe("get()", function() {
                 it("should retrieve configuration data associated with the specified key", function(done) {
-                    Am.Config.set("testKey", "testValue")
+                    Am.Config.set("testKey", "testValue");
 
                     expect(Am.Config.get("testKey")).to.deep.equal("testValue");
 
@@ -23,7 +23,7 @@ define(function() {
                     Am.Config.set("testKey", {
                         a: "testValueA",
                         b: "testValueB",
-                    })
+                    });
 
                     expect(Am.Config.get("testKey").a).to.deep.equal("testValueA");
                     expect(Am.Config.get("testKey").b).to.deep.equal("testValueB");
@@ -34,7 +34,7 @@ define(function() {
 
             describe("set()", function() {
                 it("should set the configuration data with the specified key and value", function(done) {
-                    Am.Config.set("testKey", "testValue")
+                    Am.Config.set("testKey", "testValue");
 
                     expect(Am.Config.get("testKey")).to.deep.equal("testValue");
 
@@ -45,7 +45,7 @@ define(function() {
                     Am.Config.set("testKey", {
                         a: "testValueA",
                         b: "testValueB",
-                    })
+                    });
 
                     expect(Am.Config.get("testKey").a).to.deep.equal("testValueA");
                     expect(Am.Config.get("testKey").b).to.deep.equal("testValueB");
@@ -54,11 +54,19 @@ define(function() {
 
                     done();
                 });
+
+                it("should set the whole configuration object if called with just one argument", function(done) {
+                    Am.Config.set({ testKey: "testValue" });
+
+                    expect(Am.Config.get("testKey")).to.deep.equal("testValue");
+
+                    done();
+                });
             });
 
             describe("unset()", function() {
                 it("should unset the configuration data associated with the specified key", function(done) {
-                    Am.Config.set("testKey", "testValue")
+                    Am.Config.set("testKey", "testValue");
                     Am.Config.unset("testKey");
 
                     expect(Am.Config.get("testKey")).to.be.undefined;
