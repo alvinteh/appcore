@@ -47,10 +47,13 @@ define(function() {
                         b: "testValueB",
                     });
 
+                    Am.Config.set("testKey.c.d", "testValueC");
+
                     expect(Am.Config.get("testKey").a).to.deep.equal("testValueA");
                     expect(Am.Config.get("testKey").b).to.deep.equal("testValueB");
                     expect(Am.Config.get("testKey.a")).to.deep.equal("testValueA");
                     expect(Am.Config.get("testKey.b")).to.deep.equal("testValueB");
+                    expect(Am.Config.get("testKey.c.d")).to.deep.equal("testValueC");
 
                     done();
                 });
@@ -70,6 +73,19 @@ define(function() {
                     Am.Config.unset("testKey");
 
                     expect(Am.Config.get("testKey")).to.be.undefined;
+
+                    done();
+                });
+
+                it("should unset nested configuration data properly", function(done) {
+                    Am.Config.set("testKey.a.b.c", "testValue");
+                    Am.Config.unset("testKey.a");
+
+                    expect(Am.Config.get("testKey.a.b")).to.be.undefined;
+
+                    Am.Config.unset("testKey.a.b");
+
+                    expect(Am.Config.get("testKey.a.b")).to.be.undefined;
 
                     done();
                 });

@@ -86,12 +86,15 @@ define(function() {
                     token = tokens.shift();
 
                     if (currentNestedConfig[token] === undefined) {
-                        currentNestedConfig[token] = {};
+                        return;
                     }
 
-                    if (tokens.length === 0) {
+                    if (tokens.length) {
+                        currentNestedConfig = currentNestedConfig[token];
+                    }
+                    else {
                         delete currentNestedConfig[token];
-                        break;
+                        return;
                     }
                 }
             },
