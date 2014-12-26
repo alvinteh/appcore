@@ -90,7 +90,10 @@ define(function(require) {
                             resolve(modules);
                         },
                         function(error) {
+                            //The following code must be tested manually
+                            //blanketjs:ignore true
                             reject(error);
+                            //blanketjs:ignore false
                         }
                     );
                 });
