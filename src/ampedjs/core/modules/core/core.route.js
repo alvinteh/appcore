@@ -236,12 +236,18 @@ define(function(require) {
 
             //Remove any hashes first
             if (baseUrl.substr(baseUrl.length - 1) === "#") {
+                //The following code must be tested manually
+                //blanketjs:ignore true
                 baseUrl = baseUrl.substr(0, baseUrl.length - 1);
+                //blanketjs:ignore false
             }
 
             //Handle file names at the end of URLs
             if (baseUrl.substr(baseUrl.length - 1) !== "/") {
+                //The following code must be tested manually
+                //blanketjs:ignore true
                 baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf("/")) + "/";
+                //blanketjs:ignore false
             }
 
             //Listen for changes in history state so that the route can be processed
