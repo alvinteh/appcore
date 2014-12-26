@@ -39,6 +39,7 @@ var test = function() {
 
         window.Am = Am;
 
+
         //Setup utility get URL parameter function
         window.getUrlParam = function(name) {
             name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
