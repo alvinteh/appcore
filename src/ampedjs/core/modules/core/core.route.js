@@ -3,6 +3,7 @@ define(function(require) {
 
     var Event = require("./models/event");
     var EventHelper = require("./helpers/event-helper");
+    var FunctionHelper = require("./helpers/function-helper");
 
     var _singleton = null;
 
@@ -109,6 +110,27 @@ define(function(require) {
                 var newRoutes = [];
                 var normalizedPath = path;
 
+                var processRoute = function(newRoute) {
+                    var shouldSkip = false;
+                    //Check if the route exists
+                    for (var i = 0, length = routes.length; i < length; i++) {
+                        if (routes[i].path === newRoute.path) {
+                            if (newRoute.inferred && !routes[i].inferred) {
+                                shouldSkip = true;
+                            }
+                            else {
+                                //Remove the old route so that it can be overriden
+                                routes.splice(i, 1);
+                            }
+                            break;
+                        }
+                    }
+
+                    if (!shouldSkip) {
+                        routes.push(newRoute);
+                    }
+                };
+
                 //Normalize the path to ensure it begins with a "/" and ends without a "/")
                 if (normalizedPath !== "/") {
                     if (normalizedPath.charAt(0) !== "/") {
@@ -132,6 +154,26 @@ define(function(require) {
                             inferred: true
                         });
                     }
+
+                    //Updates routes automatically as actions are added/removed
+                    controller.addAction = FunctionHelper.override(controller.addAction,
+                        function(originalFunction, context, args) {
+                        originalFunction.apply(context, args);
+
+                        processRoute({
+                            path: normalizedPath + "/" + args[0],
+                            controller: controller,
+                            action: args[0],
+                            inferred: true
+                        });
+                    });
+
+                    controller.removeAction = FunctionHelper.override(controller.removeAction,
+                        function(originalFunction, context, args) {
+                        originalFunction.apply(context, args);
+
+                        RouteModule.unbind(normalizedPath + "/" + args[0]);
+                    });
                 }
                 else {
                     newRoutes.push({
@@ -143,26 +185,7 @@ define(function(require) {
                 }
 
                 //Add the route entries
-                newRoutes.forEach(function(newRoute) {
-                    var shouldSkip = false;
-                    //Check if the route exists
-                    for (var i = 0, length = routes.length; i < length; i++) {
-                        if (routes[i].path === newRoute.path) {
-                            if (newRoute.inferred && !routes[i].inferred) {
-                                shouldSkip = true;
-                            }
-                            else {
-                                //Remove the old route so that it can be overriden
-                                routes.splice(i, 1);
-                            }
-                            break;
-                        }
-                    }
-
-                    if (!shouldSkip) {
-                        routes.push(newRoute);
-                    }
-                });
+                newRoutes.forEach(processRoute);
             },
 
             /*

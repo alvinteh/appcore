@@ -77,8 +77,8 @@ define(function() {
                     expect(eventTest).to.equal("leave");
 
                     var baseUrl = window.location.href;
-                    
-                    
+
+
                     //Remove any hashes first
                     if (baseUrl.substr(baseUrl.length - 1) === "#") {
                         baseUrl = baseUrl.substr(0, baseUrl.length - 1);
@@ -117,8 +117,8 @@ define(function() {
                 it("should retrieve the base URL with an ending slash", function(done) {
 
                     var baseUrl = window.location.href;
-                    
-                    
+
+
                     //Remove any hashes first
                     if (baseUrl.substr(baseUrl.length - 1) === "#") {
                         baseUrl = baseUrl.substr(0, baseUrl.length - 1);
@@ -130,7 +130,7 @@ define(function() {
                     }
 
                     expect(Am.Route.getBaseUrl()).to.equal(baseUrl);
-                    
+
                     done();
                 });
             });
@@ -187,6 +187,37 @@ define(function() {
 
                     expect(test).to.equal("users.edit");
                     expect(window.location.href).to.equal(Am.Route.getBaseUrl() + "users/edit");
+
+                    done();
+                });
+
+                it("should infer paths for actions added in the future if no action is specified", function(done) {
+                    Am.Route.bind("/users", usersController);
+
+                    usersController.addAction("delete", function() {
+                        test = "users.delete";
+                    }, { view: view });
+
+                    Am.go("/users/delete");
+
+                    expect(test).to.equal("users.delete");
+                    expect(window.location.href).to.equal(Am.Route.getBaseUrl() + "users/delete");
+
+                    usersController.removeAction("delete");
+
+                    done();
+                });
+
+                it("should remove paths for actions deleted in the future if no action is specified", function(done) {
+                    Am.Route.bind("/users", usersController);
+
+                    usersController.addAction("delete", function() {
+                        test = "users.delete";
+                    }, { view: view });
+
+                    usersController.removeAction("delete");
+
+                    expect(Am.Route.isBound("/users/delete")).to.be.false;
 
                     done();
                 });
