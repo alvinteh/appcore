@@ -26,14 +26,16 @@ define(function(require) {
 
         Core.init = function() {
             //Initialize core framework
-            Core.Controller = new CoreController();
+
             Core.Event = new CoreEvent();
             Core.Helper = new CoreHelper();
             Core.Model = new CoreModel(Core);
             Core.Module = new CoreModule();
-            Core.Route = new CoreRoute(Core.Config);
             Core.View = new CoreView(Core.Config);
+            Core.Route = new CoreRoute(Core.Config);
+
             Core.DI = new CoreDI(Core.Config, Core.Route);
+            Core.Controller = new CoreController(Core);
 
             //Additional convenience bindings
             Core.go = Core.Route.go;
