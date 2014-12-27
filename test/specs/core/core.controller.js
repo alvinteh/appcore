@@ -80,6 +80,26 @@ define(["ampedjs/core/modules/core/models/controller"], function(Controller) {
                         }
                     );
                 });
+
+                it("should automatically create routes unless Am.Controller.AutoRoute config is false", function(done) {
+                    var Person = Am.Model.create("Person", ["firstName", "lastName"]);
+                    var controller = Am.Controller.create(Person);
+
+                    controller.addAction("test", function() {});
+
+                    expect(Am.Route.isBound("/people/test")).to.be.true;
+
+                    Am.Config.set("Am.Controller.AutoRoute", false);
+
+                    var Job = Am.Model.create("Job", ["firstName", "lastName"]);
+                    controller = Am.Controller.create(Job);
+
+                    controller.addAction("test", function() {});
+
+                    expect(Am.Route.isBound("/jobs/test")).to.be.false;
+
+                    done();
+                });
             });
 
             describe("add()", function() {

@@ -4,6 +4,7 @@ define(function(require) {
 
     var Controller = require("./models/controller");
     var Promise = require("./models/promise");
+    var StringHelper = require("./helpers/string-helper");
 
     var _singleton = null;
 
@@ -68,6 +69,19 @@ define(function(require) {
             create: function(models) {
                 var ret;
 
+                var autoBindController = function(controller) {
+                    if (Core.Config.get("Am.Controller.AutoRoute") !== false) {
+                        var models = controller.getModels();
+                        var modelNames = [];
+
+                        for (var i = 0, length = models.length; i < length; i++) {
+                            modelNames.push(StringHelper.pluralize(models[i].getModelName().toLowerCase()));
+                        }
+
+                        Core.Route.bind("/" + modelNames.join("_"), controller);
+                    }
+                };
+
                 if (typeof models === "string") {
                     ret = new Promise();
 
@@ -76,6 +90,7 @@ define(function(require) {
                             var controller = new Controller(model);
 
                             controllers.push(controller);
+                            autoBindController(controller);
 
                             ret.resolve(controller);
                         },
@@ -102,6 +117,7 @@ define(function(require) {
                             var controller = new Controller(loadedModels);
 
                             controllers.push(controller);
+                            autoBindController(controller);
 
                             ret.resolve(controller);
                         }
@@ -125,6 +141,7 @@ define(function(require) {
                     var controller = new Controller(models);
 
                     controllers.push(controller);
+                    autoBindController(controller);
 
                     return controller;
                 }
@@ -132,6 +149,7 @@ define(function(require) {
 
             Controller: Controller
         };
+
 
         //Public instance members
         return ControllerModule;
