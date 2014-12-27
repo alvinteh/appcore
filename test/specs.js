@@ -1,5 +1,4 @@
 define([
-    "specs/util/models/promise.js",
     "specs/framework.js",
     "specs/core/models/controller.js",
     "specs/core/models/element.js",
@@ -9,6 +8,7 @@ define([
     "specs/core/models/view.js",
     "specs/core/core.controller.js",
     "specs/core/core.config.js",
+    "specs/core/core.di.js",
     "specs/core/core.event.js",
     "specs/core/core.helper.js",
     "specs/core/core.model.js",
@@ -25,5 +25,6 @@ define([
     "specs/util/helpers/storage-helper.js",
     "specs/util/helpers/string-helper.js",
     "specs/util/helpers/uuid-helper.js",
-    "specs/util/models/predicate.js"
+    "specs/util/models/predicate.js",
+    "specs/util/models/promise.js"
 ]);
