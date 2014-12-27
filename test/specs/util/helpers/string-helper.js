@@ -65,6 +65,26 @@ define(function() {
                             done();
                         });
                     });
+
+                    describe("pluralize()", function() {
+                        it("should pluralize uncountable nouns", function(done) {
+                            expect(StringHelper.pluralize("sheep")).to.equal("sheep");
+
+                            done();
+                        });
+
+                        it("should pluralize irregular nouns", function(done) {
+                            expect(StringHelper.pluralize("child")).to.equal("children");
+
+                            done();
+                        });
+
+                        it("should pluralize regular nouns", function(done) {
+                            expect(StringHelper.pluralize("page")).to.equal("pages");
+
+                            done();
+                        });
+                    });
                 });
             });
         });
