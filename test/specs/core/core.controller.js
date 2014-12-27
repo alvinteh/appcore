@@ -3,6 +3,27 @@ define(["ampedjs/core/modules/core/models/controller"], function(Controller) {
 
     describe("Am", function() {
         describe("Controller", function() {
+            var mocks;
+            var mock = function(name, definition) {
+                var moduleId = Am.Config.getBaseUrl() + "app/" + name + ".js";
+
+                mocks.push(moduleId);
+
+                define(moduleId, [], definition);
+            };
+
+            beforeEach(function() {
+                mocks = [];
+            });
+
+            afterEach(function() {
+                Am.Config.unset("Am.App");
+
+                while (mocks.length) {
+                    window.require.undef(mocks.shift());
+                }
+            });
+
             it("should be defined", function(done) {
                 expect(Am.Controller).to.exist;
 
@@ -15,6 +36,67 @@ define(["ampedjs/core/modules/core/models/controller"], function(Controller) {
                     var controller = Am.Controller.create([]);
 
                     expect(Am.Controller.has(controller)).to.be.true;
+
+                    done();
+                });
+
+                it("should correctly handle single model name arguments", function(done) {
+                    mock("models/person", function(require) {
+                        return Am.Model.create("Person", ["firstName", "lastName"]);
+                    });
+
+                    Am.Controller.create("Person").then(
+                        function(controller) {
+                            expect(Am.Controller.has(controller)).to.be.true;
+                            expect(controller.getModel().getModelName()).to.deep.equal("Person");
+
+                            done();
+                        },
+                        function(error) {
+                            done(error);
+                        }
+                    );
+                });
+
+                it("should correctly handle model name array arguments", function(done) {
+                    mock("models/person", function(require) {
+                        return Am.Model.create("Person", ["firstName", "lastName"]);
+                    });
+
+                    mock("models/job", function(require) {
+                        return Am.Model.create("Job", ["title"]);
+                    });
+
+                    Am.Controller.create(["Person", "Job"]).then(
+                        function(controller) {
+                            expect(Am.Controller.has(controller)).to.be.true;
+                            expect(controller.getModels()[0].getModelName()).to.deep.equal("Person");
+                            expect(controller.getModels()[1].getModelName()).to.deep.equal("Job");
+
+                            done();
+                        },
+                        function(error) {
+                            done(error);
+                        }
+                    );
+                });
+
+                it("should automatically create routes unless Am.Controller.AutoRoute config is false", function(done) {
+                    var Person = Am.Model.create("Person", ["firstName", "lastName"]);
+                    var controller = Am.Controller.create(Person);
+
+                    controller.addAction("test", function() {});
+
+                    expect(Am.Route.isBound("/people/test")).to.be.true;
+
+                    Am.Config.set("Am.Controller.AutoRoute", false);
+
+                    var Job = Am.Model.create("Job", ["firstName", "lastName"]);
+                    controller = Am.Controller.create(Job);
+
+                    controller.addAction("test", function() {});
+
+                    expect(Am.Route.isBound("/jobs/test")).to.be.false;
 
                     done();
                 });

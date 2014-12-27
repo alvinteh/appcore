@@ -61,5 +61,16 @@ define(function(require) {
     */
     StringHelper.addStaticMethod("humanize", coreStringHelper.humanize);
 
+    /*
+        @function pluralize
+
+        Converts the string to a plural form
+
+        @param {string} string      The desired string
+
+        @return {string}
+    */
+    StringHelper.addStaticMethod("pluralize", coreStringHelper.pluralize);
+
     return StringHelper;
 });
